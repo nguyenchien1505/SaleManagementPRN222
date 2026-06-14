@@ -1,0 +1,284 @@
+﻿
+@{
+    // ViewData["Title"] = "Quản Lý Bán Hàng Hiện Đại";
+    // ViewData["HideHeaderSpacer"] = true;
+    // bool isAuthenticated = User.Identity?.IsAuthenticated ?? false;
+    // string loginUrl = Url.Action("Login", "Account", new { returnUrl = Context.Request.Path + Context.Request.QueryString })!;
+}
+
+<style>
+    .category-filter-item {
+        cursor: pointer;
+        white-space: nowrap;
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        transition: all 0.3s;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        color: #64748b;
+        font-weight: 500;
+        scroll-snap-align: start;
+    }
+    .category-filter-item:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        background: rgba(var(--primary-rgb), 0.05);
+    }
+    .category-filter-item.active {
+        background: var(--primary-color);
+        color: #fff;
+        border-color: var(--primary-color);
+        box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.2);
+    }
+    .categories-wrapper {
+        display: flex;
+        gap: 0.75rem;
+        overflow-x: auto;
+        padding: 0.5rem 0.25rem 1.5rem;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        scroll-snap-type: x mandatory;
+    }
+    .categories-wrapper::-webkit-scrollbar {
+        display: none;
+    }
+    .loading-overlay {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(255,255,255,0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s;
+        border-radius: 12px;
+    }
+    .loading-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    .transition-container {
+        transition: opacity 0.3s ease-in-out;
+    }
+    .transition-container.fade-out {
+        opacity: 0.4;
+    }
+</style>
+
+<section class="hero-section">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="container hero-content">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <span class="badge badge-primary-modern mb-3 bg-white text-primary fw-bold px-3 py-2 rounded-pill shadow-sm">
+                    <i class="bi bi-stars"></i> Mới nhất 2026
+                </span>
+
+                <h1 class="hero-title">
+                    Khám Phá Sản Phẩm <br>
+                    <span class="text-gradient">Chất Lượng Hôm Nay</span>
+                </h1>
+
+                <p class="hero-subtitle">
+                    Duyệt qua bộ sưu tập phong phú các mặt hàng cao cấp của chúng tôi.
+                    Từ công nghệ mới nhất đến nhu yếu phẩm hàng ngày, chúng tôi có tất cả những gì bạn cần.
+                </p>
+
+                <div class="hero-actions">
+                    <a href="#products" class="btn btn-primary-modern btn-lg">
+                        Mua Ngay <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-6 mt-5 mt-lg-0">
+                <div class="hero-image-wrapper">
+                    <img src="https://t3.ftcdn.net/jpg/02/41/43/18/360_F_241431868_8DFQpCcmpEPVG0UvopdztOAd4a6Rqsoo.jpg"
+                         alt="Shopping Preview"
+                         class="hero-image bg-white p-2">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 border-top border-bottom bg-white">
+    <div class="container">
+        <div class="row text-center g-4">
+            <div class="col-md-3 col-6">
+                <h3 class="fw-bold text-primary mb-0">10k+</h3>
+                <span class="text-muted">Sản Phẩm</span>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <h3 class="fw-bold text-primary mb-0">Hàng Ngày</h3>
+                <span class="text-muted">Cập Nhật Mới</span>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <h3 class="fw-bold text-primary mb-0">Nhanh Chóng</h3>
+                <span class="text-muted">Vận Chuyển</span>
+            </div>
+
+            <div class="col-md-3 col-6">
+                <h3 class="fw-bold text-primary mb-0">24/7</h3>
+                <span class="text-muted">Hỗ Trợ</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="products" class="py-5 bg-light">
+    <div class="container">
+        <div class="section-title mb-5">
+            <span class="text-primary fw-bold text-uppercase ls-1">
+                Bộ Sưu Tập
+            </span>
+            <h2>Khám Phá Sản Phẩm</h2>
+        </div>
+
+        <!-- Search -->
+        <div class="card card-modern border-0 shadow-sm mb-5">
+            <div class="card-body p-4">
+                <div class="row g-3 align-items-center">
+                    <div class="col-lg-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 text-muted">
+                                <i class="bi bi-search"></i>
+                            </span>
+
+                            <input type="text"
+                                   class="form-control border-start-0 ps-0"
+                                   placeholder="Tìm kiếm sản phẩm theo tên hoặc mã...">
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <select class="form-select border-0 bg-light">
+                            <option>Sắp xếp: Mới nhất</option>
+                            <option>Tên: Z đến A</option>
+                            <option>Giá: Thấp đến Cao</option>
+                            <option>Giá: Cao đến Thấp</option>
+                            <option>Cũ nhất trước</option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-2">
+                        <button class="btn btn-primary-modern w-100">
+                            Tìm kiếm
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="mb-4">
+            <div class="categories-wrapper">
+                <div class="category-filter-item active">
+                    Tất cả sản phẩm
+                </div>
+
+                <div class="category-filter-item">
+                    Điện thoại
+                </div>
+
+                <div class="category-filter-item">
+                    Laptop
+                </div>
+
+                <div class="category-filter-item">
+                    Phụ kiện
+                </div>
+
+                <div class="category-filter-item">
+                    Gia dụng
+                </div>
+            </div>
+        </div>
+
+        <!-- Product List -->
+        <div id="productListContainer" class="position-relative" style="min-height: 400px;">
+
+            <div id="loadingOverlay" class="loading-overlay">
+                <div class="spinner-border text-primary">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+
+            <div class="row g-4">
+
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <img src="https://via.placeholder.com/300x250"
+                             class="card-img-top"
+                             alt="Product">
+
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                Tên sản phẩm
+                            </h5>
+
+                            <p class="text-muted small">
+                                Mô tả ngắn sản phẩm...
+                            </p>
+
+                            <div class="fw-bold text-primary fs-5">
+                                1.500.000₫
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <img src="https://via.placeholder.com/300x250"
+                             class="card-img-top"
+                             alt="Product">
+
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                Tên sản phẩm
+                            </h5>
+
+                            <p class="text-muted small">
+                                Mô tả ngắn sản phẩm...
+                            </p>
+
+                            <div class="fw-bold text-primary fs-5">
+                                2.000.000₫
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section class="py-5"
+         style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);">
+    <div class="container text-center text-white py-5">
+
+        <h2 class="fw-bold mb-3 display-5">
+            Bạn đã tìm thấy món đồ ưng ý?
+        </h2>
+
+        <p class="lead mb-4 op-8">
+            Đăng ký ngay để bắt đầu mua sắm và nhận những ưu đãi đặc quyền.
+        </p>
+
+        <div class="d-flex justify-content-center gap-3">
+            <a href="#" class="btn btn-light btn-lg rounded-pill fw-bold text-primary px-5">
+                Tạo Tài Khoản
+            </a>
+        </div>
+
+    </div>
+</section>
