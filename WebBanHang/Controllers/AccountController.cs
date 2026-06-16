@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebBanHang.BLL.Services.Interfaces;
+using System.Data;
 using WebBanHang.BLL.DTOs;
+using WebBanHang.BLL.Services.Interfaces;
 using WebBanHang.ViewModels;
 
 namespace WebBanHang.Controllers
@@ -18,8 +19,9 @@ namespace WebBanHang.Controllers
         {
             return View();
         }
+
         [HttpPost]
-        public IActionResult Login(LoginVM vm)
+        public async Task<IActionResult> Login(LoginVM vm)
         {
             if (!ModelState.IsValid) return View(vm);
             
@@ -30,7 +32,7 @@ namespace WebBanHang.Controllers
                 RememberMe = vm.RememberMe
             };
 
-            var user = _service.Login(dto.Username, dto.Password);
+            var user = await _service.Login(dto.Username, dto.Password);
 
             if(user == null)
             {
@@ -43,7 +45,17 @@ namespace WebBanHang.Controllers
             HttpContext.Session.SetString("Username", user.Username);
             HttpContext.Session.SetString("FullName", user.FullName);
 
-            return RedirectToAction("Index", "Home");
+            if (user.Role == "Admin")
+            {
+                return RedirectToAction( "Index", "Dashboard", new { area = "Admin" });
+            }
+
+            if (user.Role == "Sale")
+            {
+                return RedirectToAction( "Index", "Dashboard",new { area = "Sale" });
+            }
+
+            return RedirectToAction( "Index", "Home", new { area = "Customer" });
         }
 
         [HttpGet]
@@ -63,7 +75,7 @@ namespace WebBanHang.Controllers
         }
 
         [HttpPost]
-        public IActionResult Register(RegisterVM vm)
+        public async Task<IActionResult> Register(RegisterVM vm)
         {
             if (!ModelState.IsValid) return View(vm);
 
@@ -77,11 +89,11 @@ namespace WebBanHang.Controllers
                 ConfirmPassword = vm.ConfirmPassword
             };
 
-            bool result = _service.Register(dto);
+            bool result = await _service.Register(dto);
 
             if (!result)
             {
-                ViewBag.Error = "Tên đăng nhập đã tồn tại.";
+                ViewBag.Error = "Tên đăng nhập hoặc email đã tồn tại.";
                 return View(vm);
             }
 

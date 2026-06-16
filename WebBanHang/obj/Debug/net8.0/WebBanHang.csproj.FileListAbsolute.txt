@@ -65,6 +65,7 @@ D:\PRN222\WebBanHang\WebBanHang\obj\Debug\net8.0\WebBanHang.csproj.CoreCompileIn
 D:\PRN222\WebBanHang\WebBanHang\obj\Debug\net8.0\WebBanHang.MvcApplicationPartsAssemblyInfo.cache
 D:\PRN222\WebBanHang\WebBanHang\obj\Debug\net8.0\WebBanHang.RazorAssemblyInfo.cache
 D:\PRN222\WebBanHang\WebBanHang\obj\Debug\net8.0\WebBanHang.RazorAssemblyInfo.cs
+D:\PRN222\WebBanHang\WebBanHang\obj\Debug\net8.0\WebBanHang.sourcelink.json
 D:\PRN222\WebBanHang\WebBanHang\obj\Debug\net8.0\rjimswa.dswa.cache.json
 D:\PRN222\WebBanHang\WebBanHang\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
 D:\PRN222\WebBanHang\WebBanHang\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
