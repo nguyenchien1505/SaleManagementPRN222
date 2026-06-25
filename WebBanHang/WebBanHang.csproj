@@ -10,4 +10,8 @@
     <ProjectReference Include="..\WebBanHang.BLL\WebBanHang.BLL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Areas\Sale\Views\" />
+  </ItemGroup>
+
 </Project>

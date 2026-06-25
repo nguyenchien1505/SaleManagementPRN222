@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using WebBanHang.BLL.DTOs;
 using WebBanHang.BLL.Services.Interfaces;
@@ -32,7 +33,7 @@ namespace WebBanHang.Controllers
                 RememberMe = vm.RememberMe
             };
 
-            var user = await _service.Login(dto.Username, dto.Password);
+            var user = await _service.Login(dto);
 
             if(user == null)
             {
@@ -40,7 +41,7 @@ namespace WebBanHang.Controllers
                 return View(vm);
             }
 
-            HttpContext.Session.SetInt32("UserId", user.UserId);
+            HttpContext.Session.SetInt32("UserId", user.Id);
             HttpContext.Session.SetString("Role", user.Role);
             HttpContext.Session.SetString("Username", user.Username);
             HttpContext.Session.SetString("FullName", user.FullName);
@@ -58,8 +59,8 @@ namespace WebBanHang.Controllers
             return RedirectToAction( "Index", "Home", new { area = "Customer" });
         }
 
-        [HttpGet]
-        public IActionResult Logout()
+        [HttpPost]
+        public async Task<IActionResult> Logout()
         {
             HttpContext.Session.Clear();
 
@@ -86,7 +87,6 @@ namespace WebBanHang.Controllers
                 FullName = vm.FullName,
                 Phone = vm.Phone,
                 Password = vm.Password,
-                ConfirmPassword = vm.ConfirmPassword
             };
 
             bool result = await _service.Register(dto);

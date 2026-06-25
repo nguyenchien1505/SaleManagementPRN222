@@ -9,6 +9,7 @@ D:\PRN222\WebBanHang\WebBanHang\bin\Debug\net8.0\WebBanHang.dll
 D:\PRN222\WebBanHang\WebBanHang\bin\Debug\net8.0\WebBanHang.pdb
 D:\PRN222\WebBanHang\WebBanHang\bin\Debug\net8.0\Azure.Core.dll
 D:\PRN222\WebBanHang\WebBanHang\bin\Debug\net8.0\Azure.Identity.dll
+D:\PRN222\WebBanHang\WebBanHang\bin\Debug\net8.0\BCrypt-Net-Next.dll
 D:\PRN222\WebBanHang\WebBanHang\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
 D:\PRN222\WebBanHang\WebBanHang\bin\Debug\net8.0\Microsoft.Data.SqlClient.dll
 D:\PRN222\WebBanHang\WebBanHang\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.dll

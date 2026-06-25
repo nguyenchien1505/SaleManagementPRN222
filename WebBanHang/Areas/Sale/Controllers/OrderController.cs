@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebBanHang.Filters;
 
-namespace WebBanHang.Controllers
+namespace WebBanHang.Areas.Sale.Controllers
 {
     public class OrderController : Controller
     {
