@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebBanHang.Filters;
 
-namespace WebBanHang.Controllers
+namespace WebBanHang.Areas.Admin.Controllers
 {
     public class ProductController : Controller
     {
-        [RoleAuthorize("Admin", "Sales")]
+        [RoleAuthorize("Admin")]
         public IActionResult Index()
         {
             return View();

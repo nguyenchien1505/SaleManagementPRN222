@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/SalesManagement.Web.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/WebBanHang.styles.css" asp-append-version="true" />
 
     @RenderSection("Styles", required: false)
 
@@ -65,14 +65,14 @@
                     <ul class="navbar-nav align-items-center gap-2">
                         @if (Context.Session.GetInt32("UserId") == null)
                         {
-                            <li class="nav-item">
-                                <a class="btn btn-outline-modern btn-sm" asp-action="Login" asp-controller="Account">
+                            <li class="nav-item"> 
+                                <a class="btn btn-outline-modern btn-sm" asp-action="Login" asp-controller="Account" asp-area="">
                                     Đăng nhập
                                 </a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="btn btn-outline-modern btn-sm" asp-action="Register" asp-controller="Account">
+                                <a class="btn btn-outline-modern btn-sm" asp-action="Register" asp-controller="Account" asp-area="">
                                     Đăng ký
                                 </a>
                             </li>
@@ -149,7 +149,7 @@
                                     <li><hr class="dropdown-divider"></li>
 
                                     <li>
-                                        <a class="dropdown-item text-danger" asp-controller="Account" asp-action="Logout">
+                                        <a class="dropdown-item text-danger" asp-controller="Account" asp-action="Logout" asp-area="">
                                             <i class="bi bi-box-arrow-right me-2"></i>
                                             Đăng xuất
                                         </a>
