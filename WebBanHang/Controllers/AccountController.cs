@@ -32,7 +32,7 @@ namespace WebBanHang.Controllers
                 RememberMe = vm.RememberMe
             };
 
-            var user = await _service.Login(dto.Username, dto.Password);
+            var user = _service.Login(dto.Username, dto.Password);
 
             if(user == null)
             {
@@ -89,7 +89,7 @@ namespace WebBanHang.Controllers
                 ConfirmPassword = vm.ConfirmPassword
             };
 
-            bool result = await _service.Register(dto);
+            bool result =  _service.Register(dto);
 
             if (!result)
             {

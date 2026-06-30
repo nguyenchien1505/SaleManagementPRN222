@@ -21,6 +21,12 @@ public partial class User
 
     public DateTime? CreatedDate { get; set; }
 
+    public bool IsDeleted { get; set; }
+
+    public DateTime? DeletedDate { get; set; }
+
+    public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
+
     public virtual Customer? Customer { get; set; }
 
     public virtual ICollection<InventoryTransaction> InventoryTransactions { get; set; } = new List<InventoryTransaction>();
@@ -28,4 +34,6 @@ public partial class User
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
     public virtual ICollection<Product> Products { get; set; } = new List<Product>();
+
+    public virtual ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
 }
