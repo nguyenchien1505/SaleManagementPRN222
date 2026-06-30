@@ -25,7 +25,7 @@ namespace WebBanHang.Areas.Admin.Controllers
             {
                 Users = users,
                 TotalUsers = users.Count(),
-                SearchTerm = "",
+                SearchInput = "",
                 RoleFilter = "All"
             };
 

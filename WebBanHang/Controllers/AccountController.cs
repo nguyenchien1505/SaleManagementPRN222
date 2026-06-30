@@ -84,7 +84,7 @@ namespace WebBanHang.Controllers
             {
                 Username = vm.Username,
                 Email = vm.Email,
-                FullName = vm.FullName,
+                FullName = vm.FullName, 
                 Phone = vm.Phone,
                 Password = vm.Password,
             };

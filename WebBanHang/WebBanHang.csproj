@@ -14,4 +14,9 @@
     <Folder Include="Areas\Sale\Views\" />
   </ItemGroup>
 
+  <!-- Tránh dotnet watch restart khi upload ảnh sản phẩm -->
+  <ItemGroup>
+    <Watch Remove="wwwroot\images\**\*" />
+  </ItemGroup>
+
 </Project>

@@ -40,7 +40,7 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="/Admin/Product/Index">
                     <i class="bi bi-box-seam-fill"></i>
                     Sản phẩm
                 </a>
@@ -68,7 +68,7 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link active" href="#">
+                <a class="nav-link active" href="/Admin/Users/Index">
                     <i class="bi bi-person-badge"></i>
                     Người dùng
                 </a>
@@ -116,11 +116,11 @@
 
                     <div class="text-end d-none d-sm-block me-3">
                         <small class="d-block text-secondary mb-0" style="font-size:0.75rem;">
-                            Xin chào,
+                            Xin chào, 
                         </small>
 
                         <span class="fw-bold text-dark">
-                            admin2
+                            @Context.Session.GetString("Fullname")
                         </span>
                     </div>
 
