@@ -1,9 +1,0 @@
-﻿IF COL_LENGTH('USERS','IsDeleted') IS NULL
-BEGIN 
-     ALTER TABLE Users ADD IsDeleted BIT NOT NULL CONSTRAINT DF_Users_IsDeleted DEFAULT 0;
-END
-
-IF COL_LENGTH('USERS','DeletedDate') IS NULL
-Begin 
-     ALTER TABLE Users ADD DeletedDate DATETIME NULL;
-END

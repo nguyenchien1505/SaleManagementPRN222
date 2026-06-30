@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "targets": {
     "net8.0": {
       "Azure.Core/1.38.0": {
@@ -2730,23 +2730,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Nhat Anh\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\admin\\.nuget\\packages\\": {},
+    "D:\\VSShared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\PRN222\\SaleManagementPRN222\\WebBanHang.BLL\\WebBanHang.BLL.csproj",
+      "projectUniqueName": "D:\\PRN222\\WebBanHang\\WebBanHang.BLL\\WebBanHang.BLL.csproj",
       "projectName": "WebBanHang.BLL",
-      "projectPath": "D:\\PRN222\\SaleManagementPRN222\\WebBanHang.BLL\\WebBanHang.BLL.csproj",
-      "packagesPath": "C:\\Users\\Nhat Anh\\.nuget\\packages\\",
-      "outputPath": "D:\\PRN222\\SaleManagementPRN222\\WebBanHang.BLL\\obj\\",
+      "projectPath": "D:\\PRN222\\WebBanHang\\WebBanHang.BLL\\WebBanHang.BLL.csproj",
+      "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
+      "outputPath": "D:\\PRN222\\WebBanHang\\WebBanHang.BLL\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        "D:\\VSShared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\Nhat Anh\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -2759,10 +2759,11 @@
       },
       "frameworks": {
         "net8.0": {
+          "framework": "net8.0",
           "targetAlias": "net8.0",
           "projectReferences": {
-            "D:\\PRN222\\SaleManagementPRN222\\WebBanHang.DAL\\WebBanHang.DAL.csproj": {
-              "projectPath": "D:\\PRN222\\SaleManagementPRN222\\WebBanHang.DAL\\WebBanHang.DAL.csproj"
+            "D:\\PRN222\\WebBanHang\\WebBanHang.DAL\\WebBanHang.DAL.csproj": {
+              "projectPath": "D:\\PRN222\\WebBanHang\\WebBanHang.DAL\\WebBanHang.DAL.csproj"
             }
           }
         }
@@ -2777,10 +2778,11 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.300"
+      "SdkAnalysisLevel": "10.0.300"
     },
     "frameworks": {
       "net8.0": {
+        "framework": "net8.0",
         "targetAlias": "net8.0",
         "imports": [
           "net461",
@@ -2793,12 +2795,26 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[8.0.28, 8.0.28]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[8.0.28, 8.0.28]"
+          },
+          {
+            "name": "Microsoft.WindowsDesktop.App.Ref",
+            "version": "[8.0.28, 8.0.28]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.313/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

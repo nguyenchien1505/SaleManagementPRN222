@@ -10,10 +10,4 @@
     <ProjectReference Include="..\WebBanHang.BLL\WebBanHang.BLL.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Update="appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
 </Project>

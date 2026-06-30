@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
 using WebBanHang.DAL.Entities;
 
 namespace WebBanHang.DAL.Context;
@@ -15,10 +16,6 @@ public partial class WebBanHangContext : DbContext
         : base(options)
     {
     }
-
-    public virtual DbSet<Cart> Carts { get; set; }
-
-    public virtual DbSet<CartItem> CartItems { get; set; }
 
     public virtual DbSet<Category> Categories { get; set; }
 
@@ -40,44 +37,13 @@ public partial class WebBanHangContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
-    public virtual DbSet<Wishlist> Wishlists { get; set; }
-
+   
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Cart>(entity =>
-        {
-            entity.HasKey(e => e.CartId).HasName("PK__Carts__51BCD7B7171E3B5F");
-
-            entity.Property(e => e.CreatedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.UpdatedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-
-            entity.HasOne(d => d.User).WithMany(p => p.Carts)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK_Carts_Users");
-        });
-
-        modelBuilder.Entity<CartItem>(entity =>
-        {
-            entity.HasKey(e => e.CartItemId).HasName("PK__CartItem__488B0B0A7925C553");
-
-            entity.HasOne(d => d.Cart).WithMany(p => p.CartItems)
-                .HasForeignKey(d => d.CartId)
-                .HasConstraintName("FK_CartItems_Carts");
-
-            entity.HasOne(d => d.Product).WithMany(p => p.CartItems)
-                .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_CartItems_Products");
-        });
-
         modelBuilder.Entity<Category>(entity =>
         {
-            entity.HasKey(e => e.CategoryId).HasName("PK__Categori__19093A0B6F73D791");
+            entity.HasKey(e => e.CategoryId).HasName("PK__Categori__19093A0BA2A856E7");
 
             entity.Property(e => e.Description).HasMaxLength(255);
             entity.Property(e => e.Name).HasMaxLength(100);
@@ -92,9 +58,9 @@ public partial class WebBanHangContext : DbContext
 
         modelBuilder.Entity<Customer>(entity =>
         {
-            entity.HasKey(e => e.CustomerId).HasName("PK__Customer__A4AE64D834C597EA");
+            entity.HasKey(e => e.CustomerId).HasName("PK__Customer__A4AE64D848A6C79C");
 
-            entity.HasIndex(e => e.UserId, "UQ__Customer__1788CC4D96C174E2").IsUnique();
+            entity.HasIndex(e => e.UserId, "UQ__Customer__1788CC4DC7E70064").IsUnique();
 
             entity.Property(e => e.Address).HasMaxLength(255);
             entity.Property(e => e.CreatedDate)
@@ -109,7 +75,7 @@ public partial class WebBanHangContext : DbContext
 
         modelBuilder.Entity<InventoryTransaction>(entity =>
         {
-            entity.HasKey(e => e.TransactionId).HasName("PK__Inventor__55433A6BCB81D4E0");
+            entity.HasKey(e => e.TransactionId).HasName("PK__Inventor__55433A6B3457E96D");
 
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")
@@ -130,9 +96,9 @@ public partial class WebBanHangContext : DbContext
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BCF0A34A255");
+            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BCF475772B3");
 
-            entity.HasIndex(e => e.OrderCode, "UQ__Orders__999B5229AF50F1D4").IsUnique();
+            entity.HasIndex(e => e.OrderCode, "UQ__Orders__999B522956BCB11E").IsUnique();
 
             entity.Property(e => e.DiscountAmount)
                 .HasDefaultValue(0m)
@@ -164,7 +130,7 @@ public partial class WebBanHangContext : DbContext
 
         modelBuilder.Entity<OrderDetail>(entity =>
         {
-            entity.HasKey(e => e.OrderDetailId).HasName("PK__OrderDet__D3B9D36CAB1E61A6");
+            entity.HasKey(e => e.OrderDetailId).HasName("PK__OrderDet__D3B9D36C8A0DCD72");
 
             entity.Property(e => e.Total).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 2)");
@@ -181,7 +147,7 @@ public partial class WebBanHangContext : DbContext
 
         modelBuilder.Entity<OrderPromotion>(entity =>
         {
-            entity.HasKey(e => e.OrderPromotionId).HasName("PK__OrderPro__CE84A1017E83C757");
+            entity.HasKey(e => e.OrderPromotionId).HasName("PK__OrderPro__CE84A101B8D500F4");
 
             entity.Property(e => e.AppliedValue).HasColumnType("decimal(18, 2)");
 
@@ -197,9 +163,9 @@ public partial class WebBanHangContext : DbContext
 
         modelBuilder.Entity<Product>(entity =>
         {
-            entity.HasKey(e => e.ProductId).HasName("PK__Products__B40CC6CDD8D43F1E");
+            entity.HasKey(e => e.ProductId).HasName("PK__Products__B40CC6CD5FED6024");
 
-            entity.HasIndex(e => e.Code, "UQ__Products__A25C5AA7A39AF39C").IsUnique();
+            entity.HasIndex(e => e.Code, "UQ__Products__A25C5AA718F3B209").IsUnique();
 
             entity.Property(e => e.Code).HasMaxLength(50);
             entity.Property(e => e.CreatedDate)
@@ -225,7 +191,7 @@ public partial class WebBanHangContext : DbContext
 
         modelBuilder.Entity<ProductImage>(entity =>
         {
-            entity.HasKey(e => e.ImageId).HasName("PK__ProductI__7516F70C832E86A2");
+            entity.HasKey(e => e.ImageId).HasName("PK__ProductI__7516F70C64A0B1DD");
 
             entity.Property(e => e.ImageUrl).HasMaxLength(255);
             entity.Property(e => e.IsPrimary).HasDefaultValue(false);
@@ -237,9 +203,9 @@ public partial class WebBanHangContext : DbContext
 
         modelBuilder.Entity<Promotion>(entity =>
         {
-            entity.HasKey(e => e.PromotionId).HasName("PK__Promotio__52C42FCF23F9F0D6");
+            entity.HasKey(e => e.PromotionId).HasName("PK__Promotio__52C42FCF3CA37AA3");
 
-            entity.HasIndex(e => e.Code, "UQ__Promotio__A25C5AA74F88A676").IsUnique();
+            entity.HasIndex(e => e.Code, "UQ__Promotio__A25C5AA78CAE69E5").IsUnique();
 
             entity.Property(e => e.Code).HasMaxLength(20);
             entity.Property(e => e.DiscountType).HasMaxLength(20);
@@ -256,39 +222,21 @@ public partial class WebBanHangContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4C89771F98");
+            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4CE1A10ECC");
 
-            entity.HasIndex(e => e.Username, "UQ__Users__536C85E4FF1C900E").IsUnique();
+            entity.HasIndex(e => e.Username, "UQ__Users__536C85E40B7BCC63").IsUnique();
 
-            entity.HasIndex(e => e.Email, "UQ__Users__A9D10534CCD89E06").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__Users__A9D10534BC827076").IsUnique();
 
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
-            entity.Property(e => e.DeletedDate).HasColumnType("datetime");
             entity.Property(e => e.Email).HasMaxLength(100);
             entity.Property(e => e.FullName).HasMaxLength(100);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.PasswordHash).HasMaxLength(255);
             entity.Property(e => e.Role).HasMaxLength(20);
             entity.Property(e => e.Username).HasMaxLength(50);
-        });
-
-        modelBuilder.Entity<Wishlist>(entity =>
-        {
-            entity.HasKey(e => e.WishlistId).HasName("PK__Wishlist__233189EBDDF7D008");
-
-            entity.Property(e => e.CreatedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-
-            entity.HasOne(d => d.Product).WithMany(p => p.Wishlists)
-                .HasForeignKey(d => d.ProductId)
-                .HasConstraintName("FK_Wishlists_Products");
-
-            entity.HasOne(d => d.User).WithMany(p => p.Wishlists)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK_Wishlists_Users");
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Data;
-using WebBanHang.BLL.DTOs;
 using WebBanHang.BLL.Services.Interfaces;
+using WebBanHang.BLL.DTOs;
 using WebBanHang.ViewModels;
 
 namespace WebBanHang.Controllers
@@ -19,9 +18,8 @@ namespace WebBanHang.Controllers
         {
             return View();
         }
-
         [HttpPost]
-        public async Task<IActionResult> Login(LoginVM vm)
+        public IActionResult Login(LoginVM vm)
         {
             if (!ModelState.IsValid) return View(vm);
             
@@ -45,17 +43,7 @@ namespace WebBanHang.Controllers
             HttpContext.Session.SetString("Username", user.Username);
             HttpContext.Session.SetString("FullName", user.FullName);
 
-            if (user.Role == "Admin")
-            {
-                return RedirectToAction( "Index", "Dashboard", new { area = "Admin" });
-            }
-
-            if (user.Role == "Sale")
-            {
-                return RedirectToAction( "Index", "Dashboard",new { area = "Sale" });
-            }
-
-            return RedirectToAction( "Index", "Home", new { area = "Customer" });
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet]
@@ -75,7 +63,7 @@ namespace WebBanHang.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterVM vm)
+        public IActionResult Register(RegisterVM vm)
         {
             if (!ModelState.IsValid) return View(vm);
 
@@ -89,11 +77,11 @@ namespace WebBanHang.Controllers
                 ConfirmPassword = vm.ConfirmPassword
             };
 
-            bool result =  _service.Register(dto);
+            bool result = _service.Register(dto);
 
             if (!result)
             {
-                ViewBag.Error = "Tên đăng nhập hoặc email đã tồn tại.";
+                ViewBag.Error = "Tên đăng nhập đã tồn tại.";
                 return View(vm);
             }
 
