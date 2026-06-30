@@ -7,6 +7,7 @@ D:\PRN222\WebBanHang\WebBanHang.DAL\obj\Debug\net8.0\WebBanHang.DAL.GeneratedMSB
 D:\PRN222\WebBanHang\WebBanHang.DAL\obj\Debug\net8.0\WebBanHang.DAL.AssemblyInfoInputs.cache
 D:\PRN222\WebBanHang\WebBanHang.DAL\obj\Debug\net8.0\WebBanHang.DAL.AssemblyInfo.cs
 D:\PRN222\WebBanHang\WebBanHang.DAL\obj\Debug\net8.0\WebBanHang.DAL.csproj.CoreCompileInputs.cache
+D:\PRN222\WebBanHang\WebBanHang.DAL\obj\Debug\net8.0\WebBanHang.DAL.sourcelink.json
 D:\PRN222\WebBanHang\WebBanHang.DAL\obj\Debug\net8.0\WebBanHang.DAL.dll
 D:\PRN222\WebBanHang\WebBanHang.DAL\obj\Debug\net8.0\refint\WebBanHang.DAL.dll
 D:\PRN222\WebBanHang\WebBanHang.DAL\obj\Debug\net8.0\WebBanHang.DAL.pdb

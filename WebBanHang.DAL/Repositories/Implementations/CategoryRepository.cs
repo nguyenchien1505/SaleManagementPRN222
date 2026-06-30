@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,15 +18,11 @@ namespace WebBanHang.DAL.Repositories.Implementations
             _context = context;
         }
 
-        public List<Category> GetAll()
+        public async Task<List<Category>> GetAllAsync()
         {
-            return _context.Categories.ToList();
+            return await _context.Categories.ToListAsync();
         }
 
-        public Category? GetById(int id)
-        {
-            return _context.Categories.Find(id);
-        }
         public void Add(Category category)
         {
             _context.Categories.Add(category);
@@ -49,10 +46,14 @@ namespace WebBanHang.DAL.Repositories.Implementations
             }
         }
 
-        
+        public async Task<Category> GetByIdAsync(int id)
+        {
+            return await _context.Categories.Where(x => x.CategoryId == id).FirstOrDefaultAsync();
+        }
 
-       
-
-        
+        public async Task<Category> GetByNameAsync(string name)
+        {
+            return await _context.Categories.Where(x => x.Name == name).FirstOrDefaultAsync();
+        }
     }
 }

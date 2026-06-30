@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WebBanHang.DAL")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+65fe5cd0650694bb62fb2bd35d9a0d60607ce42d")]
 [assembly: System.Reflection.AssemblyProductAttribute("WebBanHang.DAL")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WebBanHang.DAL")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

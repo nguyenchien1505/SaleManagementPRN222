@@ -9,18 +9,19 @@ namespace WebBanHang.DAL.Repositories.Interfaces
 {
     public interface IProductRepository
     {
-        List<Product> GetAll();
+        Task<List<Product>> GetAllAsync();
 
-        Product GetById(int id);
+        Task<Product> GetByIdAsync(int id);
 
         List<Product> Search(string keyword);
 
         List<Product> GetByCategory(int categoryId);
+        Task<Product> GetByCodeAsync(string code);
 
-        void Add(Product product);
+        Task CreateAsync(Product product);
 
-        void Update(Product product);
-
+        Task UpdateAsync(Product product);
+        
         void Delete(int id);
     }
 }

@@ -36,6 +36,11 @@ namespace WebBanHang.DAL.Repositories.Implementations
             throw new NotImplementedException();
         }
 
+        public void Test()
+        {
+            throw new NotImplementedException();
+        }
+
         public void Update(Promotion promotion)
         {
             throw new NotImplementedException();

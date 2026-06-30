@@ -9,12 +9,12 @@ namespace WebBanHang.DAL.Repositories.Interfaces
 {
     public interface IUserRepository
     {
-        User GetByUsername(string username);
-        User GetById(int id);
-        List<User> GetAll();
-        void Add(User user);
-        void Update(User user);
-        void Delete(int id);
-
+        Task<User> GetByUsernameAsync(string username);
+        Task<User> GetByEmailAsync(string email);
+        Task<User> GetByIdAsync(int id);
+        Task<List<User>> GetAllAsync();
+        Task AddAsync(User user);
+        Task UpdateAsync(User user);
+        Task<bool> DeleteAsync(int id);
     }
 }

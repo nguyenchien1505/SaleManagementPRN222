@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,9 +18,10 @@ namespace WebBanHang.DAL.Repositories.Implementations
             _context = context;
         }
 
-        public void Add(Product product)
+        public async Task CreateAsync(Product product)
         {
-            throw new NotImplementedException();
+            await _context.AddAsync(product);
+            await _context.SaveChangesAsync();
         }
 
         public void Delete(int id)
@@ -27,9 +29,13 @@ namespace WebBanHang.DAL.Repositories.Implementations
             throw new NotImplementedException();
         }
 
-        public List<Product> GetAll()
+        public async Task<List<Product>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Products.Include(x => x.Category)
+                                          .Include(x => x.ProductImages)
+                                          .Include(x => x.CreatedByNavigation)
+                                          .Include(x => x.InventoryTransactions)
+                                          .Include(x => x.OrderDetails).ToListAsync();
         }
 
         public List<Product> GetByCategory(int categoryId)
@@ -37,9 +43,18 @@ namespace WebBanHang.DAL.Repositories.Implementations
             throw new NotImplementedException();
         }
 
-        public Product GetById(int id)
+        public async Task<Product> GetByCodeAsync(string code)
         {
-            throw new NotImplementedException();
+            return await _context.Products.Include(x => x.Category).Where(x => x.Code == code).FirstOrDefaultAsync();
+        }
+
+        public async Task<Product> GetByIdAsync(int id)
+        {
+            return await _context.Products.Include(x => x.Category)
+                                          .Include(x => x.ProductImages)
+                                          .Include(x => x.CreatedByNavigation)
+                                          .Include(x => x.InventoryTransactions)
+                                          .Include(x => x.OrderDetails).Where(x => x.ProductId == id).FirstOrDefaultAsync();
         }
 
         public List<Product> Search(string keyword)
@@ -47,9 +62,10 @@ namespace WebBanHang.DAL.Repositories.Implementations
             throw new NotImplementedException();
         }
 
-        public void Update(Product product)
+        public async Task UpdateAsync(Product product)
         {
-            throw new NotImplementedException();
+            _context.Update(product);
+            await _context.SaveChangesAsync();
         }
     }
 }

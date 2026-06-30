@@ -10,7 +10,12 @@ namespace WebBanHang.BLL.Services.Interfaces
 {
     public interface IUserService
     {
-        User Login(string username, string password);
-        bool Register(RegisterDTO model);
+        Task<UserDTO> Login(LoginDTO dto);
+        Task<bool> Register(RegisterDTO model);
+        Task<IEnumerable<UserDTO>> GetAllUserAsync();
+        Task<bool> CreateUserAsync(CreateUserDTO dto);
+        Task<UserDTO> GetUserByIdAsync(int id);
+        Task<bool> UpdateUserAsync(UpdateUserDTO dto);
+        Task<bool> DeleteUserAsync(int id);
     }
 }

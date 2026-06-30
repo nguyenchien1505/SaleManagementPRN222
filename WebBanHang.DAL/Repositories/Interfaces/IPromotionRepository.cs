@@ -18,5 +18,6 @@ namespace WebBanHang.DAL.Repositories.Interfaces
         void Update(Promotion promotion);
 
         void Delete(int id);
+        void Test();
     }
 }

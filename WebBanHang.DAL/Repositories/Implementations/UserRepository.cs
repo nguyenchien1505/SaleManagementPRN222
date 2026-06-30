@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,6 @@ using System.Threading.Tasks;
 using WebBanHang.DAL.Context;
 using WebBanHang.DAL.Entities;
 using WebBanHang.DAL.Repositories.Interfaces;
-
 namespace WebBanHang.DAL.Repositories.Implementations
 {
     public class UserRepository : IUserRepository
@@ -16,36 +16,49 @@ namespace WebBanHang.DAL.Repositories.Implementations
         {
             _context = context;
         }
-
-        public void Add(User user)
+        public async Task AddAsync(User user)
         {
-            _context.Users.Add(user);
-            _context.SaveChanges();
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
         }
 
-        public void Delete(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            var user = await _context.Users.Where(x => x.UserId == id).FirstOrDefaultAsync();
+            if (user == null) return false;
+
+            user.IsDeleted = true;
+            user.DeletedDate = DateTime.Now;
+            user.IsActive = false;
+            await _context.SaveChangesAsync();
+
+            return true;
         }
 
-        public List<User> GetAll()
+        public async Task<List<User>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Users.Where(x => !x.IsDeleted).ToListAsync();
         }
 
-        public User GetById(int id)
+        public async Task<User> GetByEmailAsync(string email)
         {
-            throw new NotImplementedException();
+            return await _context.Users.FirstOrDefaultAsync(x => x.Email == email && !x.IsDeleted);
         }
 
-        public User GetByUsername(string username)
+        public async Task<User> GetByIdAsync(int id)
         {
-            return _context.Users.FirstOrDefault(x => x.Username == username);
+            return await _context.Users.Where(x => x.UserId == id && !x.IsDeleted).FirstOrDefaultAsync();
         }
 
-        public void Update(User user)
+        public async Task<User> GetByUsernameAsync(string username)
         {
-            throw new NotImplementedException();
+            return await _context.Users.FirstOrDefaultAsync(x => x.Username == username && !x.IsDeleted);
+        }
+
+        public async Task UpdateAsync(User user)
+        {
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
         }
     }
 }
