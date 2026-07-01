@@ -1,8 +1,9 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\PRN222\\WebBanHang\\",
+  "WorkspaceRootPath": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\",
   "Documents": [
     {
+<<<<<<< Updated upstream
       "AbsoluteMoniker": "D:0:0:{AF07E4CD-FC53-4593-A547-E7F0B496AFD2}|WebBanHang.DAL\\WebBanHang.DAL.csproj|d:\\prn222\\webbanhang\\webbanhang.dal\\entities\\inventorytransaction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{AF07E4CD-FC53-4593-A547-E7F0B496AFD2}|WebBanHang.DAL\\WebBanHang.DAL.csproj|solutionrelative:webbanhang.dal\\entities\\inventorytransaction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -109,6 +110,78 @@
     {
       "AbsoluteMoniker": "D:0:0:{1E2CC81A-329D-4BDE-93C1-C80A9640A902}|WebBanHang.BLL\\WebBanHang.BLL.csproj|d:\\prn222\\webbanhang\\webbanhang.bll\\dtos\\logindto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{1E2CC81A-329D-4BDE-93C1-C80A9640A902}|WebBanHang.BLL\\WebBanHang.BLL.csproj|solutionrelative:webbanhang.bll\\dtos\\logindto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+=======
+      "AbsoluteMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|WebBanHang\\WebBanHang.csproj|f:\\prn222\\khuongpd\\salemanagementprn222\\webbanhang\\areas\\admin\\views\\promotion\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|WebBanHang\\WebBanHang.csproj|solutionrelative:webbanhang\\areas\\admin\\views\\promotion\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|WebBanHang\\WebBanHang.csproj|f:\\prn222\\khuongpd\\salemanagementprn222\\webbanhang\\views\\shared\\_adminlayout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|WebBanHang\\WebBanHang.csproj|solutionrelative:webbanhang\\views\\shared\\_adminlayout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|WebBanHang\\WebBanHang.csproj|f:\\prn222\\khuongpd\\salemanagementprn222\\webbanhang\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|WebBanHang\\WebBanHang.csproj|solutionrelative:webbanhang\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|WebBanHang\\WebBanHang.csproj|f:\\prn222\\khuongpd\\salemanagementprn222\\webbanhang\\views\\_viewstart.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|WebBanHang\\WebBanHang.csproj|solutionrelative:webbanhang\\views\\_viewstart.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|WebBanHang\\WebBanHang.csproj|f:\\prn222\\khuongpd\\salemanagementprn222\\webbanhang\\views\\_viewimports.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|WebBanHang\\WebBanHang.csproj|solutionrelative:webbanhang\\views\\_viewimports.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|WebBanHang\\WebBanHang.csproj|f:\\prn222\\khuongpd\\salemanagementprn222\\webbanhang\\areas\\admin\\controllers\\promotioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|WebBanHang\\WebBanHang.csproj|solutionrelative:webbanhang\\areas\\admin\\controllers\\promotioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|WebBanHang\\WebBanHang.csproj|f:\\prn222\\khuongpd\\salemanagementprn222\\webbanhang\\areas\\admin\\views\\promotion\\delete.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|WebBanHang\\WebBanHang.csproj|solutionrelative:webbanhang\\areas\\admin\\views\\promotion\\delete.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|WebBanHang\\WebBanHang.csproj|f:\\prn222\\khuongpd\\salemanagementprn222\\webbanhang\\areas\\admin\\views\\promotion\\edit.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|WebBanHang\\WebBanHang.csproj|solutionrelative:webbanhang\\areas\\admin\\views\\promotion\\edit.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|WebBanHang\\WebBanHang.csproj|f:\\prn222\\khuongpd\\salemanagementprn222\\webbanhang\\areas\\admin\\views\\promotion\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|WebBanHang\\WebBanHang.csproj|solutionrelative:webbanhang\\areas\\admin\\views\\promotion\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|WebBanHang\\WebBanHang.csproj|f:\\prn222\\khuongpd\\salemanagementprn222\\webbanhang\\areas\\admin\\views\\promotion\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|WebBanHang\\WebBanHang.csproj|solutionrelative:webbanhang\\areas\\admin\\views\\promotion\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|WebBanHang\\WebBanHang.csproj|f:\\prn222\\khuongpd\\salemanagementprn222\\webbanhang\\viewmodels\\promotionvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|WebBanHang\\WebBanHang.csproj|solutionrelative:webbanhang\\viewmodels\\promotionvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9A965AE3-49F5-716C-E6D2-B6D5FC92F538}|WebBanHang.BLL\\WebBanHang.BLL.csproj|f:\\prn222\\khuongpd\\salemanagementprn222\\webbanhang.bll\\services\\implementations\\promotionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9A965AE3-49F5-716C-E6D2-B6D5FC92F538}|WebBanHang.BLL\\WebBanHang.BLL.csproj|solutionrelative:webbanhang.bll\\services\\implementations\\promotionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9A965AE3-49F5-716C-E6D2-B6D5FC92F538}|WebBanHang.BLL\\WebBanHang.BLL.csproj|f:\\prn222\\khuongpd\\salemanagementprn222\\webbanhang.bll\\services\\interfaces\\ipromotionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9A965AE3-49F5-716C-E6D2-B6D5FC92F538}|WebBanHang.BLL\\WebBanHang.BLL.csproj|solutionrelative:webbanhang.bll\\services\\interfaces\\ipromotionservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9A965AE3-49F5-716C-E6D2-B6D5FC92F538}|WebBanHang.BLL\\WebBanHang.BLL.csproj|f:\\prn222\\khuongpd\\salemanagementprn222\\webbanhang.bll\\dtos\\promotiondto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9A965AE3-49F5-716C-E6D2-B6D5FC92F538}|WebBanHang.BLL\\WebBanHang.BLL.csproj|solutionrelative:webbanhang.bll\\dtos\\promotiondto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5294E5D4-58A1-F3BA-5DED-752E53E391D3}|WebBanHang.DAL\\WebBanHang.DAL.csproj|f:\\prn222\\khuongpd\\salemanagementprn222\\webbanhang.dal\\repositories\\implementations\\promotionrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5294E5D4-58A1-F3BA-5DED-752E53E391D3}|WebBanHang.DAL\\WebBanHang.DAL.csproj|solutionrelative:webbanhang.dal\\repositories\\implementations\\promotionrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5294E5D4-58A1-F3BA-5DED-752E53E391D3}|WebBanHang.DAL\\WebBanHang.DAL.csproj|f:\\prn222\\khuongpd\\salemanagementprn222\\webbanhang.dal\\repositories\\interfaces\\ipromotionrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5294E5D4-58A1-F3BA-5DED-752E53E391D3}|WebBanHang.DAL\\WebBanHang.DAL.csproj|solutionrelative:webbanhang.dal\\repositories\\interfaces\\ipromotionrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5294E5D4-58A1-F3BA-5DED-752E53E391D3}|WebBanHang.DAL\\WebBanHang.DAL.csproj|f:\\prn222\\khuongpd\\salemanagementprn222\\webbanhang.dal\\entities\\promotion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5294E5D4-58A1-F3BA-5DED-752E53E391D3}|WebBanHang.DAL\\WebBanHang.DAL.csproj|solutionrelative:webbanhang.dal\\entities\\promotion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|WebBanHang\\WebBanHang.csproj|f:\\prn222\\khuongpd\\salemanagementprn222\\webbanhang\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{E04196DC-8BD6-9BE7-D270-F0D09924CC8B}|WebBanHang\\WebBanHang.csproj|solutionrelative:webbanhang\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+>>>>>>> Stashed changes
     }
   ],
   "DocumentGroupContainers": [
@@ -117,6 +190,7 @@
       "VerticalTabListWidth": 256,
       "DocumentGroups": [
         {
+<<<<<<< Updated upstream
           "DockedWidth": 200,
           "SelectedChildIndex": 0,
           "Children": [
@@ -209,10 +283,27 @@
               "ViewState": "AgIAAE4AAAAAAAAAAAAAAGAAAABeAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-06-14T03:12:15.432Z",
+=======
+          "DockedWidth": 267,
+          "SelectedChildIndex": 5,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "_AdminLayout.cshtml",
+              "DocumentMoniker": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang\\Views\\Shared\\_AdminLayout.cshtml",
+              "RelativeDocumentMoniker": "WebBanHang\\Views\\Shared\\_AdminLayout.cshtml",
+              "ToolTip": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang\\Views\\Shared\\_AdminLayout.cshtml",
+              "RelativeToolTip": "WebBanHang\\Views\\Shared\\_AdminLayout.cshtml",
+              "ViewState": "AgIAAJUAAAAAAAAAAAAAwKYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-07-01T03:23:20.922Z",
+>>>>>>> Stashed changes
               "EditorCaption": ""
             },
             {
               "$type": "Document",
+<<<<<<< Updated upstream
               "DocumentIndex": 9,
               "Title": "Register.cshtml",
               "DocumentMoniker": "D:\\PRN222\\WebBanHang\\WebBanHang\\Views\\Account\\Register.cshtml",
@@ -222,11 +313,23 @@
               "ViewState": "AgIAAAkAAAAAAAAAAAAUwBkAAABwAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-06-14T08:31:40.494Z",
+=======
+              "DocumentIndex": 3,
+              "Title": "_ViewStart.cshtml",
+              "DocumentMoniker": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang\\Views\\_ViewStart.cshtml",
+              "RelativeDocumentMoniker": "WebBanHang\\Views\\_ViewStart.cshtml",
+              "ToolTip": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang\\Views\\_ViewStart.cshtml",
+              "RelativeToolTip": "WebBanHang\\Views\\_ViewStart.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-07-01T03:22:39.406Z",
+>>>>>>> Stashed changes
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
+<<<<<<< Updated upstream
               "Title": "_AuthLayout.cshtml",
               "DocumentMoniker": "D:\\PRN222\\WebBanHang\\WebBanHang\\Views\\Shared\\_AuthLayout.cshtml",
               "RelativeDocumentMoniker": "WebBanHang\\Views\\Shared\\_AuthLayout.cshtml",
@@ -235,10 +338,21 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-06-14T03:12:55.589Z",
+=======
+              "Title": "_ViewImports.cshtml",
+              "DocumentMoniker": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang\\Views\\_ViewImports.cshtml",
+              "RelativeDocumentMoniker": "WebBanHang\\Views\\_ViewImports.cshtml",
+              "ToolTip": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang\\Views\\_ViewImports.cshtml",
+              "RelativeToolTip": "WebBanHang\\Views\\_ViewImports.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-07-01T03:22:36.067Z",
+>>>>>>> Stashed changes
               "EditorCaption": ""
             },
             {
               "$type": "Document",
+<<<<<<< Updated upstream
               "DocumentIndex": 3,
               "Title": "LoginVM.cs",
               "DocumentMoniker": "D:\\PRN222\\WebBanHang\\WebBanHang\\ViewModels\\LoginVM.cs",
@@ -274,10 +388,22 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAWAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-06-14T07:32:46.887Z",
+=======
+              "DocumentIndex": 2,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang\\Views\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "WebBanHang\\Views\\Shared\\_Layout.cshtml",
+              "ToolTip": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang\\Views\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "WebBanHang\\Views\\Shared\\_Layout.cshtml",
+              "ViewState": "AgIAALQAAAAAAAAAAAAswMkAAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-07-01T03:20:13.804Z",
+>>>>>>> Stashed changes
               "EditorCaption": ""
             },
             {
               "$type": "Document",
+<<<<<<< Updated upstream
               "DocumentIndex": 13,
               "Title": "OrderController.cs",
               "DocumentMoniker": "D:\\PRN222\\WebBanHang\\WebBanHang\\Controllers\\OrderController.cs",
@@ -287,10 +413,22 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAaAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-06-14T07:14:09.135Z",
+=======
+              "DocumentIndex": 6,
+              "Title": "Delete.cshtml",
+              "DocumentMoniker": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang\\Areas\\Admin\\Views\\Promotion\\Delete.cshtml",
+              "RelativeDocumentMoniker": "WebBanHang\\Areas\\Admin\\Views\\Promotion\\Delete.cshtml",
+              "ToolTip": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang\\Areas\\Admin\\Views\\Promotion\\Delete.cshtml",
+              "RelativeToolTip": "WebBanHang\\Areas\\Admin\\Views\\Promotion\\Delete.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-07-01T03:16:26.724Z",
+>>>>>>> Stashed changes
               "EditorCaption": ""
             },
             {
               "$type": "Document",
+<<<<<<< Updated upstream
               "DocumentIndex": 14,
               "Title": "RegisterDTO.cs",
               "DocumentMoniker": "D:\\PRN222\\WebBanHang\\WebBanHang.BLL\\DTOs\\RegisterDTO.cs",
@@ -300,10 +438,22 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-06-14T08:38:27.455Z",
+=======
+              "DocumentIndex": 0,
+              "Title": "Details.cshtml",
+              "DocumentMoniker": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang\\Areas\\Admin\\Views\\Promotion\\Details.cshtml",
+              "RelativeDocumentMoniker": "WebBanHang\\Areas\\Admin\\Views\\Promotion\\Details.cshtml",
+              "ToolTip": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang\\Areas\\Admin\\Views\\Promotion\\Details.cshtml",
+              "RelativeToolTip": "WebBanHang\\Areas\\Admin\\Views\\Promotion\\Details.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADIAAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-07-01T03:15:47.194Z",
+>>>>>>> Stashed changes
               "EditorCaption": ""
             },
             {
               "$type": "Document",
+<<<<<<< Updated upstream
               "DocumentIndex": 15,
               "Title": "IUserService.cs",
               "DocumentMoniker": "D:\\PRN222\\WebBanHang\\WebBanHang.BLL\\Services\\Interfaces\\IUserService.cs",
@@ -313,11 +463,49 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-06-14T08:37:11.614Z",
+=======
+              "DocumentIndex": 7,
+              "Title": "Edit.cshtml",
+              "DocumentMoniker": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang\\Areas\\Admin\\Views\\Promotion\\Edit.cshtml",
+              "RelativeDocumentMoniker": "WebBanHang\\Areas\\Admin\\Views\\Promotion\\Edit.cshtml",
+              "ToolTip": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang\\Areas\\Admin\\Views\\Promotion\\Edit.cshtml",
+              "RelativeToolTip": "WebBanHang\\Areas\\Admin\\Views\\Promotion\\Edit.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-07-01T03:15:06.969Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang\\Areas\\Admin\\Views\\Promotion\\Index.cshtml",
+              "RelativeDocumentMoniker": "WebBanHang\\Areas\\Admin\\Views\\Promotion\\Index.cshtml",
+              "ToolTip": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang\\Areas\\Admin\\Views\\Promotion\\Index.cshtml",
+              "RelativeToolTip": "WebBanHang\\Areas\\Admin\\Views\\Promotion\\Index.cshtml",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAswAQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-07-01T03:14:16.062Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Create.cshtml",
+              "DocumentMoniker": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang\\Areas\\Admin\\Views\\Promotion\\Create.cshtml",
+              "RelativeDocumentMoniker": "WebBanHang\\Areas\\Admin\\Views\\Promotion\\Create.cshtml",
+              "ToolTip": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang\\Areas\\Admin\\Views\\Promotion\\Create.cshtml",
+              "RelativeToolTip": "WebBanHang\\Areas\\Admin\\Views\\Promotion\\Create.cshtml",
+              "ViewState": "AgIAAAEAAAAAAAAAAAAswAQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-07-01T03:14:08.244Z",
+>>>>>>> Stashed changes
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 10,
+<<<<<<< Updated upstream
               "Title": "Login.cshtml",
               "DocumentMoniker": "D:\\PRN222\\WebBanHang\\WebBanHang\\Views\\Account\\Login.cshtml",
               "RelativeDocumentMoniker": "WebBanHang\\Views\\Account\\Login.cshtml",
@@ -326,11 +514,87 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAABZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2026-06-13T18:15:30.727Z",
+=======
+              "Title": "PromotionVM.cs",
+              "DocumentMoniker": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang\\ViewModels\\PromotionVM.cs",
+              "RelativeDocumentMoniker": "WebBanHang\\ViewModels\\PromotionVM.cs",
+              "ToolTip": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang\\ViewModels\\PromotionVM.cs",
+              "RelativeToolTip": "WebBanHang\\ViewModels\\PromotionVM.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-01T03:12:20.907Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "IPromotionService.cs",
+              "DocumentMoniker": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang.BLL\\Services\\Interfaces\\IPromotionService.cs",
+              "RelativeDocumentMoniker": "WebBanHang.BLL\\Services\\Interfaces\\IPromotionService.cs",
+              "ToolTip": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang.BLL\\Services\\Interfaces\\IPromotionService.cs",
+              "RelativeToolTip": "WebBanHang.BLL\\Services\\Interfaces\\IPromotionService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-01T03:11:39.537Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "PromotionService.cs",
+              "DocumentMoniker": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang.BLL\\Services\\Implementations\\PromotionService.cs",
+              "RelativeDocumentMoniker": "WebBanHang.BLL\\Services\\Implementations\\PromotionService.cs",
+              "ToolTip": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang.BLL\\Services\\Implementations\\PromotionService.cs",
+              "RelativeToolTip": "WebBanHang.BLL\\Services\\Implementations\\PromotionService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-01T03:11:34.514Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "PromotionDTO.cs",
+              "DocumentMoniker": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang.BLL\\DTOs\\PromotionDTO.cs",
+              "RelativeDocumentMoniker": "WebBanHang.BLL\\DTOs\\PromotionDTO.cs",
+              "ToolTip": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang.BLL\\DTOs\\PromotionDTO.cs",
+              "RelativeToolTip": "WebBanHang.BLL\\DTOs\\PromotionDTO.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-01T03:11:00.329Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "PromotionRepository.cs",
+              "DocumentMoniker": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang.DAL\\Repositories\\Implementations\\PromotionRepository.cs",
+              "RelativeDocumentMoniker": "WebBanHang.DAL\\Repositories\\Implementations\\PromotionRepository.cs",
+              "ToolTip": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang.DAL\\Repositories\\Implementations\\PromotionRepository.cs",
+              "RelativeToolTip": "WebBanHang.DAL\\Repositories\\Implementations\\PromotionRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-01T03:10:31.635Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "IPromotionRepository.cs",
+              "DocumentMoniker": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang.DAL\\Repositories\\Interfaces\\IPromotionRepository.cs",
+              "RelativeDocumentMoniker": "WebBanHang.DAL\\Repositories\\Interfaces\\IPromotionRepository.cs",
+              "ToolTip": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang.DAL\\Repositories\\Interfaces\\IPromotionRepository.cs",
+              "RelativeToolTip": "WebBanHang.DAL\\Repositories\\Interfaces\\IPromotionRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-01T03:10:05.301Z",
+>>>>>>> Stashed changes
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 16,
+<<<<<<< Updated upstream
               "Title": "ProductController.cs",
               "DocumentMoniker": "D:\\PRN222\\WebBanHang\\WebBanHang\\Controllers\\ProductController.cs",
               "RelativeDocumentMoniker": "WebBanHang\\Controllers\\ProductController.cs",
@@ -339,10 +603,21 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-06-14T07:15:13.577Z",
+=======
+              "Title": "Promotion.cs",
+              "DocumentMoniker": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang.DAL\\Entities\\Promotion.cs",
+              "RelativeDocumentMoniker": "WebBanHang.DAL\\Entities\\Promotion.cs",
+              "ToolTip": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang.DAL\\Entities\\Promotion.cs",
+              "RelativeToolTip": "WebBanHang.DAL\\Entities\\Promotion.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-01T03:09:25.234Z",
+>>>>>>> Stashed changes
               "EditorCaption": ""
             },
             {
               "$type": "Document",
+<<<<<<< Updated upstream
               "DocumentIndex": 18,
               "Title": "Index.cshtml",
               "DocumentMoniker": "D:\\PRN222\\WebBanHang\\WebBanHang\\Views\\Product\\Index.cshtml",
@@ -391,11 +666,23 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-06-14T07:09:15.512Z",
+=======
+              "DocumentIndex": 5,
+              "Title": "PromotionController.cs",
+              "DocumentMoniker": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang\\Areas\\Admin\\Controllers\\PromotionController.cs",
+              "RelativeDocumentMoniker": "WebBanHang\\Areas\\Admin\\Controllers\\PromotionController.cs",
+              "ToolTip": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang\\Areas\\Admin\\Controllers\\PromotionController.cs",
+              "RelativeToolTip": "WebBanHang\\Areas\\Admin\\Controllers\\PromotionController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-01T03:07:50.369Z",
+>>>>>>> Stashed changes
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 17,
+<<<<<<< Updated upstream
               "Title": "RoleAuthorize.cs",
               "DocumentMoniker": "D:\\PRN222\\WebBanHang\\WebBanHang\\Filters\\RoleAuthorize.cs",
               "RelativeDocumentMoniker": "WebBanHang\\Filters\\RoleAuthorize.cs",
@@ -469,6 +756,16 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-06-13T18:25:41.768Z",
+=======
+              "Title": "appsettings.json",
+              "DocumentMoniker": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang\\appsettings.json",
+              "RelativeDocumentMoniker": "WebBanHang\\appsettings.json",
+              "ToolTip": "F:\\PRN222\\KhuongPD\\SaleManagementPRN222\\WebBanHang\\appsettings.json",
+              "RelativeToolTip": "WebBanHang\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAABFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-07-01T03:05:26.788Z",
+>>>>>>> Stashed changes
               "EditorCaption": ""
             }
           ]

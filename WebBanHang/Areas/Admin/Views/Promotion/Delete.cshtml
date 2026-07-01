@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Xóa Mã Khuyến Mãi";
 }
+<<<<<<< Updated upstream
 <div class="container mt-4">
     <div class="card border-danger shadow-sm">
         <div class="card-header bg-danger text-white">
@@ -29,6 +30,24 @@
             <form asp-action="Delete" method="post">
                 <input type="hidden" asp-for="PromotionId" />
                 <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Xác nhận xóa hẳn</button>
+=======
+
+<div class="container mt-4" style="max-width: 600px;">
+    <div class="card shadow border-0">
+        <div class="card-body p-4 text-center">
+            <div class="text-danger mb-3">
+                <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem;"></i>
+            </div>
+            <h3 class="fw-bold text-dark mb-2">Xác Nhận Xóa Mã?</h3>
+            <p class="text-muted mb-4">Bạn có chắc chắn muốn xóa vĩnh viễn mã khuyến mãi <strong class="text-danger">@Model.Code</strong> này không? Hành động này không thể hoàn tác.</p>
+
+            <form asp-action="Delete">
+                <input type="hidden" asp-for="PromotionId" />
+                <div class="d-flex gap-2 justify-content-center">
+                    <button type="submit" class="btn btn-danger px-4 py-2">Xóa Ngay</button>
+                    <a asp-action="Index" class="btn btn-secondary px-4 py-2">Hủy Bỏ</a>
+                </div>
+>>>>>>> Stashed changes
             </form>
         </div>
     </div>

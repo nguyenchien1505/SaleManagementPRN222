@@ -14,7 +14,11 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WebBanHang.DAL")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
+<<<<<<< Updated upstream
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+169eed27773b143245a3c8820645d8c7f4e9f039")]
+=======
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f7aa4fce801419df0ed1c700557ecf6bf239e72b")]
+>>>>>>> Stashed changes
 [assembly: System.Reflection.AssemblyProductAttribute("WebBanHang.DAL")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WebBanHang.DAL")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
