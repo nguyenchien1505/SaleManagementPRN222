@@ -1,0 +1,50 @@
+﻿@page
+@model WebBanHang.Views.Promotion.DetailsModel
+@{
+    ViewData["Title"] = "Chi Tiết Mã Khuyến Mãi";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-info text-white">
+            <h4 class="mb-0"><i class="fas fa-info-circle"></i> Chi Tiết Mã Khuyến Mãi: @Model.Code</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Mã Khuyến Mãi:</dt>
+                <dd class="col-sm-9 font-weight-bold text-primary">@Model.Code</dd>
+
+                <dt class="col-sm-3">Loại Giảm Giá:</dt>
+                <dd class="col-sm-9">@(Model.DiscountType ?? "Chưa xác định")</dd>
+
+                <dt class="col-sm-3">Giá Trị Giảm:</dt>
+                <dd class="col-sm-9 text-success">@Model.Value.ToString("N0") xu</dd>
+
+                <dt class="col-sm-3">Đơn Hàng Tối Thiểu:</dt>
+                <dd class="col-sm-9">@(Model.MinOrderValue.HasValue ? Model.MinOrderValue.Value.ToString("N0") + " xu" : "0 xu")</dd>
+
+                <dt class="col-sm-3">Ngày Bắt Đầu:</dt>
+                <dd class="col-sm-9">@(Model.StartDate.HasValue ? Model.StartDate.Value.ToString("dd/MM/yyyy HH:mm") : "---")</dd>
+
+                <dt class="col-sm-3">Ngày Kết Thúc:</dt>
+                <dd class="col-sm-9">@(Model.EndDate.HasValue ? Model.EndDate.Value.ToString("dd/MM/yyyy HH:mm") : "---")</dd>
+
+                <dt class="col-sm-3">Trạng Thái:</dt>
+                <dd class="col-sm-9">
+                    @if (Model.Status == "Active")
+                    {
+                        <span class="badge bg-success text-white">Đang áp dụng</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary text-white">Tạm dừng</span>
+                    }
+                </dd>
+            </dl>
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+            <a asp-action="Index" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Quay lại danh sách</a>
+            <a asp-action="Edit" asp-route-id="@Model.PromotionId" class="btn btn-warning text-white"><i class="fas fa-edit"></i> Chỉnh sửa</a>
+        </div>
+    </div>
+</div>

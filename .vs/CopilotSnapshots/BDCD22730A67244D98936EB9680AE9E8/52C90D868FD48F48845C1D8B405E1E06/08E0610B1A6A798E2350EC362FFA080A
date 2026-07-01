@@ -1,0 +1,79 @@
+﻿@page
+@model WebBanHang.Views.Promotion.EditModel
+@{
+    ViewData["Title"] = "Chỉnh Sửa Mã Khuyến Mãi";
+}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-white">
+                    <h4 class="mb-0"><i class="fas fa-edit"></i> Chỉnh Sửa Mã: @Model.Code</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <input type="hidden" asp-for="PromotionId" />
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Code" class="form-label font-weight-bold">Mã Khuyến Mãi <span class="text-danger">*</span></label>
+                                <input asp-for="Code" class="form-control" required />
+                                <span asp-validation-for="Code" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="DiscountType" class="form-label">Loại Giảm Giá</label>
+                                <select asp-for="DiscountType" class="form-select">
+                                    <option value="Percent">Phần trăm (Percent)</option>
+                                    <option value="Amount">Số tiền cố định (Amount)</option>
+                                </select>
+                                <span asp-validation-for="DiscountType" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Value" class="form-label font-weight-bold">Giá Trị Giảm <span class="text-danger">*</span></label>
+                                <input asp-for="Value" type="number" class="form-control" min="0" required />
+                                <span asp-validation-for="Value" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="MinOrderValue" class="form-label">Giá Trị Đơn Hàng Tối Thiểu</label>
+                                <input asp-for="MinOrderValue" type="number" class="form-control" min="0" />
+                                <span asp-validation-for="MinOrderValue" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="StartDate" class="form-label">Ngày Bắt Đầu</label>
+                                <input asp-for="StartDate" type="datetime-local" class="form-control" />
+                                <span asp-validation-for="StartDate" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="EndDate" class="form-label">Ngày Kết Thúc</label>
+                                <input asp-for="EndDate" type="datetime-local" class="form-control" />
+                                <span asp-validation-for="EndDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Status" class="form-label">Trạng Thái Kích Hoạt</label>
+                            <select asp-for="Status" class="form-select">
+                                <option value="Active">Hoạt Động (Active)</option>
+                                <option value="Inactive">Tạm Khóa (Inactive)</option>
+                            </select>
+                            <span asp-validation-for="Status" class="text-danger"></span>
+                        </div>
+
+                        <div class="card-footer d-flex justify-content-between bg-transparent border-top-0 px-0 pt-3">
+                            <a asp-action="Index" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Hủy bỏ</a>
+                            <button type="submit" class="btn btn-warning text-white"><i class="fas fa-save"></i> Cập Nhật Ngay</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

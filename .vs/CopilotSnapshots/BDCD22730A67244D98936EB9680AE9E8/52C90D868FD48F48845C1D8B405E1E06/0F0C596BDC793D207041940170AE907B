@@ -1,0 +1,35 @@
+﻿@model WebBanHang.ViewModels.PromotionVM
+@{
+    ViewData["Title"] = "Xóa Mã Khuyến Mãi";
+}
+<div class="container mt-4">
+    <div class="card border-danger shadow-sm">
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Cảnh Báo Xóa Dữ Liệu</h4>
+        </div>
+        <div class="card-body">
+            <h5 class="text-danger mb-4">Bạn có chắc chắn muốn xóa hoàn toàn mã khuyến mãi này không? Hành động này không thể hoàn tác.</h5>
+
+            <dl class="row">
+                <dt class="col-sm-3">Mã Khuyến Mãi:</dt>
+                <dd class="col-sm-9 font-weight-bold">@Model.Code</dd>
+
+                <dt class="col-sm-3">Giá Trị Giảm:</dt>
+                <dd class="col-sm-9">@Model.Value.ToString("N0") xu</dd>
+
+                <dt class="col-sm-3">Trạng Thái Hiện Tại:</dt>
+                <dd class="col-sm-9">
+                    <span class="badge @(Model.Status == "Active" ? "bg-success" : "bg-secondary") text-white">@Model.Status</span>
+                </dd>
+            </dl>
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+            <a asp-action="Index" class="btn btn-secondary"><i class="fas fa-times"></i> Hủy bỏ</a>
+
+            <form asp-action="Delete" method="post">
+                <input type="hidden" asp-for="PromotionId" />
+                <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Xác nhận xóa hẳn</button>
+            </form>
+        </div>
+    </div>
+</div>
