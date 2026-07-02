@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebBanHang.DAL.Entities;
 
 namespace WebBanHang.BLL.DTOs
 {
@@ -21,6 +22,7 @@ namespace WebBanHang.BLL.DTOs
         public DateTime CreatedDate { get; set; }
         public int CategoryId { get; set; }
         public string CategoryName { get; set; } = string.Empty;
+ 
 
     }
 }

@@ -71,7 +71,7 @@ namespace WebBanHang.BLL.Services.Implementations
                     ImageUrl = x.ImageUrl,
                     IsPrimary = x.IsPrimary
                 }),
-                CategoryName = u.Name
+                CategoryName = u.Category.Name
             }).ToList();
         }
 
