@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using WebBanHang.DAL.Context;
 using WebBanHang.DAL.Entities;
 using WebBanHang.DAL.Repositories.Interfaces;
@@ -12,38 +11,53 @@ namespace WebBanHang.DAL.Repositories.Implementations
     public class PromotionRepository : IPromotionRepository
     {
         private readonly WebBanHangContext _context;
+
         public PromotionRepository(WebBanHangContext context)
         {
             _context = context;
         }
-        public void Add(Promotion promotion)
+
+        public async Task<IEnumerable<Promotion>> GetAllAsync(string? statusFilter, string? searchString)
         {
-            throw new NotImplementedException();
+            var query = _context.Promotions.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                query = query.Where(p => p.Code.Contains(searchString));
+            }
+
+            if (!string.IsNullOrEmpty(statusFilter))
+            {
+                query = query.Where(p => p.Status == statusFilter);
+            }
+
+            return await query.ToListAsync();
         }
 
-        public void Delete(int id)
+        public async Task<Promotion?> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _context.Promotions.FindAsync(id);
         }
 
-        public List<Promotion> GetAll()
+        public async Task<bool> AddAsync(Promotion promotion)
         {
-            throw new NotImplementedException();
+            await _context.Promotions.AddAsync(promotion);
+            return await _context.SaveChangesAsync() > 0;
         }
 
-        public Promotion GetByCode(string code)
+        public async Task<bool> UpdateAsync(Promotion promotion)
         {
-            throw new NotImplementedException();
+            _context.Promotions.Update(promotion);
+            return await _context.SaveChangesAsync() > 0;
         }
 
-        public void Test()
+        public async Task<bool> DeleteAsync(int id)
         {
-            throw new NotImplementedException();
-        }
+            var promotion = await _context.Promotions.FindAsync(id);
+            if (promotion == null) return false;
 
-        public void Update(Promotion promotion)
-        {
-            throw new NotImplementedException();
+            _context.Promotions.Remove(promotion);
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }

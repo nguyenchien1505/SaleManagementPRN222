@@ -1,25 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace WebBanHang.DAL.Entities;
-
-public partial class Promotion
+namespace WebBanHang.DAL.Entities
 {
-    public int PromotionId { get; set; }
+    public class Promotion
+    {
+        public int PromotionId { get; set; }
+        public string Code { get; set; } = null!;
+        public string DiscountType { get; set; } = null!;
+        public decimal Value { get; set; }
+        public decimal MinOrderValue { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public string Status { get; set; } = "Active";
 
-    public string Code { get; set; } = null!;
-
-    public string? DiscountType { get; set; }
-
-    public decimal Value { get; set; }
-
-    public decimal? MinOrderValue { get; set; }
-
-    public DateTime? StartDate { get; set; }
-
-    public DateTime? EndDate { get; set; }
-
-    public string? Status { get; set; }
-
-    public virtual ICollection<OrderPromotion> OrderPromotions { get; set; } = new List<OrderPromotion>();
+        // Đồng bộ mối quan hệ thực tế trong WebBanHangContext
+        public virtual ICollection<OrderPromotion> OrderPromotions { get; set; } = new List<OrderPromotion>();
+    }
 }

@@ -1,0 +1,51 @@
+﻿@model WebBanHang.ViewModels.PromotionVM
+@{
+    ViewData["Title"] = "Chi Tiết Mã Khuyến Mãi";
+}
+
+<div class="container mt-4" style="max-width: 700px;">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-info text-white py-3">
+            <h4 class="mb-0 fw-bold"><i class="bi bi-info-circle-fill me-2"></i> Chi Tiết Mã Khuyến Mãi: @Model.Code</h4>
+        </div>
+        <div class="card-body p-4">
+            <dl class="row mb-0">
+                <dt class="col-sm-4 fw-bold text-secondary mb-3">Mã Khuyến Mãi:</dt>
+                <dd class="col-sm-8 text-dark fw-bold mb-3">@Model.Code</dd>
+
+                <dt class="col-sm-4 fw-bold text-secondary mb-3">Loại Giảm Giá:</dt>
+                <dd class="col-sm-8 mb-3">@Model.DiscountType</dd>
+
+                <dt class="col-sm-4 fw-bold text-secondary mb-3">Giá Trị Giảm:</dt>
+                <dd class="col-sm-8 text-success fw-semibold mb-3">
+                    @if (Model.DiscountType == "Percent")
+                    {
+                        <span>@Model.Value.ToString("G0")%</span>
+                    }
+                    else
+                    {
+                        <span>@Model.Value.ToString("#,##0") đ</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-4 fw-bold text-secondary mb-3">Đơn Tối Thiểu:</dt>
+                <dd class="col-sm-8 mb-3">@Model.MinOrderValue.ToString("#,##0") đ</dd>
+
+                <dt class="col-sm-4 fw-bold text-secondary mb-3">Ngày Bắt Đầu:</dt>
+                <dd class="col-sm-8 mb-3">@Model.StartDate.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                <dt class="col-sm-4 fw-bold text-secondary mb-3">Ngày Kết Thúc:</dt>
+                <dd class="col-sm-8 mb-3">@Model.EndDate.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                <dt class="col-sm-4 fw-bold text-secondary mb-3">Trạng Thái:</dt>
+                <dd class="col-sm-8 mb-3">
+                    <span class="badge @(Model.Status == "Active" ? "bg-success" : "bg-secondary")">@Model.Status</span>
+                </dd>
+            </dl>
+        </div>
+        <div class="card-footer bg-light d-flex gap-2 p-3 justify-content-end">
+            <a asp-action="Edit" asp-route-id="@Model.PromotionId" class="btn btn-warning text-white px-4">Chỉnh sửa</a>
+            <a asp-action="Index" class="btn btn-secondary px-4">Quay lại</a>
+        </div>
+    </div>
+</div>
