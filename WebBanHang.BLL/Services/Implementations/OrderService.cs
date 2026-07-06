@@ -38,7 +38,10 @@ namespace WebBanHang.BLL.Services.Implementations
                 .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
         }
-
+        public async Task<Order?> GetOrderDetailsAsync(int id)
+        {
+            return await _orderRepository.GetOrderDetailsAsync(id);
+        }
 
         public async Task<(bool Success, string Message, int OrderId)> CheckoutAsync(int userId, int productId, int quantity)
         {
@@ -60,20 +63,18 @@ namespace WebBanHang.BLL.Services.Implementations
 
                     product.StockQuantity -= quantity;
 
-                    // Tính toán số tiền
                     decimal subTotal = product.SellingPrice * quantity;
 
-                    // Sinh mã đơn hàng ngẫu nhiên duy nhất dựa trên thời gian
                     string uniqueOrderCode = $"ORD-{DateTime.Now:yyyyMMddHHmmss}-{new Random().Next(100, 999)}";
 
                     var order = new Order
                     {
-                        OrderCode = uniqueOrderCode, // Bổ sung bắt buộc cho thuộc tính OrderCode
+                        OrderCode = uniqueOrderCode, 
                         CustomerId = customer.CustomerId,
                         OrderDate = DateTime.Now,
-                        SubTotal = subTotal,         // Bổ sung SubTotal (Tiền gốc)
+                        SubTotal = subTotal,        
                         DiscountAmount = 0,
-                        TotalAmount = subTotal,       // Tiền cuối cùng bằng tiền gốc (do mua ngay không áp mã)
+                        TotalAmount = subTotal,       
                         Status = "Confirmed",
                         CreatedBy = userId
                     };
@@ -121,7 +122,6 @@ namespace WebBanHang.BLL.Services.Implementations
             {
                 try
                 {
-                    // 1. Tìm thông tin Customer dựa trên userId lấy từ Session
                     var customer = await _context.Customers.FirstOrDefaultAsync(c => c.UserId == userId);
                     if (customer == null)
                         return (false, "Bạn cần hoàn thiện hồ sơ khách hàng trước khi mua hàng!", 0);
@@ -129,7 +129,6 @@ namespace WebBanHang.BLL.Services.Implementations
                     decimal totalOrderAmount = 0;
                     var processedItems = new List<(Product product, int quantity)>();
 
-                    // 2. Kiểm tra tính hợp lệ của toàn bộ sản phẩm và số lượng kho
                     foreach (var item in items)
                     {
                         var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == item.productId);
@@ -143,30 +142,25 @@ namespace WebBanHang.BLL.Services.Implementations
                         processedItems.Add((product, item.quantity));
                     }
 
-                    // 3. ĐÃ BỎ LUỒNG CHECK PROMOTION QUA INTERFACE LỖI
-                    // Thiết lập số tiền giảm giá mặc định bằng 0 để đảm bảo tính toán đồng bộ
+
                     decimal discountFromPromo = 0;
                     decimal finalPayableAmount = totalOrderAmount;
 
-                    // Sinh mã đơn hàng ngẫu nhiên duy nhất cho thuộc tính OrderCode
                     string uniqueOrderCode = $"ORD-{DateTime.Now:yyyyMMddHHmmss}-{new Random().Next(100, 999)}";
 
-                    // 4. Khởi tạo một đơn hàng mới (Cố định trạng thái Draft theo yêu cầu)
                     var order = new Order
                     {
                         OrderCode = uniqueOrderCode,
                         CustomerId = customer.CustomerId,
                         OrderDate = DateTime.Now,
-                        SubTotal = totalOrderAmount,       // Gán tổng tiền hàng gốc
-                        DiscountAmount = discountFromPromo,// Bằng 0
+                        SubTotal = totalOrderAmount,       
+                        DiscountAmount = discountFromPromo,
                         TotalAmount = finalPayableAmount,  // Tổng tiền phải trả sau cùng
                         Status = "Draft",                  // RÀNG BUỘC: Luôn luôn là Draft
                         CreatedBy = userId
                     };
                     _context.Orders.Add(order);
-                    await _context.SaveChangesAsync(); // Lưu để EF Core sinh ra order.OrderId làm khóa ngoại
-
-                    // 5. Cập nhật chi tiết từng sản phẩm và lịch sử kho
+                    await _context.SaveChangesAsync(); 
                     foreach (var item in processedItems)
                     {
                         // Trừ kho của sản phẩm

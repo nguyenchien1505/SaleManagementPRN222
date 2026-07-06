@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WebBanHang.DAL.Entities;
-using WebBanHang.DAL.Entities;
 
 namespace WebBanHang.DAL.Repositories.Interfaces
 {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,6 +35,39 @@ namespace WebBanHang.DAL.Repositories.Implementations
         public Order GetById(int id)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<Order?> GetOrderDetailsAsync(int id)
+        {
+            return await _context.Orders
+                .Include(o => o.Customer)
+                .Include(o => o.CreatedByNavigation)
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Product)
+                .FirstOrDefaultAsync(m => m.OrderId == id);
+        }
+
+        public async Task<IEnumerable<Order>> GetOrdersWithCustomerAsync(string? searchString, string? statusFilter)
+        {
+            var query = _context.Orders
+                .Include(o => o.Customer)
+                    .ThenInclude(c => c.User)
+                .Include(o => o.CreatedByNavigation)
+                .OrderByDescending(o => o.OrderDate)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                query = query.Where(o => o.OrderCode.Contains(searchString) ||
+                                         o.Customer.User.FullName.Contains(searchString));
+            }
+
+            if (!string.IsNullOrEmpty(statusFilter))
+            {
+                query = query.Where(o => o.Status == statusFilter);
+            }
+
+            return await query.ToListAsync();
         }
 
         public void Update(Order order)

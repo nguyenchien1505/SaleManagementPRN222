@@ -12,5 +12,7 @@ namespace WebBanHang.BLL.Services.Interfaces
         Task<(bool Success, string Message, int OrderId)> CheckoutAsync(int userId, int productId, int quantity);
         Task<(bool Success, string Message, int OrderId)> CheckoutCartAsync(int userId, List<(int productId, int quantity)> items,  string? promoCode = null);
         Task<IEnumerable<Order>> GetMyOrdersAsync(int userId);
+
+        Task<Order?> GetOrderDetailsAsync(int id);
     }
 }
