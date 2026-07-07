@@ -13,8 +13,8 @@ namespace WebBanHang.DAL.Repositories.Interfaces
         Task<List<Category>> GetAllAsync();
         Task<Category> GetByIdAsync(int id);
         Task<Category> GetByNameAsync(string name);
-        void Add(Category category);
-        void Update(Category category);
-        void Delete(int id);
+        Task AddAsync(Category category);
+        Task UpdateAsync(Category category);
+        Task DeleteAsync(int id);
     }
 }

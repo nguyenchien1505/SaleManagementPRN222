@@ -20,40 +20,46 @@ namespace WebBanHang.DAL.Repositories.Implementations
 
         public async Task<List<Category>> GetAllAsync()
         {
-            return await _context.Categories.ToListAsync();
+            return await _context.Categories.Where(x => !x.Status.Contains("Deleted")).ToListAsync();
         }
 
-        public void Add(Category category)
+        public async Task AddAsync(Category category)
         {
-            _context.Categories.Add(category);
-            _context.SaveChanges();
+            await _context.Categories.AddAsync(category);
+            await _context.SaveChangesAsync();
         }
 
-        public void Update(Category category)
+        public async Task UpdateAsync(Category category)
         {
-            _context.Categories.Update(category);
-            _context.SaveChanges();
+            var existingCategory = await _context.Categories.FindAsync(category.CategoryId);
+            if (existingCategory == null)
+            {
+                throw new Exception("Không tìm thấy mã sản phẩm cần cập nhật.");
+            }
+            existingCategory.Name = category.Name;
+            existingCategory.Description = category.Description;
+            existingCategory.Status = category.Status;
+            existingCategory.Products = category.Products;
+
+            await _context.SaveChangesAsync();
         }
 
-        public void Delete(int id)
+        public async Task DeleteAsync(int id)
         {
             var category = _context.Categories.Find(id);
+            category.Status = "Deleted";
+            await _context.SaveChangesAsync();
 
-            if(category != null)
-            {
-                _context.Categories.Remove(category);
-                _context.SaveChanges();
-            }
         }
 
         public async Task<Category> GetByIdAsync(int id)
         {
-            return await _context.Categories.Where(x => x.CategoryId == id).FirstOrDefaultAsync();
+            return await _context.Categories.Where(x => x.CategoryId == id && !x.Status.Contains("Deleted")).FirstOrDefaultAsync();
         }
 
         public async Task<Category> GetByNameAsync(string name)
         {
-            return await _context.Categories.Where(x => x.Name == name).FirstOrDefaultAsync();
+            return await _context.Categories.Where(x => x.Name == name && !x.Status.Contains("Deleted")).FirstOrDefaultAsync();
         }
     }
 }

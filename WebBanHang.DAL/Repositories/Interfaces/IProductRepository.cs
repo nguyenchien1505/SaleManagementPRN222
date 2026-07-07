@@ -22,6 +22,6 @@ namespace WebBanHang.DAL.Repositories.Interfaces
 
         Task UpdateAsync(Product product);
         
-        void Delete(int id);
+        Task<bool> DeleteAsync(int id);
     }
 }

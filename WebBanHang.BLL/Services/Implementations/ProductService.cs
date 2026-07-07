@@ -71,7 +71,7 @@ namespace WebBanHang.BLL.Services.Implementations
                     ImageUrl = x.ImageUrl,
                     IsPrimary = x.IsPrimary
                 }),
-                CategoryName = u.Name
+                CategoryName = u.Category.Name
             }).ToList();
         }
 
@@ -93,7 +93,19 @@ namespace WebBanHang.BLL.Services.Implementations
             {
                 Code = product.Code,
                 Name = product.Name,
-                //Category = 
+                Description = product.Description,
+                Images = product.ProductImages.Select(x => new ProductImageDTO
+                {
+                    ImageUrl = x.ImageUrl,
+                    IsPrimary = x.IsPrimary
+                }),
+                Status = product.Status,
+                SellingPrice= product.SellingPrice,
+                ImportPrice = product.ImportPrice,
+                StockQuantity = product.StockQuantity,
+                CategoryId = product.CategoryId,
+                CategoryName = product.Category.Name
+
             };
         }
 
@@ -104,6 +116,7 @@ namespace WebBanHang.BLL.Services.Implementations
 
             var product = new Product
             {
+                ProductId= dto.ProductId,
                 Code = dto.Code,
                 Name = dto.Name,
                 CategoryId = dto.CategoryId,
@@ -116,10 +129,47 @@ namespace WebBanHang.BLL.Services.Implementations
                 SellingPrice = dto.SellingPrice,
                 ImportPrice = dto.ImportPrice,
                 StockQuantity = dto.StockQuantity,
-                Status = dto.Status
+                Status = dto.Status,
+                
             };
             await _repo.UpdateAsync(product);
             return true;
+        }
+
+        public async Task<DetailProductDTO> GetDetailProductByIdAsync(int id)
+        {
+            var product = await _repo.GetByIdAsync(id);
+
+            return new DetailProductDTO
+            {
+                ProductId = product.ProductId,
+                Code = product.Code,
+                Name = product.Name,
+                CategoryName = product.Category.Name,
+                SellingPrice = product.SellingPrice,
+                ImportPrice = product.ImportPrice,
+                StockQuantity = product.StockQuantity,
+                Status = product.Status,
+                Description = product.Description,
+                CreateBy = product.CreatedByNavigation.FullName,
+                CreatedDate = product.CreatedDate ?? DateTime.Now,
+                ExistingImages = product.ProductImages.Select(x => new ProductImageDTO
+                {
+                    ImageUrl = x.ImageUrl,
+                    IsPrimary = x.IsPrimary
+                }).ToList()
+            };
+            
+
+        }
+
+        public async Task<bool> DeleteProductAsync(int id)
+        {
+            var product = await _repo.GetByIdAsync(id);
+            if (product == null) return false;
+
+            return await _repo.DeleteAsync(id);
+            
         }
     }
 }

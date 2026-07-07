@@ -24,6 +24,7 @@ namespace WebBanHang.ViewModels
         public string Description { get; set; }
         [Range(1, int.MaxValue, ErrorMessage = "Vui lòng chọn danh mục")]
         public int CategoryId { get; set; }
+        public string CategoryName { get; set; }
 
         public List<CategoryVM> Categories { get; set; } = new();
     }

@@ -24,9 +24,14 @@ namespace WebBanHang.DAL.Repositories.Implementations
             await _context.SaveChangesAsync();
         }
 
-        public void Delete(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            var product = await _context.Products.FindAsync(id);
+            if (product == null)
+                return false;
+            product.Status = "Deleted";
+            await _context.SaveChangesAsync();
+            return true;
         }
 
         public async Task<List<Product>> GetAllAsync()
@@ -35,7 +40,8 @@ namespace WebBanHang.DAL.Repositories.Implementations
                                           .Include(x => x.ProductImages)
                                           .Include(x => x.CreatedByNavigation)
                                           .Include(x => x.InventoryTransactions)
-                                          .Include(x => x.OrderDetails).ToListAsync();
+                                          .Include(x => x.OrderDetails)
+                                          .Where(x => !x.Status.Contains("Deleted") && !x.Category.Status.Contains("Deleted")).ToListAsync();
         }
 
         public List<Product> GetByCategory(int categoryId)
@@ -45,7 +51,9 @@ namespace WebBanHang.DAL.Repositories.Implementations
 
         public async Task<Product> GetByCodeAsync(string code)
         {
-            return await _context.Products.Include(x => x.Category).Where(x => x.Code == code).FirstOrDefaultAsync();
+            return await _context.Products.Include(x => x.Category)
+                                          .Where(x => x.Code == code && !x.Status.Contains("Deleted") && !x.Category.Status.Contains("Deleted"))
+                                          .FirstOrDefaultAsync();
         }
 
         public async Task<Product> GetByIdAsync(int id)
@@ -54,7 +62,9 @@ namespace WebBanHang.DAL.Repositories.Implementations
                                           .Include(x => x.ProductImages)
                                           .Include(x => x.CreatedByNavigation)
                                           .Include(x => x.InventoryTransactions)
-                                          .Include(x => x.OrderDetails).Where(x => x.ProductId == id).FirstOrDefaultAsync();
+                                          .Include(x => x.OrderDetails)
+                                          .Where(x => x.ProductId == id && !x.Category.Status.Contains("Deleted") && !x.Status.Contains("Deleted"))
+                                          .FirstOrDefaultAsync();
         }
 
         public List<Product> Search(string keyword)
@@ -64,8 +74,32 @@ namespace WebBanHang.DAL.Repositories.Implementations
 
         public async Task UpdateAsync(Product product)
         {
-            _context.Update(product);
+            var existingProduct = await _context.Products.Include(x => x.Category)
+                                          .Include(x => x.ProductImages)
+                                          .Include(x => x.CreatedByNavigation)
+                                          .Include(x => x.InventoryTransactions)
+                                          .Include(x => x.OrderDetails)
+                                          .Where(x => !x.Category.Status.Contains("Deleted") && !x.Status.Contains("Deleted"))
+                                          .FirstOrDefaultAsync(x => x.ProductId == product.ProductId);
+
+            if (existingProduct == null)
+            {
+                throw new Exception("Không tìm thấy sản phẩm cần cập nhật.");
+            }
+
+            existingProduct.Code = product.Code;
+            existingProduct.Name = product.Name;
+            existingProduct.CategoryId = product.CategoryId;
+            existingProduct.ImportPrice = product.ImportPrice;
+            existingProduct.Description = product.Description;
+            existingProduct.SellingPrice = product.SellingPrice;
+            existingProduct.ProductImages = product.ProductImages;
+            existingProduct.Status = product.Status;
+            existingProduct.StockQuantity = product.StockQuantity;
+
             await _context.SaveChangesAsync();
         }
+
+
     }
 }

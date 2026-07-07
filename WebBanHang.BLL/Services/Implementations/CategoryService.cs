@@ -48,18 +48,48 @@ namespace WebBanHang.BLL.Services.Implementations
 
             return dto;
         }
-        public void Add(Category category)
+        public async Task<bool> AddCateAsync(CreateCategoryDTO dto)
         {
-            throw new NotImplementedException();
+            if (dto == null) return false;
+            var category = new Category
+            {
+                Name = dto.Name,
+                Description = dto.Description,
+                Status = dto.Status,
+            };
+            await _repo.AddAsync(category);
+            return true;
         }
 
-        public void Update(Category category)
+        public async Task<bool> UpdateCateAsync(UpdateCategoryDTO dto)
         {
-            throw new NotImplementedException();
+            if (dto == null) return false;
+            var category = new Category
+            {
+                Name = dto.Name,
+                CategoryId = dto.CategoryId,
+                Description = dto.Description,
+                Status = dto.Status,
+                Products = dto.Products.Select(p => new Product
+                {
+                    ProductId = p.ProductId,
+                    Name = p.Name,
+                    Code = p.Code,
+                    Description = p.Description,
+                    SellingPrice = p.SellingPrice,
+                    Status = p.Status,
+                    CategoryId = p.CategoryId
+                }).ToList()
+            };
+            await _repo.UpdateAsync(category);
+            return true;
         }
-        public void Delete(int id)
+        public async Task<bool> DeleteCateAsync(int id)
         {
-            throw new NotImplementedException();
+            var cate = await _repo.GetByIdAsync(id);
+            if(cate == null) return false;
+            await _repo.DeleteAsync(id);
+            return true;
         }
 
         public async Task<CategoryDTO> GetCateByNameAsync(string name)

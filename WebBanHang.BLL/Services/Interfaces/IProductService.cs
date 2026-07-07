@@ -14,6 +14,7 @@ namespace WebBanHang.BLL.Services.Interfaces
         Task<bool> CreateProductAsync(ProductDTO dto);
         Task<bool> UpdateProductAsync(ProductDTO dto);
         Task<ProductDTO> GetProductByIdAsync(int id);
-
+        Task<DetailProductDTO> GetDetailProductByIdAsync(int id);
+        Task<bool> DeleteProductAsync(int id);
     }
 }
