@@ -1,3 +1,11 @@
-.vs/
+## Bỏ qua toàn bộ thư mục bin và obj ở bất kỳ đâu trong dự án
 [Bb]in/
+[Cc]onj/
 [Oo]bj/
+
+## Nếu bạn dùng Visual Studio, nên chặn thêm các file rác này:
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
