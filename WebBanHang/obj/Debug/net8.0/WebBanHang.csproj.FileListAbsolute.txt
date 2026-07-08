@@ -84,3 +84,4 @@ D:\PRN222\WebBanHang\WebBanHang\obj\Debug\net8.0\refint\WebBanHang.dll
 D:\PRN222\WebBanHang\WebBanHang\obj\Debug\net8.0\WebBanHang.pdb
 D:\PRN222\WebBanHang\WebBanHang\obj\Debug\net8.0\WebBanHang.genruntimeconfig.cache
 D:\PRN222\WebBanHang\WebBanHang\obj\Debug\net8.0\ref\WebBanHang.dll
+D:\PRN222\WebBanHang\WebBanHang\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
