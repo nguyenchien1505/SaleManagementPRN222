@@ -88,9 +88,12 @@ namespace WebBanHang.BLL.Services.Implementations
 
         public async Task<ProductDTO> GetProductByIdAsync(int id)
         {
+            Console.WriteLine("_________________");
+            Console.WriteLine(id);
             var product = await _repo.GetByIdAsync(id);
             return new ProductDTO
             {
+                ProductId = id,
                 Code = product.Code,
                 Name = product.Name,
                 Description = product.Description,
@@ -105,7 +108,6 @@ namespace WebBanHang.BLL.Services.Implementations
                 StockQuantity = product.StockQuantity,
                 CategoryId = product.CategoryId,
                 CategoryName = product.Category.Name
-
             };
         }
 

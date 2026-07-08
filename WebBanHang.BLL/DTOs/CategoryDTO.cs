@@ -17,6 +17,7 @@ namespace WebBanHang.BLL.DTOs
         public int? ParentId { get; set; }
 
         public string? Status { get; set; }
+        public List<ProductDTO> Products { get; set; }
 
     }
 }
