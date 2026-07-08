@@ -51,9 +51,9 @@ namespace WebBanHang.Controllers
                 return RedirectToAction( "Index", "Dashboard", new { area = "Admin" });
             }
 
-            if (user.Role == "Sale")
+            if (user.Role == "Sales")
             {
-                return RedirectToAction( "Index", "Dashboard",new { area = "Sale" });
+                return RedirectToAction( "Index", "DashBoard",new { area = "Sale" });
             }
 
             return RedirectToAction( "Index", "Home", new { area = "Customer" });

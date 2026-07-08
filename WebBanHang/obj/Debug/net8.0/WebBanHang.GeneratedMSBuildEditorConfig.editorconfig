@@ -136,6 +136,22 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcU2FsZVxWaWV3c1xEYXNoYm9hcmRcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/PRN222/SaleManagementPRN222/WebBanHang/Areas/Sale/Views/Orders/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcU2FsZVxWaWV3c1xPcmRlcnNcQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PRN222/SaleManagementPRN222/WebBanHang/Areas/Sale/Views/Orders/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcU2FsZVxWaWV3c1xPcmRlcnNcRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PRN222/SaleManagementPRN222/WebBanHang/Areas/Sale/Views/Orders/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcU2FsZVxWaWV3c1xPcmRlcnNcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/PRN222/SaleManagementPRN222/WebBanHang/Areas/Sale/Views/Shared/_SaleLayout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcU2FsZVxWaWV3c1xTaGFyZWRcX1NhbGVMYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/PRN222/SaleManagementPRN222/WebBanHang/Areas/Sale/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcU2FsZVxfVmlld0ltcG9ydHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 

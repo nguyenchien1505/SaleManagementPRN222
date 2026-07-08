@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WebBanHang.DAL")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+21c8dfb1a59f3a968834588e5f6938aea56e6be7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6e5f571496247867ae86906f50a7325f3a48ea64")]
 [assembly: System.Reflection.AssemblyProductAttribute("WebBanHang.DAL")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WebBanHang.DAL")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

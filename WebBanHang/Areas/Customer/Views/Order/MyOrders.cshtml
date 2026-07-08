@@ -67,15 +67,13 @@
                                     <td>
                                         @switch (order.Status)
                                         {
-                                            case "Pending":
-                                                <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">Chờ xử lý</span>
+                                            case "Draft":
+                                                <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">Chờ xác nhận</span>
                                                 break;
                                             case "Confirmed":
                                                 <span class="badge bg-info-subtle text-info rounded-pill px-3 py-2">Đã xác nhận</span>
                                                 break;
-                                            case "Processing":
-                                                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">Đang giao hàng</span>
-                                                break;
+                                           
                                             case "Completed":
                                                 <span class="badge bg-success shadow-sm rounded-pill px-3 py-2">Hoàn thành</span>
                                                 break;

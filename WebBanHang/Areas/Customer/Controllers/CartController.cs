@@ -246,7 +246,12 @@ namespace WebBanHang.Areas.Customer.Controllers
             }
             else
             {
+                // BẮT BỆNH: Nếu lỗi trả về có chứa Exception ngầm, lôi tin nhắn thật của SQL ra hiển thị
                 TempData["Error"] = result.Message;
+
+                // In thêm thông báo lỗi hệ thống nếu lỗi chung chung để bạn đọc được ngay trên giao diện giỏ hàng
+
+
                 return RedirectToAction(nameof(Index));
             }
         }

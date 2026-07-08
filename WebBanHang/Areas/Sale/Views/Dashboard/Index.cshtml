@@ -147,9 +147,9 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div class="avatar-sm me-2 bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 0.8rem;">
-                                                    @(order.Customer?.User.FullName?[0].ToString().ToUpper() ?? "?")
+                                                    @(string.IsNullOrEmpty(order.Customer?.User?.FullName) ? "?" : order.Customer.User.FullName[0].ToString().ToUpper())
                                                 </div>
-                                                <span class="fw-medium">@order.Customer?.User.FullName</span>
+                                                <span class="fw-medium">@(order.Customer?.User?.FullName ?? "Khách hàng ẩn danh")</span>
                                             </div>
                                         </td>
                                         <td class="fw-bold text-dark">@((order.TotalAmount ?? 0m).ToString("N0")) xu</td>
@@ -158,10 +158,10 @@
                                                 var (badgeClass, statusText) = order.Status switch
                                                 {
                                                     "Completed" => ("bg-success", "Hoàn thành"),
-                                                    "Paid" => ("bg-primary", "Đã thanh toán"),
-                                                    "Pending" => ("bg-warning", "Chờ xử lý"),
+                                                    "Confirmed" => ("bg-warning", "Đã xác nhận"),
                                                     "Cancelled" => ("bg-danger", "Đã hủy"),
-                                                    _ => ("bg-secondary", order.Status)
+                                                    "Draft" => ("bg-secondary", "Chờ xác nhận"), // Bổ sung cho đúng trạng thái hệ thống của bạn
+                                                    _ => ("bg-secondary", order.Status ?? "Không rõ")
                                                 };
                                             }
                                             <span class="badge @badgeClass bg-opacity-10 text-@badgeClass.Replace("bg-", "") rounded-pill px-3">@statusText</span>

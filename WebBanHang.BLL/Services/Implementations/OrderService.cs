@@ -38,9 +38,16 @@ namespace WebBanHang.BLL.Services.Implementations
                 .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
         }
-        public async Task<Order?> GetOrderDetailsAsync(int id)
+        public async Task<Order?> GetOrderDetailsAsync(int orderId)
         {
-            return await _orderRepository.GetOrderDetailsAsync(id);
+            return await _context.Orders
+                .Include(o => o.Customer)
+                    .ThenInclude(c => c.User) 
+                .Include(o => o.CreatedByNavigation) 
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Product) 
+                        .ThenInclude(p => p.ProductImages) 
+                .FirstOrDefaultAsync(o => o.OrderId == orderId);
         }
 
         public async Task<(bool Success, string Message, int OrderId)> CheckoutAsync(int userId, int productId, int quantity)
@@ -142,9 +149,21 @@ namespace WebBanHang.BLL.Services.Implementations
                         processedItems.Add((product, item.quantity));
                     }
 
-
                     decimal discountFromPromo = 0;
-                    decimal finalPayableAmount = totalOrderAmount;
+
+                    if (!string.IsNullOrEmpty(promoCode) && promoCode.Trim() != "")
+                    {
+                        // 💡 SAU NÀY CÓ LOGIC PROMOTION BẠN CHỈ CẦN VIẾT VÀO ĐÂY:
+                        // var promoResult = await _promotionService.ValidatePromotionAsync(promoCode, totalOrderAmount);
+                        // if (promoResult.Success) {
+                        //     discountFromPromo = promoResult.DiscountAmount;
+                        // }
+
+                        discountFromPromo = 0;
+                    }
+
+                    decimal finalPayableAmount = totalOrderAmount - discountFromPromo;
+                    if (finalPayableAmount < 0) finalPayableAmount = 0;
 
                     string uniqueOrderCode = $"ORD-{DateTime.Now:yyyyMMddHHmmss}-{new Random().Next(100, 999)}";
 
@@ -152,21 +171,21 @@ namespace WebBanHang.BLL.Services.Implementations
                     {
                         OrderCode = uniqueOrderCode,
                         CustomerId = customer.CustomerId,
+                        CreatedBy = userId,
                         OrderDate = DateTime.Now,
-                        SubTotal = totalOrderAmount,       
+                        SubTotal = totalOrderAmount,
                         DiscountAmount = discountFromPromo,
-                        TotalAmount = finalPayableAmount,  // Tổng tiền phải trả sau cùng
-                        Status = "Draft",                  // RÀNG BUỘC: Luôn luôn là Draft
-                        CreatedBy = userId
+                        TotalAmount = finalPayableAmount,
+                        Status = "Draft" 
                     };
+
                     _context.Orders.Add(order);
                     await _context.SaveChangesAsync(); 
+
                     foreach (var item in processedItems)
                     {
-                        // Trừ kho của sản phẩm
                         item.product.StockQuantity -= item.quantity;
 
-                        // Tạo Chi tiết đơn hàng
                         var detail = new OrderDetail
                         {
                             OrderId = order.OrderId,
@@ -177,31 +196,123 @@ namespace WebBanHang.BLL.Services.Implementations
                         };
                         _context.OrderDetails.Add(detail);
 
-                        // Ghi lịch sử giao dịch kho (Inventory log)
                         _context.InventoryTransactions.Add(new InventoryTransaction
                         {
                             ProductId = item.product.ProductId,
-                            Quantity = -item.quantity,
+                            Quantity = -item.quantity, 
                             CreatedDate = DateTime.Now,
-                            Type = "Sale",
+                            Type = "Export",
                             Note = $"Order Code: {order.OrderCode}",
-                            CreatedBy = userId // Sử dụng chính userId mua hàng để khớp ràng buộc khóa ngoại trong DB
+                            CreatedBy = userId 
                         });
                     }
 
-                    // 6. Lưu toàn bộ thay đổi dữ liệu chi tiết và commit giao dịch hoàn tất đặt đơn
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
 
-                    return (true, "Đặt đơn hàng nháp thành công!", order.OrderId);
+                    return (true, "Đặt hàng thành công!", order.OrderId);
                 }
                 catch (Exception ex)
                 {
-                    // Hoàn tác dữ liệu cũ nếu xuất hiện lỗi bất kỳ
                     await transaction.RollbackAsync();
-                    return (false, $"Lỗi hệ thống: {ex.Message}", 0);
+
+                    // 🔎 GIẢI PHẪU TẬN GỐC LỖI NGẦM CỦA SQL SERVER
+                    string realSqlErrorMessage = ex.Message;
+
+                    if (ex.InnerException != null)
+                    {
+                        realSqlErrorMessage = ex.InnerException.Message; // Tầng 1: EF Core Exception
+
+                        if (ex.InnerException.InnerException != null)
+                        {
+                            realSqlErrorMessage = ex.InnerException.InnerException.Message; // Tầng 2: Lỗi gốc từ Microsoft.Data.SqlClient
+                        }
+                    }
+
+                    // Trả về chuỗi lỗi thực sự từ SQL Server để hiển thị lên View
+                    return (false, $"🚨 LỖI SQL THỰC TẾ: {realSqlErrorMessage}", 0);
                 }
             }
+        }
+        public async Task<IEnumerable<Order>> GetOrdersOverviewAsync(string? searchString, string? statusFilter)
+        {
+            return await _orderRepository.GetOrdersWithCustomerAsync(searchString, statusFilter);
+        }
+        public async Task<Order?> CreateOrderAsync(int customerId, List<int> productIds, List<int> quantities)
+        {
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    var order = new Order
+                    {
+                        CustomerId = customerId,
+                        OrderDate = DateTime.Now,
+                        Status = "Completed",
+                        CreatedBy = 1 
+                    };
+
+                    _context.Orders.Add(order);
+                    await _context.SaveChangesAsync();
+
+                    decimal subTotal = 0;
+
+                    for (int i = 0; i < productIds.Count; i++)
+                    {
+                        var product = await _context.Products.FindAsync(productIds[i]);
+                        if (product == null || quantities[i] <= 0 || quantities[i] > (product.StockQuantity))
+                            continue;
+
+                        var detail = new OrderDetail
+                        {
+                            OrderId = order.OrderId,
+                            ProductId = product.ProductId,
+                            Quantity = quantities[i],
+                            UnitPrice = product.SellingPrice,
+                            Total = quantities[i] * product.SellingPrice
+                        };
+
+                        subTotal += detail.Total ;
+                        product.StockQuantity -= quantities[i];
+                        _context.OrderDetails.Add(detail);
+
+                        _context.InventoryTransactions.Add(new InventoryTransaction
+                        {
+                            ProductId = product.ProductId,
+                            Quantity = -quantities[i],
+                            CreatedDate = DateTime.Now,
+                            Type = "Sale",
+                            CreatedBy = 1
+                        });
+                    }
+
+                    order.SubTotal = subTotal;
+                    order.TotalAmount = order.SubTotal;
+
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    return order;
+                }
+                catch (Exception)
+                {
+                    await transaction.RollbackAsync();
+                    return null;
+                }
+            }
+        }
+
+        public async Task<bool> UpdateOrderStatusAsync(int id, string status)
+        {
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == id);
+            if (order == null) return false;
+
+            // 2. Cập nhật trạng thái đơn hàng ('Draft', 'Confirmed', 'Completed', 'Cancelled')
+            order.Status = status;
+
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }
