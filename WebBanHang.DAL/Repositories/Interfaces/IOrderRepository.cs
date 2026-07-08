@@ -9,6 +9,10 @@ namespace WebBanHang.DAL.Repositories.Interfaces
 {
     public interface IOrderRepository
     {
+        Task<IEnumerable<Order>> GetOrdersWithCustomerAsync(string? searchString, string? statusFilter);
+
+        Task<Order?> GetOrderDetailsAsync(int id);
+
         List<Order> GetAll();
 
         Order GetById(int id);

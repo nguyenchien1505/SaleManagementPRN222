@@ -1,19 +1,14 @@
-# Build folders
-**/bin/
-**/obj/
 
-# Visual Studio
+
+## Bỏ qua toàn bộ thư mục bin và obj ở bất kỳ đâu trong dự án
+[Bb]in/
+[Cc]onj/
+[Oo]bj/
+
+## Nếu bạn dùng Visual Studio, nên chặn thêm các file rác này:
 .vs/
-
-# Rider
-.idea/
-
-# VS Code
-.vscode/
-
-# User files
 *.user
 *.suo
+*.userosscache
+*.sln.docstates
 
-# Logs
-*.log
