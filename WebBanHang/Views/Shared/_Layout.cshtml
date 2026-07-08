@@ -1,6 +1,5 @@
 ﻿<!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -31,7 +30,6 @@
         }
     </style>
 </head>
-
 <body>
     <header>
         <nav class="navbar navbar-expand-lg fixed-top glass-effect">
@@ -105,11 +103,35 @@
 
                                     <li>
                                         <span class="dropdown-item-text small text-muted">
-                                            @Context.Session.GetString("Role")
+                                            Quyền: @Context.Session.GetString("Role")
                                         </span>
                                     </li>
 
                                     <li><hr class="dropdown-divider"></li>
+
+                                    @* MENU ĐIỀU HƯỚNG KHO DÀNH CHO ADMIN HOẶC SALES *@
+                                    @if (Context.Session.GetString("Role") == "Admin" || Context.Session.GetString("Role") == "Sales")
+                                    {
+                                        <li>
+                                            <a class="dropdown-item text-primary fw-bold" asp-area="Admin" asp-controller="Inventory" asp-action="Stock">
+                                                <i class="bi bi-boxes me-2"></i>
+                                                Xem Tồn Kho (Stock)
+                                            </a>
+                                        </li>
+
+                                        @if (Context.Session.GetString("Role") == "Admin")
+                                        {
+                                            <li>
+                                                <a class="dropdown-item text-success fw-bold" asp-area="Admin" asp-controller="Inventory" asp-action="Inbound">
+                                                    <i class="bi bi-download me-2"></i>
+                                                    Nhập Kho (Inbound)
+                                                    Chin
+                                                </a>
+                                            </li>
+                                        }
+
+                                        <li><hr class="dropdown-divider"></li>
+                                    }
 
                                     <li>
                                         <a class="dropdown-item" href="#">
@@ -200,6 +222,5 @@
     </script>
 
     @RenderSection("Scripts", required: false)
-
 </body>
 </html>

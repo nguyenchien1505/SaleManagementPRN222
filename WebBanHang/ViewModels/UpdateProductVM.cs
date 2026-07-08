@@ -28,19 +28,15 @@ namespace WebBanHang.ViewModels
         public int StockQuantity { get; set; }
 
         public string? Description { get; set; }
-
         public string Status { get; set; }
 
+        public List<ProductImageDTO> ExistingImages { get; set; } = new();
+        public DateTime? CreatedDate { get; set; }
         public int CreatedBy { get; set; }
-
-        public DateTime CreatedDate { get; set; }
-
         public string? CategoryName { get; set; }
-
         public IFormFile? ImageFile { get; set; }
 
         public List<CategoryDTO>? Categories { get; set; }
 
-        public List<ProductImageDTO>? ExistingImages { get; set; }
     }
 }

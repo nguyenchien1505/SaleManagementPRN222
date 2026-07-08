@@ -1,5 +1,4 @@
 
-
 ## Bỏ qua toàn bộ thư mục bin và obj ở bất kỳ đâu trong dự án
 [Bb]in/
 [Cc]onj/
@@ -11,4 +10,6 @@
 *.suo
 *.userosscache
 *.sln.docstates
+
+
 

@@ -9,15 +9,10 @@ namespace WebBanHang.DAL.Repositories.Interfaces
 {
     public interface IPromotionRepository
     {
-        Promotion GetByCode(string code);
-
-        List<Promotion> GetAll();
-
-        void Add(Promotion promotion);
-
-        void Update(Promotion promotion);
-
-        void Delete(int id);
-        void Test();
+        Task<IEnumerable<Promotion>> GetAllAsync(string? statusFilter, string? searchString);
+        Task<Promotion?> GetByIdAsync(int id);
+        Task<bool> AddAsync(Promotion promotion);
+        Task<bool> UpdateAsync(Promotion promotion);
+        Task<bool> DeleteAsync(int id);
     }
 }

@@ -1,9 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using WebBanHang.BLL.Services.Interfaces;
 using WebBanHang.DAL.Context;
 using WebBanHang.DAL.Entities;
@@ -15,11 +13,13 @@ namespace WebBanHang.BLL.Services.Implementations
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IProductRepository _productRepository;
+        private readonly IInventoryService _inventoryService;
         private readonly WebBanHangContext _context;
         private readonly IPromotionService _promotionService;
 
-        public OrderService(IOrderRepository orderRepository, IProductRepository productRepository, WebBanHangContext context, IPromotionService promotionService)
+        public OrderService(IInventoryService inventoryService,IOrderRepository orderRepository, IProductRepository productRepository, WebBanHangContext context, IPromotionService promotionService)
         {
+            _inventoryService = inventoryService;
             _orderRepository = orderRepository;
             _productRepository = productRepository;
             _context = context;
@@ -314,5 +314,35 @@ namespace WebBanHang.BLL.Services.Implementations
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public void ConfirmOrder(int orderId, int userId)
+        {
+            var order = _context.Orders
+                .Include(o => o.OrderDetails)
+                .FirstOrDefault(o => o.OrderId == orderId);
+
+            if (order == null)
+                throw new Exception("Đơn hàng không tồn tại");
+
+            // Xuất kho: Tự động sinh khi Order Confirmed
+            foreach (var detail in order.OrderDetails)
+            {
+                _inventoryService.XuatKho(
+                    detail.ProductId,
+                    detail.Quantity,
+                    userId,
+                    $"Tự động sinh khi Order Confirmed - Đơn hàng #{order.OrderCode}");
+            }
+
+            order.Status = "Confirmed";
+            _context.Orders.Update(order);
+            _context.SaveChanges();
+        }
+
+
+
     }
+
+
+
 }

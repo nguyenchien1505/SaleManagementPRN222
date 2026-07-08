@@ -1,9 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
+﻿using Microsoft.EntityFrameworkCore; // Bắt buộc phải có để dùng ToListAsync(), FindAsync(),...
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading.Tasks; // Bắt buộc phải có để dùng Task
 using WebBanHang.DAL.Context;
 using WebBanHang.DAL.Entities;
 using WebBanHang.DAL.Repositories.Interfaces;
@@ -13,12 +11,14 @@ namespace WebBanHang.DAL.Repositories.Implementations
     public class CategoryRepository : ICategoryRepository
     {
         private readonly WebBanHangContext _context;
+
         public CategoryRepository(WebBanHangContext context)
         {
             _context = context;
         }
 
-        public async Task<List<Category>> GetAllAsync()
+        // 1. Lấy tất cả danh mục (Async)
+        public async Task<IEnumerable<Category>> GetAllAsync()
         {
             return await _context.Categories.Where(x => !x.Status.Contains("Deleted")).ToListAsync();
         }
@@ -61,5 +61,6 @@ namespace WebBanHang.DAL.Repositories.Implementations
         {
             return await _context.Categories.Where(x => x.Name == name && !x.Status.Contains("Deleted")).FirstOrDefaultAsync();
         }
+
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using WebBanHang.DAL.Entities;
 
 namespace WebBanHang.DAL.Repositories.Interfaces
@@ -12,5 +8,13 @@ namespace WebBanHang.DAL.Repositories.Interfaces
         void AddTransaction(InventoryTransaction transaction);
 
         List<InventoryTransaction> GetTransactionsByProduct(int productId);
+
+        List<InventoryTransaction> GetAll();
+
+        Product? GetProductWithStock(int productId);
+
+        List<Product> GetLowStockProducts(int threshold);
+
+        void UpdateProductStock(Product product);
     }
 }
