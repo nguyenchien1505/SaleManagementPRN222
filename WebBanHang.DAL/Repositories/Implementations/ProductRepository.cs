@@ -1,9 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using WebBanHang.DAL.Context;
 using WebBanHang.DAL.Entities;
 using WebBanHang.DAL.Repositories.Interfaces;
@@ -13,59 +11,84 @@ namespace WebBanHang.DAL.Repositories.Implementations
     public class ProductRepository : IProductRepository
     {
         private readonly WebBanHangContext _context;
+
         public ProductRepository(WebBanHangContext context)
         {
             _context = context;
         }
 
-        public async Task CreateAsync(Product product)
-        {
-            await _context.AddAsync(product);
-            await _context.SaveChangesAsync();
-        }
-
-        public void Delete(int id)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<List<Product>> GetAllAsync()
         {
-            return await _context.Products.Include(x => x.Category)
-                                          .Include(x => x.ProductImages)
-                                          .Include(x => x.CreatedByNavigation)
-                                          .Include(x => x.InventoryTransactions)
-                                          .Include(x => x.OrderDetails).ToListAsync();
+            return await _context.Products
+                .Include(p => p.Category)
+                .Include(p => p.ProductImages)
+                .ToListAsync();
         }
 
-        public List<Product> GetByCategory(int categoryId)
+        public async Task<Product?> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _context.Products
+                .Include(p => p.Category)
+                .Include(p => p.ProductImages)
+                .FirstOrDefaultAsync(p => p.ProductId == id);
         }
 
-        public async Task<Product> GetByCodeAsync(string code)
+        public async Task<Product?> GetByCodeAsync(string code)
         {
-            return await _context.Products.Include(x => x.Category).Where(x => x.Code == code).FirstOrDefaultAsync();
+            return await _context.Products
+                .FirstOrDefaultAsync(p => p.Code == code);
         }
 
-        public async Task<Product> GetByIdAsync(int id)
+        public async Task CreateAsync(Product product)
         {
-            return await _context.Products.Include(x => x.Category)
-                                          .Include(x => x.ProductImages)
-                                          .Include(x => x.CreatedByNavigation)
-                                          .Include(x => x.InventoryTransactions)
-                                          .Include(x => x.OrderDetails).Where(x => x.ProductId == id).FirstOrDefaultAsync();
-        }
-
-        public List<Product> Search(string keyword)
-        {
-            throw new NotImplementedException();
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(Product product)
         {
-            _context.Update(product);
+            _context.Products.Update(product);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product != null)
+            {
+                _context.Products.Remove(product);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        // ---- Sync methods (dùng cho InventoryController) ----
+        public List<Product> GetAll()
+        {
+            return _context.Products
+                .Include(p => p.Category)
+                .ToList();
+        }
+
+        public Product? GetById(int id)
+        {
+            return _context.Products.Find(id);
+        }
+
+        public List<Product> Search(string keyword)
+        {
+            if (string.IsNullOrWhiteSpace(keyword))
+                return GetAll();
+
+            return _context.Products
+                .Where(p => p.Name.Contains(keyword) || p.Code.Contains(keyword))
+                .ToList();
+        }
+
+        public List<Product> GetByCategory(int categoryId)
+        {
+            return _context.Products
+                .Where(p => p.CategoryId == categoryId)
+                .ToList();
         }
     }
 }

@@ -100,7 +100,7 @@ namespace WebBanHang.Areas.Admin.Controllers
                 SellingPrice = vm.SellingPrice,
                 Status = vm.Status,
                 StockQuantity = vm.StockQuantity,
-                CreatedBy = userId.Value
+                CreatedBy = userId ?? 0
             };
             var result = await _service.CreateProductAsync(dto);
             if (!result)
@@ -130,18 +130,19 @@ namespace WebBanHang.Areas.Admin.Controllers
                     CategoryId = x.CategoryId,
                     Name = x.Name
                 }).ToList(),
-                ExistingImages = product.Images.Select(x => new ProductImageDTO
+                // Thêm dấu ? vào sau product.Images
+                ExistingImages = product.Images?.Select(x => new ProductImageDTO
                 {
                     ImageUrl = x.ImageUrl,
                     IsPrimary = x.IsPrimary
-                }).ToList(),
+                }).ToList() ?? new List<ProductImageDTO>(),
                 Description = product.Description,
                 SellingPrice    = product.SellingPrice,
                 ImportPrice = product.ImportPrice,
                 StockQuantity = product.StockQuantity,
                 Status = product.Status,
                 CreatedBy = product.CreatedBy,
-                CreatedDate = product.CreatedDate
+                CreatedDate = product.CreatedDate ?? DateTime.Now
             };
             return View(vm);
         }

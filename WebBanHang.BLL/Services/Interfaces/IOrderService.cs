@@ -8,5 +8,6 @@ namespace WebBanHang.BLL.Services.Interfaces
 {
     public interface IOrderService
     {
+        void ConfirmOrder(int orderId, int userId);
     }
 }

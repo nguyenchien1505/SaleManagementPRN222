@@ -9,7 +9,6 @@ namespace WebBanHang.BLL.DTOs
     public class ProductImageDTO
     {
         public string ImageUrl { get; set; } = null!;
-
         public bool? IsPrimary { get; set; }
     }
 }

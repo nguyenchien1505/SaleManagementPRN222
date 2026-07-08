@@ -2,7 +2,6 @@
     // Tự động nhận diện tên Controller trên trình duyệt để kích hoạt class active động
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
 }
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -63,9 +62,9 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link @(currentController == "Coin" ? "active" : "")" asp-area="Admin" asp-controller="Coin" asp-action="Index">
-                    <i class="bi bi-wallet-fill"></i>
-                    Nạp xu
+                <a class="nav-link @(currentController == "Inventory" ? "active" : "")" asp-area="Admin" asp-controller="Inventory" asp-action="Index">
+                    <i class="bi bi-boxes"></i>
+                    Quản lý kho
                 </a>
             </li>
 

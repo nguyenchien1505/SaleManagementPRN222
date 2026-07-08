@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using WebBanHang.DAL.Entities;
 
@@ -11,17 +8,23 @@ namespace WebBanHang.DAL.Repositories.Interfaces
     {
         Task<List<Product>> GetAllAsync();
 
-        Task<Product> GetByIdAsync(int id);
+        Task<Product?> GetByIdAsync(int id);
 
-        List<Product> Search(string keyword);
-
-        List<Product> GetByCategory(int categoryId);
-        Task<Product> GetByCodeAsync(string code);
+        Task<Product?> GetByCodeAsync(string code);
 
         Task CreateAsync(Product product);
 
         Task UpdateAsync(Product product);
-        
-        void Delete(int id);
+
+        Task DeleteAsync(int id);
+
+        // Dùng cho InventoryController (đồng bộ, không async)
+        List<Product> GetAll();
+
+        Product? GetById(int id);
+
+        List<Product> Search(string keyword);
+
+        List<Product> GetByCategory(int categoryId);
     }
 }

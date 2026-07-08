@@ -26,7 +26,7 @@ namespace WebBanHang.ViewModels
         public List<CategoryDTO> Categories { get; set; } = new();
         public int CategoryId { get; set; }
         public List<ProductImageDTO> ExistingImages { get; set; } = new();
-        public DateTime CreatedDate { get; set; }
+        public DateTime? CreatedDate { get; set; }
         public int CreatedBy { get; set; }
     }
 }

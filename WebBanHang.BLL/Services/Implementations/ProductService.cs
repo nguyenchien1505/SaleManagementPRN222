@@ -24,7 +24,8 @@ namespace WebBanHang.BLL.Services.Implementations
 
         public async Task<bool> CreateProductAsync(ProductDTO dto)
         {
-            if (dto.CategoryId == null) return false;
+            // Sửa: CategoryId là int, không so sánh với null được
+            if (dto.CategoryId <= 0) return false;
 
             var existedCode = await _repo.GetByCodeAsync(dto.Code);
             if (existedCode != null) return false;
@@ -78,22 +79,26 @@ namespace WebBanHang.BLL.Services.Implementations
         public async Task<ProductDTO> GetProductByCodeAsync(string code)
         {
             var product = await _repo.GetByCodeAsync(code);
+            if (product == null)
+                return new ProductDTO(); // tránh null reference
+
             return new ProductDTO
             {
                 ProductId = product.ProductId,
-                Name= product.Name,
-
+                Name = product.Name,
             };
         }
 
         public async Task<ProductDTO> GetProductByIdAsync(int id)
         {
             var product = await _repo.GetByIdAsync(id);
+            if (product == null)
+                return new ProductDTO();
+
             return new ProductDTO
             {
                 Code = product.Code,
                 Name = product.Name,
-                //Category = 
             };
         }
 
@@ -104,14 +109,16 @@ namespace WebBanHang.BLL.Services.Implementations
 
             var product = new Product
             {
+                ProductId = dto.ProductId, // cần set Id để Update đúng bản ghi
                 Code = dto.Code,
                 Name = dto.Name,
                 CategoryId = dto.CategoryId,
-                ProductImages = dto.Images.Select(x => new ProductImage
-                {
-                    ImageUrl = x.ImageUrl,
-                    IsPrimary = x.IsPrimary
-                }).ToList(),
+                ProductImages = (dto.Images ?? Enumerable.Empty<ProductImageDTO>())
+                    .Select(x => new ProductImage
+                    {
+                        ImageUrl = x.ImageUrl,
+                        IsPrimary = x.IsPrimary
+                    }).ToList(),
                 Description = dto.Description,
                 SellingPrice = dto.SellingPrice,
                 ImportPrice = dto.ImportPrice,
