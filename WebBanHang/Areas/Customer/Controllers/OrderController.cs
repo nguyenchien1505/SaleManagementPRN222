@@ -52,13 +52,44 @@ namespace WebBanHang.Areas.Customer.Controllers
         // ──────────────────────────────────────────────
         public async Task<IActionResult> MyOrders()
         {
-            // ĐỒNG BỘ: Đọc UserId từ Session thay vì ClaimTypes
             int? userId = HttpContext.Session.GetInt32("UserId");
             if (!userId.HasValue)
                 return RedirectToAction("Login", "Account", new { area = "" });
 
             var orders = await _orderService.GetMyOrdersAsync(userId.Value);
             return View(orders);
+        }
+
+        // ──────────────────────────────────────────────
+        // 🌟 BỔ SUNG: POST: /Customer/Order/UpdateStatus (Hủy đơn hàng)
+        // ──────────────────────────────────────────────
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateStatus(int id, string status)
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (!userId.HasValue)
+                return RedirectToAction("Login", "Account", new { area = "" });
+
+            // Bảo mật phía Server: Khách hàng chỉ được phép gửi trạng thái "Cancelled" (Hủy đơn)
+            if (status != "Cancelled")
+            {
+                TempData["Error"] = "Thao tác không hợp lệ.";
+                return RedirectToAction(nameof(MyOrders));
+            }
+
+            // Thực hiện cập nhật thông qua hàm có sẵn ở tầng Service của bạn
+            var success = await _orderService.UpdateOrderStatusAsync(id, status);
+            if (success)
+            {
+                TempData["Success"] = "Hủy đơn hàng thành công!";
+            }
+            else
+            {
+                TempData["Error"] = "Không thể hủy đơn hàng này.";
+            }
+
+            return RedirectToAction(nameof(MyOrders));
         }
     }
 }

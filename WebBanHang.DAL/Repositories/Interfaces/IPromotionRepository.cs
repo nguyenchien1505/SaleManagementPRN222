@@ -14,5 +14,6 @@ namespace WebBanHang.DAL.Repositories.Interfaces
         Task<bool> AddAsync(Promotion promotion);
         Task<bool> UpdateAsync(Promotion promotion);
         Task<bool> DeleteAsync(int id);
+
     }
 }

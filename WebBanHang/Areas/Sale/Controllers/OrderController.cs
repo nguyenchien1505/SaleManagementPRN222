@@ -43,40 +43,15 @@ namespace WebBanHang.Areas.Sale.Controllers
             return View(order);
         }
 
-        // GET: Sale/Orders/Create
-        public async Task<IActionResult> Create()
-        {
-            ViewBag.Customers = await _customerService.GetAllCustomersAsync(null);
-            //           var products = await _productService.GetPagedProductsAsync(1, 100, null, null);
-            //           ViewBag.Products = products.Where(p => (p.StockQuantity ?? 0) > 0).ToList();
-            return View();
-        }
+  
 
-        // POST: Sale/Orders/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(int customerId, List<int> productIds, List<int> quantities)
-        {
-            if (productIds == null || quantities == null || productIds.Count != quantities.Count)
-            {
-                ModelState.AddModelError("", "Dữ liệu sản phẩm không hợp lệ");
-                return RedirectToAction(nameof(Create));
-            }
-
-            var order = await _orderService.CreateOrderAsync(customerId, productIds, quantities);
-            if (order == null)
-            {
-                ModelState.AddModelError("", "Lỗi trong quá trình tạo đơn hàng.");
-                return RedirectToAction(nameof(Create));
-            }
-
-            return RedirectToAction(nameof(Index));
-        }
+  
 
         [HttpPost]
-        public async Task<IActionResult> UpdateStatus(int id, string status)
+        public async Task<IActionResult> UpdateStatus(int id, string newStatus) 
         {
-            var result = await _orderService.UpdateOrderStatusAsync(id, status);
+            var result = await _orderService.UpdateOrderStatusAsync(id, newStatus);
+
             if (result)
             {
                 TempData["SuccessMessage"] = "Cập nhật trạng thái thành công!";

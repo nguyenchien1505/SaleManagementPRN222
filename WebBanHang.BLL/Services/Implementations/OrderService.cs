@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 using WebBanHang.BLL.Services.Interfaces;
 using WebBanHang.DAL.Context;
 using WebBanHang.DAL.Entities;
@@ -17,7 +18,7 @@ namespace WebBanHang.BLL.Services.Implementations
         private readonly WebBanHangContext _context;
         private readonly IPromotionService _promotionService;
 
-        public OrderService(IInventoryService inventoryService,IOrderRepository orderRepository, IProductRepository productRepository, WebBanHangContext context, IPromotionService promotionService)
+        public OrderService(IInventoryService inventoryService, IOrderRepository orderRepository, IProductRepository productRepository, WebBanHangContext context, IPromotionService promotionService)
         {
             _inventoryService = inventoryService;
             _orderRepository = orderRepository;
@@ -38,18 +39,22 @@ namespace WebBanHang.BLL.Services.Implementations
                 .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
         }
+
         public async Task<Order?> GetOrderDetailsAsync(int orderId)
         {
             return await _context.Orders
                 .Include(o => o.Customer)
-                    .ThenInclude(c => c.User) 
-                .Include(o => o.CreatedByNavigation) 
+                    .ThenInclude(c => c.User)
+                .Include(o => o.CreatedByNavigation)
                 .Include(o => o.OrderDetails)
-                    .ThenInclude(od => od.Product) 
-                        .ThenInclude(p => p.ProductImages) 
+                    .ThenInclude(od => od.Product)
+                        .ThenInclude(p => p.ProductImages)
                 .FirstOrDefaultAsync(o => o.OrderId == orderId);
         }
 
+        // ──────────────────────────────────────────────────────────────────────
+        // LUỒNG 1: MUA NGAY (Checkout nhanh 1 sản phẩm từ trang chi tiết)
+        // ──────────────────────────────────────────────────────────────────────
         public async Task<(bool Success, string Message, int OrderId)> CheckoutAsync(int userId, int productId, int quantity)
         {
             using (var transaction = await _context.Database.BeginTransactionAsync())
@@ -64,26 +69,31 @@ namespace WebBanHang.BLL.Services.Implementations
 
                     var customer = await _context.Customers.FirstOrDefaultAsync(c => c.UserId == userId);
                     if (customer == null)
-                    {
                         return (false, "Bạn cần hoàn thiện hồ sơ khách hàng trước khi mua hàng!", 0);
-                    }
+
+                    if (string.IsNullOrEmpty(customer.Address) || string.IsNullOrWhiteSpace(customer.Address))
+                        return (false, "Đặt hàng thất bại! Vui lòng cập nhật địa chỉ giao hàng trong hồ sơ.", 0);
+
+                    var userExists = await _context.Users.AnyAsync(u => u.UserId == userId);
+                    int safeCreatedBy = userExists ? userId : (await _context.Users.Select(u => u.UserId).FirstOrDefaultAsync());
 
                     product.StockQuantity -= quantity;
-
                     decimal subTotal = product.SellingPrice * quantity;
-
                     string uniqueOrderCode = $"ORD-{DateTime.Now:yyyyMMddHHmmss}-{new Random().Next(100, 999)}";
 
                     var order = new Order
                     {
-                        OrderCode = uniqueOrderCode, 
+                        OrderCode = uniqueOrderCode,
                         CustomerId = customer.CustomerId,
                         OrderDate = DateTime.Now,
-                        SubTotal = subTotal,        
+                        SubTotal = subTotal,
                         DiscountAmount = 0,
-                        TotalAmount = subTotal,       
-                        Status = "Confirmed",
-                        CreatedBy = userId
+                        TotalAmount = subTotal,
+                        Status = "Draft", 
+                        CreatedBy = safeCreatedBy,
+
+                        ShippingAddress = customer.Address,
+                        ShippingPhone = customer.Phone
                     };
                     _context.Orders.Add(order);
                     await _context.SaveChangesAsync();
@@ -103,8 +113,9 @@ namespace WebBanHang.BLL.Services.Implementations
                         ProductId = productId,
                         Quantity = -quantity,
                         CreatedDate = DateTime.Now,
-                        Type = "DirectSale",
-                        CreatedBy = userId
+                        Type = "Export", 
+                        Note = $"Direct Order Code: {order.OrderCode}",
+                        CreatedBy = safeCreatedBy
                     });
 
                     await _context.SaveChangesAsync();
@@ -120,6 +131,9 @@ namespace WebBanHang.BLL.Services.Implementations
             }
         }
 
+        // ──────────────────────────────────────────────────────────────────────
+        // LUỒNG 2: ĐẶT HÀNG TỪ GIỎ HÀNG (CheckoutCart)
+        // ──────────────────────────────────────────────────────────────────────
         public async Task<(bool Success, string Message, int OrderId)> CheckoutCartAsync(int userId, List<(int productId, int quantity)> items, string? promoCode = null)
         {
             if (items == null || !items.Any())
@@ -132,6 +146,17 @@ namespace WebBanHang.BLL.Services.Implementations
                     var customer = await _context.Customers.FirstOrDefaultAsync(c => c.UserId == userId);
                     if (customer == null)
                         return (false, "Bạn cần hoàn thiện hồ sơ khách hàng trước khi mua hàng!", 0);
+
+                    if (string.IsNullOrEmpty(customer.Address) || string.IsNullOrWhiteSpace(customer.Address))
+                    {
+                        return (false, "Đặt hàng không thành công! Tài khoản của bạn chưa cập nhật địa chỉ giao hàng. Vui lòng bổ sung địa chỉ trong trang quản lý tài khoản để tiếp tục.", 0);
+                    }
+
+                    var userExists = await _context.Users.AnyAsync(u => u.UserId == userId);
+                    int safeCreatedBy = userExists ? userId : (await _context.Users.Select(u => u.UserId).FirstOrDefaultAsync());
+
+                    if (safeCreatedBy == 0)
+                        return (false, "Hệ thống chưa có tài khoản User nào hợp lệ để tạo giao dịch kho!", 0);
 
                     decimal totalOrderAmount = 0;
                     var processedItems = new List<(Product product, int quantity)>();
@@ -149,19 +174,19 @@ namespace WebBanHang.BLL.Services.Implementations
                         processedItems.Add((product, item.quantity));
                     }
 
+                    // 🌟 ĐÃ SỬA: Tính toán tiền giảm giá thực tế từ mã Promotion được gửi lên
                     decimal discountFromPromo = 0;
-
-                    if (!string.IsNullOrEmpty(promoCode) && promoCode.Trim() != "")
+                    if (!string.IsNullOrWhiteSpace(promoCode))
                     {
-                        // 💡 SAU NÀY CÓ LOGIC PROMOTION BẠN CHỈ CẦN VIẾT VÀO ĐÂY:
-                        // var promoResult = await _promotionService.ValidatePromotionAsync(promoCode, totalOrderAmount);
-                        // if (promoResult.Success) {
-                        //     discountFromPromo = promoResult.DiscountAmount;
-                        // }
-
-                        discountFromPromo = 0;
+                        // Gọi qua PromotionService để kiểm tra tính hợp lệ và lấy số tiền giảm
+                        var promoResult = await _promotionService.ValidatePromotionAsync(promoCode, totalOrderAmount);
+                        if (promoResult.Success)
+                        {
+                            discountFromPromo = promoResult.DiscountAmount;
+                        }
                     }
 
+                    // Tính số tiền cuối cùng khách cần trả sau khi trừ khuyến mãi
                     decimal finalPayableAmount = totalOrderAmount - discountFromPromo;
                     if (finalPayableAmount < 0) finalPayableAmount = 0;
 
@@ -171,16 +196,19 @@ namespace WebBanHang.BLL.Services.Implementations
                     {
                         OrderCode = uniqueOrderCode,
                         CustomerId = customer.CustomerId,
-                        CreatedBy = userId,
+                        CreatedBy = safeCreatedBy,
                         OrderDate = DateTime.Now,
-                        SubTotal = totalOrderAmount,
-                        DiscountAmount = discountFromPromo,
-                        TotalAmount = finalPayableAmount,
-                        Status = "Draft" 
+                        SubTotal = totalOrderAmount,      // Giá gốc trước giảm
+                        DiscountAmount = discountFromPromo, // Lưu vết số tiền giảm giá
+                        TotalAmount = finalPayableAmount,   // Giá thực tế phải thu
+                        Status = "Draft",
+
+                        ShippingAddress = customer.Address,
+                        ShippingPhone = customer.Phone
                     };
 
                     _context.Orders.Add(order);
-                    await _context.SaveChangesAsync(); 
+                    await _context.SaveChangesAsync();
 
                     foreach (var item in processedItems)
                     {
@@ -199,11 +227,11 @@ namespace WebBanHang.BLL.Services.Implementations
                         _context.InventoryTransactions.Add(new InventoryTransaction
                         {
                             ProductId = item.product.ProductId,
-                            Quantity = -item.quantity, 
+                            Quantity = -item.quantity,
                             CreatedDate = DateTime.Now,
                             Type = "Export",
                             Note = $"Order Code: {order.OrderCode}",
-                            CreatedBy = userId 
+                            CreatedBy = safeCreatedBy
                         });
                     }
 
@@ -215,29 +243,25 @@ namespace WebBanHang.BLL.Services.Implementations
                 catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
-
-                    // 🔎 GIẢI PHẪU TẬN GỐC LỖI NGẦM CỦA SQL SERVER
                     string realSqlErrorMessage = ex.Message;
-
                     if (ex.InnerException != null)
                     {
-                        realSqlErrorMessage = ex.InnerException.Message; // Tầng 1: EF Core Exception
-
+                        realSqlErrorMessage = ex.InnerException.Message;
                         if (ex.InnerException.InnerException != null)
                         {
-                            realSqlErrorMessage = ex.InnerException.InnerException.Message; // Tầng 2: Lỗi gốc từ Microsoft.Data.SqlClient
+                            realSqlErrorMessage = ex.InnerException.InnerException.Message;
                         }
                     }
-
-                    // Trả về chuỗi lỗi thực sự từ SQL Server để hiển thị lên View
-                    return (false, $"🚨 LỖI SQL THỰC TẾ: {realSqlErrorMessage}", 0);
+                    return (false, $"Lỗi hệ thống: {ex.Message} | Chi tiết DB: {realSqlErrorMessage}", 0);
                 }
             }
         }
+
         public async Task<IEnumerable<Order>> GetOrdersOverviewAsync(string? searchString, string? statusFilter)
         {
             return await _orderRepository.GetOrdersWithCustomerAsync(searchString, statusFilter);
         }
+
         public async Task<Order?> CreateOrderAsync(int customerId, List<int> productIds, List<int> quantities)
         {
             using (var transaction = await _context.Database.BeginTransactionAsync())
@@ -249,7 +273,7 @@ namespace WebBanHang.BLL.Services.Implementations
                         CustomerId = customerId,
                         OrderDate = DateTime.Now,
                         Status = "Completed",
-                        CreatedBy = 1 
+                        CreatedBy = 1
                     };
 
                     _context.Orders.Add(order);
@@ -272,7 +296,7 @@ namespace WebBanHang.BLL.Services.Implementations
                             Total = quantities[i] * product.SellingPrice
                         };
 
-                        subTotal += detail.Total ;
+                        subTotal += detail.Total;
                         product.StockQuantity -= quantities[i];
                         _context.OrderDetails.Add(detail);
 
@@ -281,14 +305,13 @@ namespace WebBanHang.BLL.Services.Implementations
                             ProductId = product.ProductId,
                             Quantity = -quantities[i],
                             CreatedDate = DateTime.Now,
-                            Type = "Sale",
+                            Type = "Export", 
                             CreatedBy = 1
                         });
                     }
 
                     order.SubTotal = subTotal;
                     order.TotalAmount = order.SubTotal;
-
 
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
@@ -305,10 +328,34 @@ namespace WebBanHang.BLL.Services.Implementations
 
         public async Task<bool> UpdateOrderStatusAsync(int id, string status)
         {
-            var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == id);
+            var order = await _context.Orders
+                .Include(o => o.OrderDetails)
+                .FirstOrDefaultAsync(o => o.OrderId == id);
+
             if (order == null) return false;
 
-            // 2. Cập nhật trạng thái đơn hàng ('Draft', 'Confirmed', 'Completed', 'Cancelled')
+            if (order.Status == "Draft" && status == "Cancelled")
+            {
+                foreach (var detail in order.OrderDetails)
+                {
+                    var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == detail.ProductId);
+                    if (product != null)
+                    {
+                        product.StockQuantity += detail.Quantity;
+
+                        _context.InventoryTransactions.Add(new InventoryTransaction
+                        {
+                            ProductId = detail.ProductId,
+                            Quantity = detail.Quantity, 
+                            CreatedDate = DateTime.Now,
+                            Type = "Import", 
+                            Note = $"Hoàn kho tự động - Hủy đơn hàng rác #{order.OrderCode}",
+                            CreatedBy = order.CreatedBy 
+                        });
+                    }
+                }
+            }
+
             order.Status = status;
 
             await _context.SaveChangesAsync();
@@ -324,7 +371,6 @@ namespace WebBanHang.BLL.Services.Implementations
             if (order == null)
                 throw new Exception("Đơn hàng không tồn tại");
 
-            // Xuất kho: Tự động sinh khi Order Confirmed
             foreach (var detail in order.OrderDetails)
             {
                 _inventoryService.XuatKho(
@@ -338,11 +384,5 @@ namespace WebBanHang.BLL.Services.Implementations
             _context.Orders.Update(order);
             _context.SaveChanges();
         }
-
-
-
     }
-
-
-
 }
