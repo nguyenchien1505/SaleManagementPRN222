@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using WebBanHang.BLL.DTOs;
 using WebBanHang.BLL.Services.Interfaces;
 using WebBanHang.DAL.Entities;
+using WebBanHang.DAL.Repositories.Implementations;
 using WebBanHang.DAL.Repositories.Interfaces;
 
 namespace WebBanHang.BLL.Services.Implementations
@@ -19,16 +20,16 @@ namespace WebBanHang.BLL.Services.Implementations
 
         public async Task<IEnumerable<PromotionDTO>> GetAllPromotionsAsync(string? statusFilter, string? searchString)
         {
-            var promotions = await _promotionRepo.GetAllAsync(statusFilter, searchString);
+            var promotions = await _promotionRepo.GetAllAsync(null, null);
             return promotions.Select(p => new PromotionDTO
             {
                 PromotionId = p.PromotionId,
                 Code = p.Code,
                 DiscountType = p.DiscountType,
                 Value = p.Value,
-                MinOrderValue = p.MinOrderValue,
-                StartDate = p.StartDate,
-                EndDate = p.EndDate,
+                MinOrderValue = p.MinOrderValue ?? 0,
+                StartDate = p.StartDate ?? DateTime.Now,
+                EndDate = p.EndDate ?? DateTime.Now.AddDays(7),
                 Status = p.Status
             }).ToList();
         }
@@ -44,9 +45,9 @@ namespace WebBanHang.BLL.Services.Implementations
                 Code = p.Code,
                 DiscountType = p.DiscountType,
                 Value = p.Value,
-                MinOrderValue = p.MinOrderValue,
-                StartDate = p.StartDate,
-                EndDate = p.EndDate,
+                MinOrderValue = p.MinOrderValue ?? 0,
+                StartDate = p.StartDate ?? DateTime.Now,
+                EndDate = p.EndDate ??DateTime.Now.AddDays(7),
                 Status = p.Status
             };
         }
@@ -91,5 +92,33 @@ namespace WebBanHang.BLL.Services.Implementations
         {
             return await _promotionRepo.DeleteAsync(id);
         }
+        public async Task<(bool Success, string Message, decimal DiscountAmount)> ValidatePromotionAsync(string code, decimal orderValue)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+                return (false, "Vui lòng nhập mã giảm giá.", 0);
+
+            var all = await _promotionRepo.GetAllAsync(null, null);
+            var promo = all.FirstOrDefault(p => p.Code.Equals(code, StringComparison.OrdinalIgnoreCase) && p.Status == "Active");
+
+            if (promo == null)
+                return (false, "Mã giảm giá không tồn tại hoặc đã bị vô hiệu hóa.", 0);
+
+            if (promo.StartDate.HasValue && promo.StartDate > DateTime.Now)
+                return (false, "Chương trình khuyến mãi chưa bắt đầu.", 0);
+
+            if (promo.EndDate.HasValue && promo.EndDate < DateTime.Now)
+                return (false, "Mã giảm giá đã hết hạn.", 0);
+
+            if (orderValue < (promo.MinOrderValue ?? 0))
+                return (false, $"Đơn hàng tối thiểu {(promo.MinOrderValue ?? 0):N0} xu mới được áp dụng mã này.", 0);
+
+            decimal discount = promo.Value;
+
+            discount = Math.Min(discount, orderValue);
+
+            return (true, $"Áp dụng thành công mã '{promo.Code}'.", discount);
+        }
+
+     
     }
 }

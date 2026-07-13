@@ -66,6 +66,23 @@ namespace WebBanHang.Areas.Customer.Controllers
         public async Task<IActionResult> Index()
         {
             var cart = await GetCartItemsAsync();
+
+            var activePromotionsDto = await _promotionService.GetAllPromotionsAsync("Active", null);
+
+            var activePromos = activePromotionsDto.Select(p => new WebBanHang.DAL.Entities.Promotion
+            {
+                PromotionId = p.PromotionId,
+                Code = p.Code,
+                DiscountType = p.DiscountType,
+                Value = p.Value,
+                MinOrderValue = p.MinOrderValue,
+                StartDate = p.StartDate,
+                EndDate = p.EndDate,
+                Status = p.Status
+            }).ToList();
+
+            ViewBag.ActivePromotions = activePromos;
+
             return View(cart);
         }
 
@@ -273,23 +290,42 @@ namespace WebBanHang.Areas.Customer.Controllers
             return Json(new { count = cart.Sum(c => c.Quantity) });
         }
 
-        //[HttpPost]
-        //[Authorize]
-        //public async Task<IActionResult> ValidatePromo(string code, List<int> selectedProductIds)
-        //{
-        //    var cart = await GetCartItemsAsync();
-        //    var selectedItems = cart.Where(c => selectedProductIds != null && selectedProductIds.Contains(c.ProductId)).ToList();
+        // ──────────────────────────────────────────────
+        // POST: /Customer/Cart/ValidatePromo  (AJAX)
+        // ──────────────────────────────────────────────
+        [HttpPost]
+        public async Task<IActionResult> ValidatePromo(string code, List<int> selectedProductIds)
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (!userId.HasValue)
+            {
+                return Json(new { success = false, message = "Vui lòng đăng nhập để áp dụng mã giảm giá." });
+            }
 
-        //    decimal totalOrderAmount = selectedItems.Sum(c => c.Price * c.Quantity);
+            if (selectedProductIds == null || !selectedProductIds.Any())
+            {
+                return Json(new { success = false, message = "Vui lòng chọn ít nhất một sản phẩm để áp mã." });
+            }
 
-        //    var result = await _promotionService.ValidatePromotionAsync(code, totalOrderAmount);
-        //    return Json(new
-        //    {
-        //        success = result.Success,
-        //        message = result.Message,
-        //        discountAmount = result.DiscountAmount,
-        //        discountAmountDisplay = result.DiscountAmount.ToString("N0")
-        //    });
-        //}
+            var cart = await GetCartItemsAsync();
+            var selectedItems = cart.Where(c => selectedProductIds.Contains(c.ProductId)).ToList();
+
+            if (!selectedItems.Any())
+            {
+                return Json(new { success = false, message = "Sản phẩm đã chọn không tồn tại trong giỏ hàng." });
+            }
+
+            decimal totalOrderAmount = selectedItems.Sum(c => c.Price * c.Quantity);
+
+            var result = await _promotionService.ValidatePromotionAsync(code, totalOrderAmount);
+
+            return Json(new
+            {
+                success = result.Success,
+                message = result.Message,
+                discountAmount = result.DiscountAmount,
+                discountAmountDisplay = result.DiscountAmount.ToString("N0", new System.Globalization.CultureInfo("vi-VN"))
+            });
+        }
     }
 }

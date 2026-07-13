@@ -14,5 +14,6 @@ namespace WebBanHang.BLL.Services.Interfaces
         Task<bool> AddPromotionAsync(PromotionDTO dto);
         Task<bool> UpdatePromotionAsync(PromotionDTO dto);
         Task<bool> DeletePromotionAsync(int id);
+        Task<(bool Success, string Message, decimal DiscountAmount)> ValidatePromotionAsync(string code, decimal orderValue);
     }
 }

@@ -1,0 +1,35 @@
+﻿@model WebBanHang.ViewModels.DetailProductVM
+
+@{
+    ViewData["Title"] = "Chi tiết sản phẩm";
+    Layout = "_SaleLayout";
+}
+
+<div class="container-fluid py-4">
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-header bg-white border-0 py-3">
+            <h5 class="fw-bold mb-0">Chi tiết sản phẩm: @Model.Name</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="@(Model.ExistingImages?.FirstOrDefault(p => p.IsPrimary == true)?.ImageUrl ?? "https://placehold.co/300")"
+                         class="img-fluid rounded shadow-sm" alt="@Model.Name" />
+                </div>
+                <div class="col-md-8">
+                    <dl class="row">
+                        <dt class="col-sm-3">Mã sản phẩm</dt>
+                        <dd class="col-sm-9">@Model.Code</dd>
+                        <dt class="col-sm-3">Giá bán</dt>
+                        <dd class="col-sm-9 text-primary fw-bold">@Model.SellingPrice.ToString("N0") đ</dd>
+                        <dt class="col-sm-3">Tồn kho</dt>
+                        <dd class="col-sm-9">@Model.StockQuantity</dd>
+                        <dt class="col-sm-3">Trạng thái</dt>
+                        <dd class="col-sm-9">@Model.Status</dd>
+                    </dl>
+                    <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -7,7 +7,7 @@ public partial class Order
 {
     public int OrderId { get; set; }
 
-    public string OrderCode { get; set; }
+    public string OrderCode { get; set; } = null!;
 
     public int CustomerId { get; set; }
 
@@ -22,6 +22,10 @@ public partial class Order
     public decimal? TotalAmount { get; set; }
 
     public string? Status { get; set; }
+
+    public string? ShippingAddress { get; set; }
+
+    public string? ShippingPhone { get; set; }
 
     public virtual User CreatedByNavigation { get; set; } = null!;
 

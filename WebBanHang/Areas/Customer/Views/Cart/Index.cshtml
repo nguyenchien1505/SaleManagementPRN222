@@ -195,12 +195,12 @@
                                             @foreach (var promo in activePromos)
                                             {
                                                 <div class="voucher-tag p-2 border border-primary border-dashed rounded-3 bg-primary-subtle d-flex align-items-center cursor-pointer"
-                                                     onclick="setVoucher('@promo.Code')" title="Click để áp dụng">
+                                                     onclick="setVoucher('@promo.Code')" title="Click để áp dụng" style="transition: all 0.2s;">
                                                     <i class="bi bi-ticket-perforated me-2 text-primary"></i>
                                                     <div>
-                                                        <div class="fw-bold text-primary small">@promo.Code</div>
+                                                        <div class="fw-bold text-primary small voucher-code-text">@promo.Code</div>
                                                         <div class="text-muted" style="font-size: 0.75rem;">
-                                                            Giảm @promo.Value.ToString("N0") đ
+                                                            Giảm @(promo.Value.ToString("N0") ?? "0") đ
                                                         </div>
                                                     </div>
                                                 </div>
@@ -239,6 +239,30 @@
     }
 </div>
 
+<style>
+    .voucher-tag:hover {
+        background-color: var(--bs-primary) !important;
+        border-style: solid !important;
+    }
+
+        .voucher-tag:hover .text-primary, .voucher-tag:hover .text-muted {
+            color: #fff !important;
+        }
+
+    .voucher-tag.active {
+        background-color: #0d6efd !important;
+        border-style: solid !important;
+    }
+
+        .voucher-tag.active .text-primary, .voucher-tag.active .text-muted {
+            color: #fff !important;
+        }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+</style>
+
 @section Scripts {
     <script>
         let currentPromoDiscount = 0;
@@ -247,9 +271,10 @@
         function setVoucher(code) {
             $('#promoCodeInput').val(code);
 
-            // Highlight danh sách voucher đang chọn
+            // Highlight danh sách voucher đang chọn bằng class active
             document.querySelectorAll('.voucher-tag').forEach(el => {
-                if (el.querySelector('.fw-bold').innerText === code) {
+                let codeText = el.querySelector('.voucher-code-text').innerText.trim();
+                if (codeText.toUpperCase() === code.toUpperCase()) {
                     el.classList.add('active');
                 } else {
                     el.classList.remove('active');
@@ -308,7 +333,7 @@
                             $('#promoDiscountAmount').text(data.discountAmountDisplay);
                             Swal.fire({
                                 icon: 'success',
-                                  title: 'Thành công',
+                                title: 'Thành công',
                                 text: data.message,
                                 timer: 1500,
                                 showConfirmButton: false
@@ -423,8 +448,8 @@
         }
 
         function updateCartBadge() {
-        $.get('@Url.Action("Count", "Cart", new { area = "Customer" })', function(data) {
-            const b = document.getElementById('cart-badge');
+            $.get('@Url.Action("Count", "Cart", new { area = "Customer" })', function(data) {
+                const b = document.getElementById('cart-badge');
                 if (b) b.textContent = data.count > 0 ? data.count : '';
             });
         }

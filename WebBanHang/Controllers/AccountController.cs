@@ -46,6 +46,8 @@ namespace WebBanHang.Controllers
             HttpContext.Session.SetString("Username", user.Username);
             HttpContext.Session.SetString("FullName", user.FullName);
 
+            
+
             if (user.Role == "Admin")
             {
                 return RedirectToAction( "Index", "Dashboard", new { area = "Admin" });

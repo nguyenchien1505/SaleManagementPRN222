@@ -33,7 +33,7 @@ namespace WebBanHang.BLL.Services.Implementations
             {
                 ProductId = productId,
                 Quantity = quantity,
-                Type = "Nhap",
+                Type = "Import",
                 Note = note,
                 CreatedBy = userId,
                 CreatedDate = DateTime.Now
@@ -59,7 +59,7 @@ namespace WebBanHang.BLL.Services.Implementations
             {
                 ProductId = productId,
                 Quantity = quantity,
-                Type = "Xuat",
+                Type = "Export",
                 Note = note ?? "Tự động sinh khi Order Confirmed",
                 CreatedBy = userId,
                 CreatedDate = DateTime.Now

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using WebBanHang.BLL.DTOs;
 using WebBanHang.BLL.Services.Interfaces;
 using WebBanHang.DAL.Entities;
+using WebBanHang.DAL.Repositories.Implementations;
 using WebBanHang.DAL.Repositories.Interfaces;
 
 namespace WebBanHang.BLL.Services.Implementations
@@ -179,5 +180,6 @@ namespace WebBanHang.BLL.Services.Implementations
             return await _repo.DeleteAsync(id);
             
         }
+       
     }
 }
