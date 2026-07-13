@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using WebBanHang.BLL.DTOs;
 using WebBanHang.BLL.Services.Interfaces;
 using WebBanHang.Filters;
@@ -26,8 +27,30 @@ namespace WebBanHang.Areas.Admin.Controllers
 
             var vm = new CategoryManagementVM
             {
-                Categories = categories
+                Categories = categories,
+                SearchInput = "",
+                SortStatus = 0,
+                StatusFilter = "All"
             };
+
+            return View(vm);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Index(CategoryManagementVM vm)
+        {
+            var categories = await _cateService.GetAllCateAsync();
+            categories = vm.SortStatus == 0 ? categories.OrderByDescending(x => x.Name).ToList() : categories.OrderBy(x => x.Name).ToList();
+
+            if (!vm.SearchInput.IsNullOrEmpty())
+            {
+                var format = vm.SearchInput.ToLower().Trim();
+                categories = categories.Where(x => x.Name.ToLower().Contains(format) || (x.Description ?? "").ToLower().Contains(format)).ToList();
+            }
+            if (!vm.StatusFilter.IsNullOrEmpty() && vm.StatusFilter != "All")
+                categories = categories.Where(x => (x.Status ?? "").Contains(vm.StatusFilter)).ToList();
+
+            vm.Categories = categories;
+            vm.SortStatus = 1 - vm.SortStatus;
 
             return View(vm);
         }

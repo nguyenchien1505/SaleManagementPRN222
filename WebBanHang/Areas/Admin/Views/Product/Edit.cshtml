@@ -53,10 +53,10 @@
                         <div class="form-group mb-3">
                             <label class="control-label fw-bold">Current Image</label>
                             <div class="mb-2">
+                                <input type="hidden" asp-for="ExistingImages" />
                                 @if (Model.ExistingImages != null && Model.ExistingImages.Any(p => p.IsPrimary == true))
                                 {
                                     <img src="@Model.ExistingImages.First(p => p.IsPrimary == true).ImageUrl" style="width: 100px; height: 100px; object-fit: cover;" class="img-thumbnail" />
-                                    <input type="hidden" name="existingImage" value="true" />
                                     <!-- Logic to delete old image could be added here -->
                                 }
                                 else
@@ -65,7 +65,8 @@
                                 }
                             </div>
                             <label class="control-label">Update Image (New)</label>
-                            <input type="file" name="imageFile" class="form-control" />
+                            <input type="file" asp-for="ImageFile" class="form-control" />
+                          
                         </div>
                     </div>
 

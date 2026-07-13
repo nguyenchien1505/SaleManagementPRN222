@@ -24,7 +24,6 @@ namespace WebBanHang.BLL.Services.Implementations
 
         public async Task<bool> CreateProductAsync(ProductDTO dto)
         {
-            // Sửa: CategoryId là int, không so sánh với null được
             if (dto.CategoryId <= 0) return false;
 
             var existedCode = await _repo.GetByCodeAsync(dto.Code);
@@ -72,7 +71,8 @@ namespace WebBanHang.BLL.Services.Implementations
                     ImageUrl = x.ImageUrl,
                     IsPrimary = x.IsPrimary
                 }),
-                CategoryName = u.Category.Name
+                CategoryName = u.Category.Name,
+                CategoryId = u.CategoryId
             }).ToList();
         }
 
@@ -80,7 +80,7 @@ namespace WebBanHang.BLL.Services.Implementations
         {
             var product = await _repo.GetByCodeAsync(code);
             if (product == null)
-                return new ProductDTO(); // tránh null reference
+                return new ProductDTO(); 
 
             return new ProductDTO
             {
@@ -91,8 +91,6 @@ namespace WebBanHang.BLL.Services.Implementations
 
         public async Task<ProductDTO> GetProductByIdAsync(int id)
         {
-            Console.WriteLine("_________________");
-            Console.WriteLine(id);
             var product = await _repo.GetByIdAsync(id);
             if (product == null)
                 return new ProductDTO();

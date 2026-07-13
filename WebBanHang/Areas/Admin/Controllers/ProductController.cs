@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System.Runtime.InteropServices;
 using System.Security.Claims;
 using WebBanHang.BLL.DTOs;
 using WebBanHang.BLL.Services.Interfaces;
@@ -54,12 +56,55 @@ namespace WebBanHang.Areas.Admin.Controllers
         public async Task<IActionResult> Index()
         {
             var products = await _service.GetAllProductsAsync();
+            var categories = await _cateService.GetAllCateAsync();
             var vm = new ProductManagementVM
             {
-                Products = products
+                Products = products,
+                Categories = categories.Select(c => new CategoryVM
+                {
+                    Id = c.CategoryId,
+                    Name = c.Name
+                }).ToList()
             };
             return View(vm);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Index(ProductManagementVM vm)
+        {
+            var products = await _service.GetAllProductsAsync();
+            var categories = await _cateService.GetAllCateAsync();
+
+            if (!vm.SearchInput.IsNullOrEmpty())
+            {
+                var format = vm.SearchInput.ToLower().Trim();
+                products = products.Where(p => p.Code.ToLower().Contains(format) || p.Name.ToLower().Contains(format) || p.CategoryName.ToLower().Contains(format)).ToList();
+            }
+
+            if (!vm.CateFilter.IsNullOrEmpty() && !vm.CateFilter.Contains("All"))
+                products = products.Where(x => x.CategoryId.ToString() == vm.CateFilter).ToList();
+
+            if (!vm.StatusFilter.IsNullOrEmpty() && !vm.StatusFilter.Contains("All"))
+                products = products.Where(p => p.Status == vm.StatusFilter).ToList();
+
+            switch (vm.SortColumn)
+            {
+                case "Code": products = vm.SortStatus == 0 ? products.OrderBy(p => p.Code).ToList() : products.OrderByDescending(p => p.Code).ToList(); break;
+                case "Name": products = vm.SortStatus == 0 ? products.OrderBy(p => p.Name).ToList() : products.OrderByDescending(p => p.Name).ToList(); break;
+                case "Price": products = vm.SortStatus == 0 ? products.OrderBy(p => p.SellingPrice).ToList() : products.OrderByDescending(p => p.SellingPrice).ToList(); break;
+                case "Stock": products = vm.SortStatus == 0 ? products.OrderBy(p => p.StockQuantity).ToList() : products.OrderByDescending(p => p.StockQuantity).ToList(); break;
+            }
+
+            vm.Products = products;
+            vm.Categories = categories.Select(c => new CategoryVM
+            {
+                Id = c.CategoryId,
+                Name = c.Name
+            }).ToList();
+
+            return View(vm);
+        }
+
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -76,6 +121,7 @@ namespace WebBanHang.Areas.Admin.Controllers
 
             return View(vm);
         }
+
         [HttpPost]
         public async Task<IActionResult> Create(CreateProductVM vm)
         {
@@ -160,7 +206,7 @@ namespace WebBanHang.Areas.Admin.Controllers
                     CategoryId = x.CategoryId,
                     Name = x.Name
                 }).ToList(),
-                // Thêm dấu ? vào sau product.Images
+                
                 ExistingImages = product.Images?.Select(x => new ProductImageDTO
                 {
                     ImageUrl = x.ImageUrl,
@@ -181,22 +227,35 @@ namespace WebBanHang.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(UpdateProductVM vm)
         {
-            if (vm == null) return NotFound();
-
-            Console.WriteLine("VM Id = " + vm.Id);
-            Console.WriteLine("VM Code = " + vm.Code);
-
+            Console.WriteLine("____________________");
+            Console.WriteLine(vm.ExistingImages.FirstOrDefault()?.ImageUrl ?? "NULL");
             if (!ModelState.IsValid)
             {
                 await LoadEditData(vm);
                 return View(vm);
             }
 
-            var imageDtos = vm.ExistingImages ?? new List<ProductImageDTO>();
+            var products = await _service.GetProductByIdAsync(vm.Id);
+            products.ProductId = vm.Id;
+            products.Code = vm.Code;
+            products.SellingPrice = vm.SellingPrice;
+            products.ImportPrice = vm.ImportPrice;
+            products.StockQuantity = vm.StockQuantity;
+            products.CategoryId = vm.CategoryId;
+            products.CategoryName = vm.CategoryName;
+            products.Description = vm.Description;
 
-            if (vm.ImageFile != null && vm.ImageFile.Length > 0)
+
+            var imageDtos = products.Images?.Select(x => new ProductImageDTO
             {
-                var fileName = Guid.NewGuid() + Path.GetExtension(vm.ImageFile.FileName);
+                ImageUrl = x.ImageUrl,
+                IsPrimary = x.IsPrimary
+            }).ToList();
+
+            if (products.Images != null )
+            {
+                
+                var fileName = Guid.NewGuid() + Path.GetExtension(products.Images.FirstOrDefault()?.ImageUrl);
                 var folder = Path.Combine(_env.WebRootPath, "images");
 
                 if (!Directory.Exists(folder))
@@ -211,12 +270,15 @@ namespace WebBanHang.Areas.Admin.Controllers
                     await vm.ImageFile.CopyToAsync(stream);
                 }
 
-                imageDtos.Add(new ProductImageDTO
+                imageDtos?.Add(new ProductImageDTO
                 {
                     ImageUrl = "/images/" + fileName,
                     IsPrimary = true
                 });
             }
+
+            Console.WriteLine("______________________________");
+            Console.WriteLine(imageDtos.FirstOrDefault()?.ImageUrl ?? "NULL DTO");
 
             var dto = new ProductDTO
             {
@@ -234,6 +296,9 @@ namespace WebBanHang.Areas.Admin.Controllers
                 StockQuantity = vm.StockQuantity,
                 Images = imageDtos
             };
+
+            Console.WriteLine("_______________");
+            Console.WriteLine(dto.Images.FirstOrDefault()?.ImageUrl ?? "NULL IMAGE DTO");
 
             try
             {
