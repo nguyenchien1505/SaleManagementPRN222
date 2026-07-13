@@ -1,0 +1,269 @@
+﻿@model WebBanHang.ViewModels.ProductManagementVM
+
+@{
+    ViewData["Title"] = "Quản lý sản phẩm";
+    Layout = "_SaleLayout";
+}
+
+<div class="container-fluid px-4">
+    <!-- Vùng thông báo hệ thống tự động ẩn -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mt-3 border-0 shadow-sm rounded-3" role="alert">
+            <i class="bi bi-check-circle-fill alert-icon me-2"></i>
+            <strong>Thành công!</strong> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show mt-3 border-0 shadow-sm rounded-3" role="alert">
+            <i class="bi bi-exclamation-circle-fill alert-icon me-2"></i>
+            <strong>Lỗi!</strong> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Tiêu đề trang chuẩn phân hệ Quản trị / Sales -->
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-4 pb-2 border-bottom">
+        <div>
+            <h4 class="fw-bold text-dark mb-1"><i class="bi bi-box me-2 text-primary"></i>Quản lý sản phẩm</h4>
+            <p class="text-muted mb-0 small">Tra cứu, điều chỉnh trạng thái và theo dõi lượng tồn kho sản phẩm thực tế</p>
+        </div>
+    </div>
+
+    <!-- Khối dữ liệu chính -->
+    <div class="card border-0 shadow-sm rounded-3 bg-white">
+        <div class="card-body p-4">
+
+            <!-- Bộ lọc dữ liệu dạng phẳng (Flat Action Toolbar) -->
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+                <form asp-action="Index" method="get" class="d-flex flex-grow-1 gap-2" style="max-width: 650px;">
+                    <div class="position-relative flex-grow-1">
+                        <i class="bi bi-search text-muted position-absolute top-50 start-0 translate-middle-y ms-3"></i>
+                        <input type="text" name="searchString" class="form-control rounded-3 ps-5 border py-2 small shadow-none text-dark"
+                               placeholder="Tìm theo tên, mã sản phẩm hoặc danh mục..." value="@ViewBag.SearchString">
+                    </div>
+                    <div style="min-width: 180px;">
+                        <select name="sortOrder" class="form-select rounded-3 border py-2 px-3 small cursor-pointer shadow-none text-secondary fw-medium" onchange="this.form.submit()">
+                            <option value="">Sắp xếp mặc định</option>
+                            <option value="name_desc" selected="@(ViewBag.SortOrder == "name_desc")">Tên sản phẩm (Z-A)</option>
+                            <option value="Price" selected="@(ViewBag.SortOrder == "Price")">Giá bán: Thấp đến Cao</option>
+                            <option value="price_desc" selected="@(ViewBag.SortOrder == "price_desc")">Giá bán: Cao đến Thấp</option>
+                            <option value="Date" selected="@(ViewBag.SortOrder == "Date")">Sản phẩm cũ nhất</option>
+                            <option value="date_desc" selected="@(ViewBag.SortOrder == "date_desc")">Sản phẩm mới nhất</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Bảng dữ liệu dạng tối giản (Minimal Admin Table) -->
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 border-top">
+                    <thead class="text-uppercase text-muted fs-7 bg-light">
+                        <tr>
+                            <th class="border-0 ps-3 py-3" style="width: 100px;">Mã SP</th>
+                            <th class="border-0 py-3" style="width: 80px;">Ảnh</th>
+                            <th class="border-0 py-3">Tên sản phẩm</th>
+                            <th class="border-0 py-3">Danh mục</th>
+                            <th class="border-0 py-3">Giá bán</th>
+                            <th class="border-0 py-3">Tồn kho</th>
+                            <th class="border-0 py-3" style="width: 140px;">Trạng thái</th>
+                            <th class="border-0 text-end pe-3 py-3" style="width: 100px;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Products == null || !Model.Products.Any())
+                        {
+                            <tr>
+                                <td colspan="8" class="text-center py-5 text-muted italic">
+                                    <i class="bi bi-inbox display-5 d-block mb-2 opacity-40 text-secondary"></i>
+                                    Không tìm thấy dữ liệu sản phẩm phù hợp.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var item in Model.Products)
+                            {
+                                var primaryImg = item.Images?.FirstOrDefault(p => p.IsPrimary == true)?.ImageUrl ?? "/images/no-image.png";
+                                <tr class="border-bottom small text-secondary">
+                                    <td class="ps-3 fw-bold text-dark">@item.Code</td>
+                                    <td>
+                                        <div class="rounded-2 overflow-hidden border shadow-sm" style="width: 44px; height: 44px; flex-shrink: 0;">
+                                            <img src="@primaryImg" alt="@item.Name" class="w-100 h-100 object-fit-cover"
+                                                 onerror="this.src='/images/no-image.png'">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold text-dark mb-0.5">@item.Name</div>
+                                        <small class="text-muted text-truncate d-block" style="max-width: 250px;" title="@item.Description">
+                                            @(string.IsNullOrEmpty(item.Description) ? "Chưa cấu hình mô tả ngắn" : item.Description)
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-secondary border border-light-subtle rounded-2 px-2 py-1 fw-medium">
+                                            @item.CategoryName
+                                        </span>
+                                    </td>
+                                    <td class="fw-bold text-dark">
+                                        @((item.SellingPrice).ToString("N0", new System.Globalization.CultureInfo("vi-VN"))) đ
+                                    </td>
+                                    <td>
+                                        @if ((item.StockQuantity ) < 10)
+                                        {
+                                            <span class="text-danger fw-bold"><i class="bi bi-exclamation-triangle-fill me-1"></i>@item.StockQuantity</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-dark fw-medium">@item.StockQuantity</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (item.Status == "Active")
+                                        {
+                                            <span class="badge bg-success-subtle text-success rounded-2 px-2.5 py-1.5 fw-medium small">Hoạt động</span>
+                                        }
+                                        else if (item.Status == "Deleted")
+                                        {
+                                            <span class="badge bg-danger-subtle text-danger rounded-2 px-2.5 py-1.5 fw-medium small">Đã xóa tạm</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning-subtle text-warning rounded-2 px-2.5 py-1.5 fw-medium small">@item.Status</span>
+                                        }
+                                    </td>
+                                    <td class="text-end pe-3">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            
+                                            <a asp-action="Detail" asp-route-id="@item.ProductId" class="btn btn-light btn-sm rounded-3 px-2 border" title="Chi tiết">
+                                                <i class="bi bi-eye text-info"></i>
+                                            </a>
+                                            
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Khối phân trang phẳng (Clean Pagination) -->
+            @if (ViewBag.TotalPages > 1)
+            {
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center mt-4 pt-3 border-top gap-2">
+                    <span class="text-muted small">Hiển thị trang <strong>@ViewBag.CurrentPage</strong> / <strong>@ViewBag.TotalPages</strong> trang</span>
+                    <nav aria-label="Product navigation">
+                        <ul class="pagination mb-0 rounded-2 overflow-hidden small">
+                            <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                                <a class="page-link border px-3 py-1.5" asp-action="Index"
+                                   asp-route-page="@(ViewBag.CurrentPage - 1)"
+                                   asp-route-searchString="@ViewBag.SearchString"
+                                   asp-route-sortOrder="@ViewBag.SortOrder">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                            {
+                                <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                                    <a class="page-link border px-3 py-1.5" asp-action="Index"
+                                       asp-route-page="@i"
+                                       asp-route-searchString="@ViewBag.SearchString"
+                                       asp-route-sortOrder="@ViewBag.SortOrder">@i</a>
+                                </li>
+                            }
+                            <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                                <a class="page-link border px-3 py-1.5" asp-action="Index"
+                                   asp-route-page="@(ViewBag.CurrentPage + 1)"
+                                   asp-route-searchString="@ViewBag.SearchString"
+                                   asp-route-sortOrder="@ViewBag.SortOrder">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    // Tự động phai mờ (Fade out) toàn bộ thông báo sau 3 giây
+    document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(function () {
+            let alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function (alert) {
+                let bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+                if (bsAlert) {
+                    alert.style.transition = "opacity 0.5s ease";
+                    alert.style.opacity = "0";
+                    setTimeout(() => bsAlert.close(), 500);
+                }
+            });
+        }, 3000);
+    });
+</script>
+
+<style>
+    /* Bảng màu Badge tối giản theo khối Admin phẳng */
+    .bg-success-subtle {
+        background-color: #ebfbee !important;
+        color: #1f9d55 !important;
+        border: 1px solid #c2f5d3;
+    }
+
+    .bg-danger-subtle {
+        background-color: #fdf2f2 !important;
+        color: #e02424 !important;
+        border: 1px solid #fbd5d5;
+    }
+
+    .bg-warning-subtle {
+        background-color: #fffbeb !important;
+        color: #b45309 !important;
+        border: 1px solid #fef3c7;
+    }
+
+    .object-fit-cover {
+        object-fit: cover;
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    .fs-7 {
+        font-size: 0.785rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .italic {
+        font-style: italic;
+    }
+
+    /* Đồng bộ kiểu phân trang phẳng vuông nhẹ */
+    .page-item.active .page-link {
+        background-color: #0d6efd !important;
+        border-color: #0d6efd !important;
+        color: #fff !important;
+    }
+
+    .page-link {
+        color: #4b5563;
+        background-color: #fff;
+        border: 1px solid #e5e7eb;
+    }
+
+        .page-link:hover {
+            background-color: #f9fafb;
+            color: #0d6efd;
+        }
+
+    .btn-link:focus {
+        box-shadow: none;
+    }
+</style>
