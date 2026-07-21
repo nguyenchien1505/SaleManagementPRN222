@@ -35,5 +35,5 @@ public partial class User
 
     public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 
-    public virtual ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
+    //public virtual ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
 }

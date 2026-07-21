@@ -40,7 +40,7 @@ public partial class WebBanHangContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
-    public virtual DbSet<Wishlist> Wishlists { get; set; }
+    //public virtual DbSet<Wishlist> Wishlists { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -277,22 +277,22 @@ public partial class WebBanHangContext : DbContext
             entity.Property(e => e.Username).HasMaxLength(50);
         });
 
-        modelBuilder.Entity<Wishlist>(entity =>
-        {
-            entity.HasKey(e => e.WishlistId).HasName("PK__Wishlist__233189EBDDF7D008");
+        //modelBuilder.Entity<Wishlist>(entity =>
+        //{
+        //    entity.HasKey(e => e.WishlistId).HasName("PK__Wishlist__233189EBDDF7D008");
 
-            entity.Property(e => e.CreatedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
+        //    entity.Property(e => e.CreatedDate)
+        //        .HasDefaultValueSql("(getdate())")
+        //        .HasColumnType("datetime");
 
-            entity.HasOne(d => d.Product).WithMany(p => p.Wishlists)
-                .HasForeignKey(d => d.ProductId)
-                .HasConstraintName("FK_Wishlists_Products");
+        //    entity.HasOne(d => d.Product).WithMany(p => p.Wishlists)
+        //        .HasForeignKey(d => d.ProductId)
+        //        .HasConstraintName("FK_Wishlists_Products");
 
-            entity.HasOne(d => d.User).WithMany(p => p.Wishlists)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK_Wishlists_Users");
-        });
+        //    entity.HasOne(d => d.User).WithMany(p => p.Wishlists)
+        //        .HasForeignKey(d => d.UserId)
+        //        .HasConstraintName("FK_Wishlists_Users");
+        //});
 
         OnModelCreatingPartial(modelBuilder);
     }
