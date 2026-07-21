@@ -32,7 +32,7 @@
 
 <div class="card-modern">
     <form asp-action="Index">
-        <input type="hidden" asp-for="RoleFilter"/> 
+        <input type="hidden" asp-for="RoleFilter" />
 
         <div class="input-group mb-3" style="max-width:350px;">
             <span class="input-group-text bg-light border-end-0 rounded-start-pill">
@@ -113,21 +113,59 @@
                                 {
                                     <span class="badge-modern badge-success-modern">Hoạt động</span>
                                 }
-                                else
+                                else if (item.IsActived == false && item.IsDeleted == false)
                                 {
-                                    <span class="badge-modern badge-secondary-modern">Đã khóa</span>
+                                    <span class="badge-modern badge-secondnary-modern">Đã khóa</span>
+                                }
+                                else if (item.IsDeleted == true)
+                                {
+                                    <span class="badge-modern badge-danger-modern">Đã xóa</span>
                                 }
                             </td>
                             <td class="text-center">
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-icon btn-light rounded-circle" title="Sửa"><i class="bi bi-pencil"></i></a>
-                                @if (item.Role != "Admin")
+                                @if (item.IsDeleted)
                                 {
-                                    <form asp-action="Delete" asp-route-id="@item.Id" asp-controller="Users" method="get" class="d-inline">
-                                        @Html.AntiForgeryToken()
-                                        <button type="submit" class="btn btn-sm btn-icon btn-light rounded-circle text-danger" title="Xóa">
+                                    <a asp-controller="Users"
+                                       asp-action="Restore"
+                                       asp-route-id="@item.Id"
+                                       class="btn btn-sm btn-icon btn-light rounded-circle text-success"
+                                       title="Khôi phục">
+
+                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                    </a>
+
+                                    @if (item.Role != "Admin")
+                                    {
+                                        <a asp-controller="Users"
+                                           asp-action="HardDelete"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-icon btn-light rounded-circle text-danger"
+                                           title="Xóa vĩnh viễn">
+
+                                            <i class="bi bi-trash3-fill"></i>
+                                        </a>
+                                    }
+                                }
+                                else
+                                {
+                                    <a asp-action="Edit"
+                                       asp-route-id="@item.Id"
+                                       class="btn btn-sm btn-icon btn-light rounded-circle"
+                                       title="Sửa">
+
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+
+                                    @if (item.Role != "Admin")
+                                    {
+                                        <a asp-action="Delete"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-icon btn-light rounded-circle text-danger"
+                                           title="Xóa mềm">
+
                                             <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
+                                        </a>
+                                    }
                                 }
                             </td>
                         </tr>

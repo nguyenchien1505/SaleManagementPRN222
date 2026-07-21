@@ -16,6 +16,12 @@ namespace WebBanHang.BLL.Services.Interfaces
         Task<bool> AddCateAsync(CreateCategoryDTO dto);
         Task<bool> UpdateCateAsync(UpdateCategoryDTO dto);
         Task<bool> DeleteCateAsync(int id);
+        //Admin
+        Task<List<CategoryDTO>> GetAllCateIncludeDeleteAsync();
+        Task<CategoryDTO> GetCateByIdIncludeDeleteAsync(int id);
+        Task<CategoryDTO> GetCateByNameIncludeDeleteAsync(string name);
+        Task<bool> RestoreCateAsync(int categoryId);
+        Task<bool> HardDeleteCateAsync(int categoryId);
 
     }
 }

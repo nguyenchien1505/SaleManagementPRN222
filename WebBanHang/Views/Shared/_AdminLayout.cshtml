@@ -34,13 +34,6 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link @(currentController == "Employee" ? "active" : "")" asp-area="Admin" asp-controller="Employee" asp-action="Index">
-                    <i class="bi bi-people-fill"></i>
-                    Nhân viên
-                </a>
-            </li>
-
-            <li class="nav-item">
                 <a class="nav-link @(currentController == "Product" ? "active" : "")" asp-area="Admin" asp-controller="Product" asp-action="Index">
                     <i class="bi bi-box-seam-fill"></i>
                     Sản phẩm
@@ -48,8 +41,6 @@
             </li>
 
             <li class="nav-item">
-
-                <a class="nav-link" href="/Admin/Category/Index">
 
                 <a class="nav-link @(currentController == "Category" ? "active" : "")" asp-area="Admin" asp-controller="Category" asp-action="Index">
 
@@ -79,7 +70,7 @@
                 </a>
             </li>
 
-            <li class="nav-item">
+            @* <li class="nav-item">
                 <a class="nav-link @(currentController == "Report" ? "active" : "")" asp-area="Admin" asp-controller="Report" asp-action="Index">
                     <i class="bi bi-bar-chart-line-fill"></i>
                     Báo cáo
@@ -91,7 +82,7 @@
                     <i class="bi bi-gear-fill"></i>
                     Cài đặt
                 </a>
-            </li>
+            </li> *@
 
         </ul>
 
@@ -119,11 +110,11 @@
 
                     <div class="text-end d-none d-sm-block me-3">
                         <small class="d-block text-secondary mb-0" style="font-size:0.75rem;">
-                            Xin chào,
+                            Xin chào, 
                         </small>
 
                         <span class="fw-bold text-dark">
-                            @Context.Session.GetString("Fullname")
+                            @Context.Session.GetString("FullName")
                         </span>
                     </div>
 

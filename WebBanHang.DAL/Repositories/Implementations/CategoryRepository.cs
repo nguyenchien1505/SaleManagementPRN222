@@ -17,10 +17,9 @@ namespace WebBanHang.DAL.Repositories.Implementations
             _context = context;
         }
 
-        // 1. Lấy tất cả danh mục (Async)
         public async Task<IEnumerable<Category>> GetAllAsync()
         {
-            return await _context.Categories.Where(x => !x.Status.Contains("Deleted")).ToListAsync();
+            return await _context.Categories.ToListAsync();
         }
 
         public async Task AddAsync(Category category)
@@ -54,12 +53,47 @@ namespace WebBanHang.DAL.Repositories.Implementations
 
         public async Task<Category> GetByIdAsync(int id)
         {
-            return await _context.Categories.Where(x => x.CategoryId == id && !x.Status.Contains("Deleted")).FirstOrDefaultAsync();
+            return await _context.Categories.FirstOrDefaultAsync(x => x.CategoryId == id);
         }
 
         public async Task<Category> GetByNameAsync(string name)
         {
-            return await _context.Categories.Where(x => x.Name == name && !x.Status.Contains("Deleted")).FirstOrDefaultAsync();
+            return await _context.Categories.FirstOrDefaultAsync(x => x.Name == name);
+        }
+
+        //Admin
+        public async Task<IEnumerable<Category>> GetAllIncludeDeleteAsync()
+        {
+            return await _context.Categories.IgnoreQueryFilters().ToListAsync();
+        }
+        public async Task<Category> GetByIdIncludeDeleteAsync(int id)
+        {
+            return await _context.Categories.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.CategoryId == id);
+        }
+
+        public async Task<Category> GetByNameIncludeDeleteAsync(string name)
+        {
+            return await _context.Categories.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Name == name);
+        }
+
+        public async Task<bool> HasProductsAsync(int categoryId)
+        {
+            return await _context.Products
+                .IgnoreQueryFilters()
+                .AnyAsync(p => p.CategoryId == categoryId);
+        }
+
+        public async Task<bool> HasChildCategoriesAsync(int categoryId)
+        {
+            return await _context.Categories
+                .IgnoreQueryFilters()
+                .AnyAsync(c => c.ParentId == categoryId);
+        }
+
+        public async Task HardDeleteAsync(Category category)
+        {
+            _context.Categories.Remove(category);
+            await _context.SaveChangesAsync();
         }
 
     }

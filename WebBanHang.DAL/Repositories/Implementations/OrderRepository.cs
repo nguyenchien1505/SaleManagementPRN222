@@ -70,6 +70,8 @@ namespace WebBanHang.DAL.Repositories.Implementations
             return await query.ToListAsync();
         }
 
+        
+
         public void Update(Order order)
         {
             throw new NotImplementedException();

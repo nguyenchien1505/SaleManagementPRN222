@@ -134,11 +134,11 @@
                                 <td>
                                     @if (item.Status == "Active")
                                     {
-                                        <span class="badge bg-success-subtle text-success border border-success px-3 py-2 rounded-pill">HOẠT ĐỘNG</span>
+                                        <span class="badge bg-success-subtle text-success border border-success px-3 py-2 rounded-pill">@item.Status</span>
                                     }
                                     else if (item.Status == "Deleted")
                                     {
-                                        <span class="badge bg-danger-subtle text-danger border border-danger px-3 py-2 rounded-pill">ĐÃ XÓA</span>
+                                        <span class="badge bg-danger-subtle text-danger border border-danger px-3 py-2 rounded-pill">@item.Status</span>
                                     }
                                     else
                                     {
@@ -151,10 +151,32 @@
                                             <i class="fas fa-ellipsis-v text-muted"></i>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end border-0 shadow">
-                                            <li><a class="dropdown-item py-2" asp-action="Edit" asp-route-id="@item.ProductId" asp-controller="Product"><i class="fas fa-edit me-2 text-warning"></i>Sửa</a></li>
-                                            <li><a class="dropdown-item py-2" asp-action="Detail" asp-route-id="@item.ProductId"><i class="fas fa-info-circle me-2 text-info"></i>Chi tiết</a></li>
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li><a class="dropdown-item py-2 text-danger" asp-action="Delete" asp-route-id="@item.ProductId" method="get"><i class="fas fa-trash me-2"></i>Xóa</a></li>
+
+                                          
+                                            @if (item.Status == "Deleted")
+                                            {
+                                                <li>
+                                                    <a class="dropdown-item py-2 text-success"  asp-area="Admin"   asp-controller="Product" asp-action="Restore" method="get" asp-route-id="@item.ProductId">
+                                                        <i class="fas fa-undo-alt me-2"></i>Khôi phục
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item py-2 text-danger fw-bold" asp-area="Admin" asp-controller="Product" asp-action="HardDelete" asp-route-id="@item.ProductId">
+                                                        <i class="fas fa-trash-alt me-2"></i>Xóa vĩnh viễn
+                                                    </a>
+                                                </li>
+                                            }
+                                            else
+                                            {
+                                                <li><a class="dropdown-item py-2" asp-action="Edit" asp-route-id="@item.ProductId" asp-controller="Product"><i class="fas fa-edit me-2 text-warning"></i>Sửa</a></li>
+                                                <li><a class="dropdown-item py-2" asp-action="Detail" asp-route-id="@item.ProductId"><i class="fas fa-info-circle me-2 text-info"></i>Chi tiết</a></li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li>
+                                                    <a class="dropdown-item py-2 text-danger" asp-area="Admin" asp-controller="Product" asp-action="Delete" asp-route-id="@item.ProductId">
+                                                        <i class="fas fa-trash me-2"></i>Xóa
+                                                    </a>
+                                                </li>
+                                            }
                                         </ul>
                                     </div>
                                 </td>

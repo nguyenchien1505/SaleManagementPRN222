@@ -77,6 +77,9 @@
                             {
                                 <span class="badge-modern badge-success-modern">Hoạt động</span>
                             }
+                            else if(item.Status == "Deleted"){
+                                <span class="badge-modern badge-danger-modern">Đã xóa mềm</span>
+                            }
                             else
                             {
                                 <span class="badge-modern badge-secondary">Tạm ẩn</span>
@@ -84,13 +87,79 @@
                         </td>
                         <td class="text-center">
                             <div class="dropdown">
-                                <button class="btn btn-sm btn-light rounded-circle" type="button" data-bs-toggle="dropdown">
+                                <button class="btn btn-sm btn-light rounded-circle"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false">
                                     <i class="bi bi-three-dots-vertical"></i>
                                 </button>
+
                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-                                    <li><a class="dropdown-item" asp-action="Edit" asp-route-id="@item.CategoryId"><i class="bi bi-pencil me-2"></i> Chỉnh sửa</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.CategoryId"><i class="bi bi-trash me-2"></i> Xóa</a></li>
+
+                                    @if (item.Status == "Deleted")
+                                    {
+                                        <li>
+                                            <form asp-action="Restore"
+                                                  asp-route-id="@item.CategoryId"
+                                                  method="post"
+                                                  class="m-0">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <button type="submit"
+                                                        class="dropdown-item text-success">
+                                                    <i class="bi bi-arrow-counterclockwise me-2"></i>
+                                                    Khôi phục
+                                                </button>
+                                            </form>
+                                        </li>
+
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+
+                                        <li>
+                                            <form asp-action="HardDelete"
+                                                  asp-route-id="@item.CategoryId"
+                                                  method="post"
+                                                  class="m-0"
+                                                  onsubmit="return confirm('Bạn có chắc muốn xóa vĩnh viễn danh mục này? Dữ liệu sau khi xóa sẽ không thể khôi phục.');">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <button type="submit"
+                                                        class="dropdown-item text-danger">
+                                                    <i class="bi bi-trash3-fill me-2"></i>
+                                                    Xóa vĩnh viễn
+                                                </button>
+                                            </form>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-action="Edit"
+                                               asp-route-id="@item.CategoryId">
+                                                <i class="bi bi-pencil me-2"></i>
+                                                Chỉnh sửa
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+
+                                        <li>
+                                            <a class="dropdown-item text-danger"
+                                               asp-action="Delete"
+                                               asp-route-id="@item.CategoryId">
+                                                <i class="bi bi-trash me-2"></i>
+                                                Xóa
+                                            </a>
+                                        </li>
+                                    }
+
                                 </ul>
                             </div>
                         </td>

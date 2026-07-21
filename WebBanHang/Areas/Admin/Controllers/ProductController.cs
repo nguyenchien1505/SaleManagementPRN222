@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Runtime.InteropServices;
 using System.Security.Claims;
@@ -13,7 +14,7 @@ using static System.Net.Mime.MediaTypeNames;
 namespace WebBanHang.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    //[RoleAuthorize("Admin")]
+    [RoleAuthorize("Admin")]
     public class ProductController : Controller
     {
 
@@ -39,7 +40,7 @@ namespace WebBanHang.Areas.Admin.Controllers
 
             if (vm.Id > 0)
             {
-                var product = await _service.GetProductByIdAsync(vm.Id);
+                var product = await _service.GetProductByIdIncludeDeleteAsync(vm.Id);
 
                 vm.ExistingImages = product?.Images?.Select(x => new ProductImageDTO
                 {
@@ -55,7 +56,7 @@ namespace WebBanHang.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var products = await _service.GetAllProductsAsync();
+            var products = await _service.GetAllProductsIncludeDeleteAsync();
             var categories = await _cateService.GetAllCateAsync();
             var vm = new ProductManagementVM
             {
@@ -72,7 +73,7 @@ namespace WebBanHang.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Index(ProductManagementVM vm)
         {
-            var products = await _service.GetAllProductsAsync();
+            var products = await _service.GetAllProductsIncludeDeleteAsync();
             var categories = await _cateService.GetAllCateAsync();
 
             if (!vm.SearchInput.IsNullOrEmpty())
@@ -191,7 +192,7 @@ namespace WebBanHang.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var product = await _service.GetProductByIdAsync(id);
+            var product = await _service.GetProductByIdIncludeDeleteAsync(id);
             var cate = await _cateService.GetAllCateAsync();
 
             if (product == null) return NotFound();
@@ -235,50 +236,60 @@ namespace WebBanHang.Areas.Admin.Controllers
                 return View(vm);
             }
 
-            var products = await _service.GetProductByIdAsync(vm.Id);
-            products.ProductId = vm.Id;
-            products.Code = vm.Code;
-            products.SellingPrice = vm.SellingPrice;
-            products.ImportPrice = vm.ImportPrice;
-            products.StockQuantity = vm.StockQuantity;
-            products.CategoryId = vm.CategoryId;
-            products.CategoryName = vm.CategoryName;
-            products.Description = vm.Description;
-
+            var products = await _service.GetProductByIdIncludeDeleteAsync(vm.Id);
+            if (products == null)
+            {
+                ModelState.AddModelError("", "Không tìm thấy sản phẩm cần cập nhật.");
+                await LoadEditData(vm);
+                return View(vm);
+            }
 
             var imageDtos = products.Images?.Select(x => new ProductImageDTO
             {
                 ImageUrl = x.ImageUrl,
                 IsPrimary = x.IsPrimary
-            }).ToList();
+            }).ToList() ?? new List<ProductImageDTO>();
 
-            if (products.Images != null )
+            if (vm.ImageFile != null && vm.ImageFile.Length > 0)
             {
-                
-                var fileName = Guid.NewGuid() + Path.GetExtension(products.Images.FirstOrDefault()?.ImageUrl);
+
+                var extension = Path.GetExtension(vm.ImageFile.FileName)
+            .ToLowerInvariant();
+
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+
+                if (!allowedExtensions.Contains(extension))
+                {
+                    ModelState.AddModelError(nameof(UpdateProductVM.ImageFile), "Chỉ cho phép file JPG, JPEG, PNG hoặc WEBP.");
+
+                    await LoadEditData(vm);
+                    return View(vm);
+                }
+
+                var fileName = $"{Guid.NewGuid():N}{extension}";
                 var folder = Path.Combine(_env.WebRootPath, "images");
 
-                if (!Directory.Exists(folder))
-                {
-                    Directory.CreateDirectory(folder);
-                }
+                Directory.CreateDirectory(folder);
 
                 var filePath = Path.Combine(folder, fileName);
 
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                await using (var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
                 {
                     await vm.ImageFile.CopyToAsync(stream);
                 }
 
-                imageDtos?.Add(new ProductImageDTO
+                foreach (var image in imageDtos)
                 {
-                    ImageUrl = "/images/" + fileName,
+                    image.IsPrimary = false;
+                }
+
+                imageDtos.Add(new ProductImageDTO
+                {
+                    ImageUrl = $"/images/{fileName}",
                     IsPrimary = true
                 });
             }
 
-            Console.WriteLine("______________________________");
-            Console.WriteLine(imageDtos.FirstOrDefault()?.ImageUrl ?? "NULL DTO");
 
             var dto = new ProductDTO
             {
@@ -296,9 +307,6 @@ namespace WebBanHang.Areas.Admin.Controllers
                 StockQuantity = vm.StockQuantity,
                 Images = imageDtos
             };
-
-            Console.WriteLine("_______________");
-            Console.WriteLine(dto.Images.FirstOrDefault()?.ImageUrl ?? "NULL IMAGE DTO");
 
             try
             {
@@ -342,7 +350,7 @@ namespace WebBanHang.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> Detail(int id)
         {
-            var product = await _service.GetDetailProductByIdAsync(id);
+            var product = await _service.GetDetailProductByIdIncludeDeleteAsync(id);
             if (product == null) return NotFound();
 
             var vm = new DetailProductVM
@@ -372,7 +380,7 @@ namespace WebBanHang.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
-            var product = await _service.GetProductByIdAsync(id);
+            var product = await _service.GetProductByIdIncludeDeleteAsync(id);
             if (product == null) return NotFound();
 
             var vm = new DeleteProductVM
@@ -391,8 +399,6 @@ namespace WebBanHang.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(DeleteProductVM vm)
         {
-            Console.WriteLine("_________________________________________");
-            Console.WriteLine(vm.ProductId);
             if (vm == null || vm.ProductId <= 0)
             {
                 TempData["Error"] = "Sản phẩm không hợp lệ.";
@@ -409,6 +415,177 @@ namespace WebBanHang.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Restore(int id)
+        {
+            var product = await _service.GetProductByIdIncludeDeleteAsync(id);
+
+            if (product == null)
+            {
+                TempData["Error"] = "Không tìm thấy sản phẩm.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (product.Status != "Deleted")
+            {
+                TempData["Error"] = "Sản phẩm này không ở trạng thái đã xóa.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var model = new RestoreProductVM
+            {
+                ProductId = product.ProductId,
+                Code = product.Code,
+                Name = product.Name,
+                CategoryName = product.CategoryName,
+                SellingPrice = product.SellingPrice,
+                StockQuantity = product.StockQuantity
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Restore(DeleteProductVM vm)
+        {
+            var product = await _service.GetProductByIdIncludeDeleteAsync(vm.ProductId);
+
+            if (product == null)
+            {
+                TempData["Error"] = "Không tìm thấy sản phẩm cần khôi phục.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (product.Status != "Deleted")
+            {
+                TempData["Error"] = "Sản phẩm này đã được khôi phục hoặc chưa bị xóa.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var result = await _service.RestoreProductAsync(vm.ProductId);
+            if (!result)
+            {
+                TempData["Error"] = $"Khôi phục sản phẩm \"{product.Name}\" thất bại. Vui lòng thử lại.";
+                return RedirectToAction("Index");
+            }
+
+            TempData["Success"] = $"Đã khôi phục sản phẩm \"{product.Name}\" thành công.";
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> HardDelete(int id)
+        {
+            var product = await _service.GetProductByIdIncludeDeleteAsync(id);
+
+            if (product == null)
+            {
+                TempData["Error"] = "Không tìm thấy sản phẩm.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (product.Status != "Deleted")
+            {
+                TempData["Error"] = "Phải xóa mềm sản phẩm trước khi xóa vĩnh viễn.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            var vm = new DeleteProductVM
+            {
+                ProductId = product.ProductId,
+                Code = product.Code,
+                Name = product.Name,
+                CategoryName = product.CategoryName,
+                SellingPrice = product.SellingPrice,
+                StockQuantity = product.StockQuantity
+            };
+
+            return View(vm);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> HardDelete(DeleteProductVM vm)
+        {
+            if (vm.ProductId <= 0)
+            {
+                TempData["Error"] = "Sản phẩm không hợp lệ.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var product = await _service.GetProductByIdIncludeDeleteAsync(vm.ProductId);
+
+            if (product == null)
+            {
+                TempData["Error"] = "Không tìm thấy sản phẩm.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (product.Status != "Deleted")
+            {
+                TempData["Error"] =
+                    "Chỉ được xóa vĩnh viễn sản phẩm đã xóa mềm.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            var imageUrls = product.Images?.Select(x => x.ImageUrl).Where(x => !string.IsNullOrWhiteSpace(x)).ToList() ?? new List<string>();
+
+            var result = await _service.HardDeleteProductAsync(vm.ProductId);
+
+            if (!result)
+            {
+                TempData["Error"] ="Không thể xóa vĩnh viễn. Sản phẩm có thể đang được sử dụng trong đơn hàng hoặc lịch sử kho.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            DeleteProductImageFiles(imageUrls);
+
+            TempData["Success"] = $"Đã xóa vĩnh viễn sản phẩm \"{product.Name}\".";
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        private void DeleteProductImageFiles(
+    IEnumerable<string> imageUrls)
+        {
+            foreach (var imageUrl in imageUrls)
+            {
+                if (string.IsNullOrWhiteSpace(imageUrl))
+                {
+                    continue;
+                }
+
+                var fileName = Path.GetFileName(imageUrl);
+
+                if (string.IsNullOrWhiteSpace(fileName) ||
+                    fileName.Equals("no-image.png", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                var filePath = Path.Combine(_env.WebRootPath,"images",fileName);
+
+                try
+                {
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+                }
+                catch (IOException ex)
+                {
+                    Console.WriteLine(ex);
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    Console.WriteLine(ex);
+                }
+            }
+        }
     }
 }
 

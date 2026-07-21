@@ -37,22 +37,22 @@ namespace WebBanHang.DAL.Repositories.Implementations
 
         public async Task<List<User>> GetAllAsync()
         {
-            return await _context.Users.Where(x => !x.IsDeleted).ToListAsync();
+            return await _context.Users.ToListAsync();
         }
 
         public async Task<User> GetByEmailAsync(string email)
         {
-            return await _context.Users.FirstOrDefaultAsync(x => x.Email == email && !x.IsDeleted);
+            return await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
         }
 
         public async Task<User> GetByIdAsync(int id)
         {
-            return await _context.Users.Where(x => x.UserId == id && !x.IsDeleted).FirstOrDefaultAsync();
+            return await _context.Users.FirstOrDefaultAsync(x => x.UserId == id);
         }
 
         public async Task<User> GetByUsernameAsync(string username)
         {
-            return await _context.Users.FirstOrDefaultAsync(x => x.Username == username && !x.IsDeleted);
+            return await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
         }
 
         public async Task UpdateAsync(User user)
@@ -60,5 +60,46 @@ namespace WebBanHang.DAL.Repositories.Implementations
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
         }
+
+        //IncludeDelete
+        public async Task<List<User>> GetAllIncludeDeleteAsync()
+        {
+            return await _context.Users.IgnoreQueryFilters().ToListAsync();
+        }
+
+        public async Task<User> GetByEmailIncludeDeleteAsync(string email)
+        {
+            return await _context.Users.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Email == email);
+        }
+
+        public async Task<User> GetByIdIncludeDeleteAsync(int id)
+        {
+            return await _context.Users.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.UserId == id);
+        }
+
+        public async Task<User> GetByUsernameIncludeDeleteAsync(string username)
+        {
+            return await _context.Users.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Username == username);
+        }
+        public async Task<bool> HasHistoricalReferencesAsync(int userId)
+        {
+            var customerId = await _context.Customers.Where(c => c.UserId == userId).Select(c => (int?)c.CustomerId).FirstOrDefaultAsync();
+
+            var hasCustomerOrders = customerId.HasValue && await _context.Orders.AnyAsync(o => o.CustomerId == customerId.Value);
+
+            var hasCreatedOrders = await _context.Orders.AnyAsync(o => o.CreatedBy == userId);
+
+            var hasInventoryTransactions = await _context.InventoryTransactions.AnyAsync(i => i.CreatedBy == userId);
+
+            return hasCustomerOrders || hasCreatedOrders || hasInventoryTransactions;
+        }
+
+        public async Task<bool> HardDeleteUserAsync(User user)
+        {
+            _context.Users.Remove(user);
+
+            return await _context.SaveChangesAsync() > 0;
+        }
+
     }
 }
