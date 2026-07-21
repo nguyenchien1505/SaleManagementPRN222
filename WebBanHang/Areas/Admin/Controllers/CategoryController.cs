@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using WebBanHang.BLL.DTOs;
+using WebBanHang.BLL.Services.Implementations;
 using WebBanHang.BLL.Services.Interfaces;
 using WebBanHang.Filters;
 using WebBanHang.ViewModels;
@@ -9,7 +10,7 @@ using WebBanHang.ViewModels;
 namespace WebBanHang.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    //[RoleAuthorize("Admin")]
+    [RoleAuthorize("Admin")]
     public class CategoryController : Controller
     {
         private readonly ICategoryService _cateService;
@@ -21,7 +22,7 @@ namespace WebBanHang.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var categories = await _cateService.GetAllCateAsync();
+            var categories = await _cateService.GetAllCateIncludeDeleteAsync();
 
             if (categories == null) return NotFound();
 
@@ -38,7 +39,7 @@ namespace WebBanHang.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Index(CategoryManagementVM vm)
         {
-            var categories = await _cateService.GetAllCateAsync();
+            var categories = await _cateService.GetAllCateIncludeDeleteAsync();
             categories = vm.SortStatus == 0 ? categories.OrderByDescending(x => x.Name).ToList() : categories.OrderBy(x => x.Name).ToList();
 
             if (!vm.SearchInput.IsNullOrEmpty())
@@ -146,6 +147,43 @@ namespace WebBanHang.Areas.Admin.Controllers
             }
             TempData["Success"] = "Xóa danh mục thành công";
             return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Restore(int id)
+        {
+            var result = await _cateService.RestoreCateAsync(id);
+
+            if (result)
+            {
+                TempData["Success"] = "Khôi phục danh mục thành công!";
+            }
+            else
+            {
+                TempData["Error"] = "Khôi phục danh mục thất bại. Vui lòng thử lại!";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> HardDelete(int id)
+        {
+            var result =
+                await _cateService.HardDeleteCateAsync(id);
+
+            if (result)
+            {
+                TempData["Success"] = "Danh mục đã được xóa vĩnh viễn thành công!";
+            }
+            else
+            {
+                TempData["Error"] = "Hành động xóa cứng danh mục thất bại. Vui lòng thử lại!";
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
     }

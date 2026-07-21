@@ -1,35 +1,41 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using WebBanHang.BLL.DTOs;
 using WebBanHang.BLL.Services.Interfaces;
+using WebBanHang.DAL.Entities;
 using WebBanHang.Filters;
 using WebBanHang.ViewModels;
 
 namespace WebBanHang.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    //[RoleAuthorize("Admin")]
+    [RoleAuthorize("Admin")]
     public class DashboardController : Controller
     {
-        private readonly IUserService _service;
+        private readonly IDashboardService _dashboardService;
 
-        public DashboardController(IUserService service)
+        public DashboardController(IDashboardService dashboardService)
         {
-            _service = service;
+            _dashboardService = dashboardService;
         }
 
-        [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var users = await _service.GetAllUserAsync();
-            var vm = new UserManagementVM
+            var stats = await _dashboardService.GetDashboardStatsAsync();
+
+            var viewModel = new AdminDashboardVM
             {
-                Users = users,
-                TotalUsers = users.Count(),
-                SearchInput = "",
-                RoleFilter = "All"
+                TotalRevenue = stats.TotalRevenue,
+                TotalOrders = stats.TotalOrders,
+                PendingOrders = stats.PendingOrders,
+                NewUsers = stats.NewUsers,
+                RecentOrders = stats.RecentOrders?.ToList() ?? new List<RecentOrderDTO>(),
+                RevenueData = stats.RevenueData ?? new List<decimal>(),
+                CategoryLabels = stats.CategoryLabels ?? new List<string>(),
+                CategoryData = stats.CategoryData ?? new List<int>()
             };
 
-            return View(vm);
+            return View(viewModel);
         }
 
         [HttpGet]

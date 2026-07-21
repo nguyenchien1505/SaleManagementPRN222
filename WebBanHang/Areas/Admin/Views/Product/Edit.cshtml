@@ -17,7 +17,7 @@
             Edit Product: @Model.Name
         </div>
         <div class="card-body">
-            <form asp-action="Edit" enctype="multipart/form-data">
+            <form asp-action="Edit" method="post" enctype="multipart/form-data">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="Id" />
                 <!-- Hidden fields to preserve data not in form if needed, though mostly handled by controller logic or optional -->
@@ -53,7 +53,6 @@
                         <div class="form-group mb-3">
                             <label class="control-label fw-bold">Current Image</label>
                             <div class="mb-2">
-                                <input type="hidden" asp-for="ExistingImages" />
                                 @if (Model.ExistingImages != null && Model.ExistingImages.Any(p => p.IsPrimary == true))
                                 {
                                     <img src="@Model.ExistingImages.First(p => p.IsPrimary == true).ImageUrl" style="width: 100px; height: 100px; object-fit: cover;" class="img-thumbnail" />

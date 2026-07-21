@@ -17,7 +17,34 @@ namespace WebBanHang.DAL.Repositories.Implementations
             _context = context;
         }
 
+        public async Task<List<Product>> GetAllAsync()
+        {
+            return await _context.Products.Include(x => x.Category)
+                                          .Include(x => x.ProductImages)
+                                          .Include(x => x.CreatedByNavigation)
+                                          .Include(x => x.InventoryTransactions)
+                                          .Include(x => x.OrderDetails)
+                                          .ToListAsync();
 
+        }
+
+        public async Task<Product?> GetByIdAsync(int id)
+        {
+            return await _context.Products.Include(x => x.Category)
+                                         .Include(x => x.ProductImages)
+                                         .Include(x => x.CreatedByNavigation)
+                                         .Include(x => x.InventoryTransactions)
+                                         .Include(x => x.OrderDetails)
+                                         .FirstOrDefaultAsync(x => x.ProductId == id);
+        }
+
+        public async Task<Product?> GetByCodeAsync(string code)
+        {
+            return await _context.Products.Include(x => x.Category)
+                                          .FirstOrDefaultAsync(x => x.Code == code);
+        }
+
+        //Admin
         public async Task CreateAsync(Product product)
         {
             await _context.AddAsync(product);
@@ -33,45 +60,13 @@ namespace WebBanHang.DAL.Repositories.Implementations
             await _context.SaveChangesAsync();
             return true;
         }
-
-        public async Task<List<Product>> GetAllAsync()
-        {
-            return await _context.Products.Include(x => x.Category)
-                                          .Include(x => x.ProductImages)
-                                          .Include(x => x.CreatedByNavigation)
-                                          .Include(x => x.InventoryTransactions)
-                                          .Include(x => x.OrderDetails)
-                                          .Where(x => !x.Status.Contains("Deleted") && !x.Category.Status.Contains("Deleted")).ToListAsync();
-
-        }
-
-        public async Task<Product?> GetByIdAsync(int id)
-        {
-            return await _context.Products.Include(x => x.Category)
-                                         .Include(x => x.ProductImages)
-                                         .Include(x => x.CreatedByNavigation)
-                                         .Include(x => x.InventoryTransactions)
-                                         .Include(x => x.OrderDetails)
-                                         .Where(x => x.ProductId == id && !x.Category.Status.Contains("Deleted") && !x.Status.Contains("Deleted"))
-                                         .FirstOrDefaultAsync();
-        }
-
-        public async Task<Product?> GetByCodeAsync(string code)
-        {
-            return await _context.Products.Include(x => x.Category)
-                                          .Where(x => x.Code == code && !x.Status.Contains("Deleted") && !x.Category.Status.Contains("Deleted"))
-                                          .FirstOrDefaultAsync();
-        }
-
-
         public async Task UpdateAsync(Product product)
         {
-            var existingProduct = await _context.Products.Include(x => x.Category)
+            var existingProduct = await _context.Products.IgnoreQueryFilters().Include(x => x.Category)
                                           .Include(x => x.ProductImages)
                                           .Include(x => x.CreatedByNavigation)
                                           .Include(x => x.InventoryTransactions)
                                           .Include(x => x.OrderDetails)
-                                          .Where(x => !x.Category.Status.Contains("Deleted") && !x.Status.Contains("Deleted"))
                                           .FirstOrDefaultAsync(x => x.ProductId == product.ProductId);
 
             if (existingProduct == null)
@@ -91,6 +86,52 @@ namespace WebBanHang.DAL.Repositories.Implementations
 
             await _context.SaveChangesAsync();
         }
+
+
+        public async Task<List<Product>> GetAllIncludeDeleteAsync()
+        {
+            return await _context.Products.IgnoreQueryFilters()
+                                          .Include(x => x.Category)
+                                          .Include(x => x.ProductImages)
+                                          .Include(x => x.CreatedByNavigation)
+                                          .Include(x => x.InventoryTransactions)
+                                          .Include(x => x.OrderDetails)
+                                          .ToListAsync();
+        }
+
+        public async Task<Product?> GetByIdIncludeDeleteAsync(int id)
+        {
+            return await _context.Products.IgnoreQueryFilters()
+                                          .Include(x => x.Category)
+                                          .Include(x => x.ProductImages)
+                                          .Include(x => x.CreatedByNavigation)
+                                          .Include(x => x.InventoryTransactions)
+                                          .Include(x => x.OrderDetails)
+                                          .FirstOrDefaultAsync(x => x.ProductId == id);
+        }
+
+        public async Task<Product?> GetByCodeIncludeDeleteAsync(string code)
+        {
+            return await _context.Products.IgnoreQueryFilters().Include(x => x.Category) .FirstOrDefaultAsync(x => x.Code == code);
+        }
+
+        public async Task<bool> HasHistoricalReferencesAsync(int productId)
+        {
+            var hasOrderDetails = await _context.OrderDetails.AnyAsync(od => od.ProductId == productId);
+
+            var hasInventoryTransactions =
+                await _context.InventoryTransactions.AnyAsync(x => x.ProductId == productId);
+
+            return hasOrderDetails || hasInventoryTransactions;
+        }
+
+        public async Task<bool> HardDeleteAsync(Product product)
+        {
+            _context.Products.Remove(product);  
+
+            return await _context.SaveChangesAsync() > 0;
+        }
+
 
 
         // ---- Sync methods (dùng cho InventoryController) ----
@@ -118,10 +159,10 @@ namespace WebBanHang.DAL.Repositories.Implementations
 
         public List<Product> GetByCategory(int categoryId)
         {
-            return _context.Products
-                .Where(p => p.CategoryId == categoryId)
+            return _context.Products.Where(p => p.CategoryId == categoryId)
                 .ToList();
         }
 
+        
     }
 }

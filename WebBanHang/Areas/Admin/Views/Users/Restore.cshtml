@@ -1,0 +1,110 @@
+﻿@model WebBanHang.ViewModels.DeleteUserVM
+
+@{
+    ViewData["Title"] = "Khôi phục người dùng";
+}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Khôi phục người dùng</h1>
+
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item">
+            <a asp-area="Admin"
+               asp-controller="Users"
+               asp-action="Index">
+                Người dùng
+            </a>
+        </li>
+        <li class="breadcrumb-item active">Khôi phục</li>
+    </ol>
+
+    <div class="alert alert-info" role="alert">
+        <h4 class="alert-heading">
+            <i class="fas fa-undo-alt me-2"></i>
+            Xác nhận khôi phục
+        </h4>
+
+        <p class="mb-0">
+            Bạn có chắc chắn muốn khôi phục người dùng (@Model.FullName)?
+            Sau khi khôi phục, người dùng (@Model.FullName) sẽ xuất hiện lại trong danh sách.
+        </p>
+    </div>
+
+    <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-header bg-white fw-bold py-3">
+            <i class="fas fa-box me-2 text-primary"></i>
+            Thông tin Người dùng
+        </div>
+
+        <div class="card-body">
+            <dl class="row mb-4">
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.UserName)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.UserName)
+                </dd>
+
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.FullName)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.FullName)
+                </dd>
+
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Role)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Role)
+                </dd>
+
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Email)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Email)
+                </dd>
+
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.CreatedAt)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.CreatedAt)
+                </dd>
+
+                <dt class="col-sm-3">
+                    Trạng thái hiện tại
+                </dt>
+                <dd class="col-sm-9">
+                    <span class="badge bg-danger">
+                        Soft Deleted
+                    </span>
+                </dd>
+            </dl>
+
+            <form asp-area="Admin"
+                  asp-controller="Users"
+                  asp-action="RestoreUser"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="Id" />
+
+                <a asp-area="Admin"
+                   asp-controller="Users"
+                   asp-action="Index"
+                   class="btn btn-secondary me-2">
+                    <i class="fas fa-arrow-left me-1"></i>
+                    Quay lại
+                </a>
+
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-undo-alt me-1"></i>
+                    Khôi phục Người dùng
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

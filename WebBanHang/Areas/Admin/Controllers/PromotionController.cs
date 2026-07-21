@@ -3,11 +3,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using WebBanHang.BLL.DTOs;
 using WebBanHang.BLL.Services.Interfaces;
+using WebBanHang.Filters;
 using WebBanHang.ViewModels;
 
 namespace WebBanHang.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [RoleAuthorize("Admin")]
     public class PromotionController : Controller
     {
         private readonly IPromotionService _promotionService;

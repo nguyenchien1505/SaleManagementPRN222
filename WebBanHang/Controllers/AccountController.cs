@@ -30,7 +30,6 @@ namespace WebBanHang.Controllers
             {
                 Username = vm.Username,
                 Password = vm.Password,
-                RememberMe = vm.RememberMe
             };
 
             var user = await _service.Login(dto);

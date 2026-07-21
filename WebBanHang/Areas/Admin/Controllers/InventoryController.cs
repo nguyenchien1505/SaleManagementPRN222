@@ -9,7 +9,7 @@ using WebBanHang.Filters;
 namespace WebBanHang.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Route("Admin/[controller]")] // Định nghĩa gốc: Admin/Inventory
+    //[Route("Admin/[controller]")] // Định nghĩa gốc: Admin/Inventory
     public class InventoryController : Controller
     {
         private readonly IInventoryService _inventoryService;
@@ -25,7 +25,7 @@ namespace WebBanHang.Areas.Admin.Controllers
         // 1. TRANG LỊCH SỬ KHO (Index)
         // Chấp nhận: /Admin/Inventory hoặc /Admin/Inventory/Index
         // ==========================================
-        //[RoleAuthorize("Admin", "Sales")]
+        [RoleAuthorize("Admin", "Sales")]
         [HttpGet]
         [Route("")]
         [Route("Index")]
@@ -41,7 +41,7 @@ namespace WebBanHang.Areas.Admin.Controllers
         // -> /Admin/Inventory/Inbound 
         // -> /Admin/Inventory/NhapKho
         // ==========================================
-        //[RoleAuthorize("Admin")]
+        [RoleAuthorize("Admin")]
         [HttpGet]
         [Route("Inbound")]
         [Route("NhapKho")]
@@ -51,7 +51,7 @@ namespace WebBanHang.Areas.Admin.Controllers
             return View(); // Khớp hoàn hảo với file Inbound.cshtml của bạn
         }
 
-        //[RoleAuthorize("Admin")]
+        [RoleAuthorize("Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("Inbound")]
@@ -87,7 +87,7 @@ namespace WebBanHang.Areas.Admin.Controllers
         // -> /Admin/Inventory/Stock 
         // -> /Admin/Inventory/TonKho
         // ==========================================
-        //[RoleAuthorize("Admin", "Sales")]
+        [RoleAuthorize("Admin", "Sales")]
         [HttpGet]
         [Route("Stock")]
         [Route("TonKho")]

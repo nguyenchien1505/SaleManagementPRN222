@@ -7,7 +7,7 @@ using WebBanHang.ViewModels;
 namespace WebBanHang.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    //[RoleAuthorize("Admin")]
+    [RoleAuthorize("Admin")]
     public class UsersController : Controller
     {
         private readonly IUserService _service;
@@ -15,7 +15,9 @@ namespace WebBanHang.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var users = await _service.GetAllUserAsync();
+            var users = await _service.GetAllUserIncludeDeleteAsync();
+            Console.WriteLine("___________");
+            Console.WriteLine(users.FirstOrDefault(x => x.IsActived == true)?.FullName ?? "NULL");
             var vm = new UserManagementVM
             {
                 Users = users,
@@ -28,7 +30,7 @@ namespace WebBanHang.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Index(UserManagementVM vm)
         {
-            var users = await _service.GetAllUserAsync();
+            var users = await _service.GetAllUserIncludeDeleteAsync();
             users = vm.SortStatus == 0 ? users.OrderByDescending(x => x.CreatedAt) : users.OrderBy(x => x.CreatedAt);
             if (!vm.SearchInput.IsNullOrEmpty())
             {
@@ -52,7 +54,6 @@ namespace WebBanHang.Areas.Admin.Controllers
         {
             return View();
         }
-        //Tao nguoi dung moi
         [HttpPost]
         public async Task<IActionResult> Create(CreateUserVM vm)
         {
@@ -155,6 +156,109 @@ namespace WebBanHang.Areas.Admin.Controllers
             }
 
             TempData["Success"] = "Đã xóa người dùng thành công!";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Restore (int id)
+        {
+            var user = await _service.GetUserByIdIncludeDeleteAsync(id);
+
+            if (user == null) return NotFound();
+            DeleteUserVM vm = new DeleteUserVM
+            { 
+                Id = user.Id,
+                Role = user.Role,
+                UserName = user.Username,
+                FullName = user.FullName,
+                Email = user.Email,
+                CreatedAt = user.CreatedAt
+            };
+            return View(vm);
+        }
+
+        [HttpPost]
+        //[ValidateAntiForgeryToken]
+        public async Task<IActionResult> RestoreUser(int id)
+        {
+            var success = await _service.RestoreUserAsync(id);
+            if (!success)
+            {
+                TempData["Error"] = "Không thể khôi phục người dùng này.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            TempData["Success"] = "Khôi phục người dùng thành công!";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> HardDelete(int id)
+        {
+            var user = await _service.GetUserByIdIncludeDeleteAsync(id);
+
+            if (user == null)
+            {
+                TempData["Error"] = "Không tìm thấy người dùng.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (!user.IsDeleted)
+            {
+                TempData["Error"] = "Phải xóa mềm người dùng trước khi xóa vĩnh viễn.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (string.Equals(user.Role,"Admin",StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["Error"] =
+                    "Không được xóa vĩnh viễn tài khoản Admin.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            var vm = new DeleteUserVM
+            {
+                Id = user.Id,
+                UserName = user.Username,
+                FullName = user.FullName,
+                Email = user.Email,
+                Role = user.Role,
+                CreatedAt = user.CreatedAt
+            };
+
+            return View(vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> HardDeleteUser(int id)
+        {
+            var currentUserId = HttpContext.Session.GetInt32("UserId");
+
+            var user = await _service.GetUserByIdIncludeDeleteAsync(id);
+
+            if (user == null)
+            {
+                TempData["Error"] = "Không tìm thấy người dùng.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var fullName = user.FullName;
+
+            var success = await _service.HardDeleteUserAsync(id, currentUserId);
+
+            if (!success)
+            {
+                TempData["Error"] =
+                    "Không thể xóa vĩnh viễn. Người dùng có thể chưa được xóa mềm, là Admin hoặc còn dữ liệu lịch sử.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            TempData["Success"] = $"Đã xóa vĩnh viễn người dùng \"{fullName}\".";
+
             return RedirectToAction(nameof(Index));
         }
     }

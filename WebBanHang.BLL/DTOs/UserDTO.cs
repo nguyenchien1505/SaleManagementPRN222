@@ -19,6 +19,8 @@ namespace WebBanHang.BLL.DTOs
         public string Role { get; set; }
         public bool IsActived { get; set; }
         public string? Avatar { get; set; }
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedDate { get; set; }
 
     }
 }

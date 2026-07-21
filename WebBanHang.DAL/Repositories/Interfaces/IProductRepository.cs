@@ -16,8 +16,16 @@ namespace WebBanHang.DAL.Repositories.Interfaces
 
         Task UpdateAsync(Product product);
 
-
         Task<bool> DeleteAsync(int id);
+        //Admin
+        Task<List<Product>> GetAllIncludeDeleteAsync();
+
+        Task<Product?> GetByIdIncludeDeleteAsync(int id);
+
+        Task<Product?> GetByCodeIncludeDeleteAsync(string code);
+        Task<bool> HasHistoricalReferencesAsync(int productId);
+
+        Task<bool> HardDeleteAsync(Product product);
 
 
         // Dùng cho InventoryController (đồng bộ, không async)

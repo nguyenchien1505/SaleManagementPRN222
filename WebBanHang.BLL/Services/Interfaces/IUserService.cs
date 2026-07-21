@@ -17,5 +17,9 @@ namespace WebBanHang.BLL.Services.Interfaces
         Task<UserDTO> GetUserByIdAsync(int id);
         Task<bool> UpdateUserAsync(UpdateUserDTO dto);
         Task<bool> DeleteUserAsync(int id);
+        Task<bool> RestoreUserAsync(int id);
+        Task<bool> HardDeleteUserAsync(int userId, int? currentUserId);
+        Task<IEnumerable<UserDTO>> GetAllUserIncludeDeleteAsync();
+        Task<UserDTO> GetUserByIdIncludeDeleteAsync(int id);
     }
 }

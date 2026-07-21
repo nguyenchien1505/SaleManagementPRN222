@@ -44,21 +44,32 @@ public partial class WebBanHangContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Product>()
+            .HasQueryFilter(p => p.Status != "Deleted");
+
+        modelBuilder.Entity<Category>()
+            .HasQueryFilter(c => c.Status != "Deleted");
+
+        modelBuilder.Entity<User>()
+            .HasQueryFilter(u => !u.IsDeleted);
+
         modelBuilder.Entity<Cart>(entity =>
-        {
-            entity.HasKey(e => e.CartId).HasName("PK__Carts__51BCD7B7171E3B5F");
+            {
+                entity.HasKey(e => e.CartId).HasName("PK__Carts__51BCD7B7171E3B5F");
 
-            entity.Property(e => e.CreatedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.UpdatedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
+                entity.Property(e => e.CreatedDate)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
+                entity.Property(e => e.UpdatedDate)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
 
-            entity.HasOne(d => d.User).WithMany(p => p.Carts)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK_Carts_Users");
-        });
+                entity.HasOne(d => d.User).WithMany(p => p.Carts)
+                    .HasForeignKey(d => d.UserId)
+                    .HasConstraintName("FK_Carts_Users");
+            });
 
         modelBuilder.Entity<CartItem>(entity =>
         {

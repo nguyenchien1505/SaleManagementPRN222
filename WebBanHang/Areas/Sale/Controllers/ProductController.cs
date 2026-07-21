@@ -19,6 +19,7 @@ namespace WebBanHang.Areas.Sale.Controllers
             _cateService = ceteService;
             _env = env;
         }
+
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -29,6 +30,7 @@ namespace WebBanHang.Areas.Sale.Controllers
             };
             return View(vm);
         }
+
         [HttpGet]
         public async Task<IActionResult> Detail(int id)
         {
@@ -46,7 +48,7 @@ namespace WebBanHang.Areas.Sale.Controllers
                 StockQuantity = product.StockQuantity,
                 Status = product.Status,
                 Description = product.Description,
-                ExistingImages = product.ExistingImages.Select(x => new ProductImageDTO
+                ExistingImages = product.ExistingImages?.Select(x => new ProductImageDTO
                 {
                     ImageUrl = x.ImageUrl,
                     IsPrimary = x.IsPrimary
