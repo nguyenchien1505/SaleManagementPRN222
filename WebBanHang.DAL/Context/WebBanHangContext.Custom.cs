@@ -31,12 +31,7 @@ namespace WebBanHang.DAL.Context
                 .HasForeignKey(ci => ci.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // 3. Xóa Product thì xóa sản phẩm khỏi danh sách yêu thích
-            modelBuilder.Entity<Wishlist>()
-                .HasOne(w => w.Product)
-                .WithMany(p => p.Wishlists)
-                .HasForeignKey(w => w.ProductId)
-                .OnDelete(DeleteBehavior.Cascade);
+            
 
             // 4. Không cho hard delete nếu Product đã có trong đơn hàng
             modelBuilder.Entity<OrderDetail>()
@@ -67,12 +62,7 @@ namespace WebBanHang.DAL.Context
                 .HasForeignKey(ci => ci.CartId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Xóa User thì xóa Wishlist
-            modelBuilder.Entity<Wishlist>()
-                .HasOne(w => w.User)
-                .WithMany(u => u.Wishlists)
-                .HasForeignKey(w => w.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+            
 
             // Xóa User thì xóa hồ sơ Customer
             modelBuilder.Entity<Customer>()

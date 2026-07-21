@@ -37,8 +37,7 @@ namespace WebBanHang.Areas.Customer.Controllers
         [HttpGet]
         public async Task<IActionResult> Detail(int id)
         {
-            Console.WriteLine("______________");
-            Console.WriteLine(id);
+    
             var product = await _prodService.GetProductByIdAsync(id);
             if (product == null)
             {
