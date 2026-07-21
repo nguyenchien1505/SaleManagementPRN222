@@ -1,0 +1,59 @@
+﻿@using WebBanHang.DAL.Entities
+@{
+    ViewData["Title"] = "Nhập kho";
+    var products = ViewBag.Products as List<Product>;
+}
+
+<div class="container px-4 py-4" style="max-width: 850px;">
+    <div class="mb-4">
+        <h2 class="fw-bold text-dark m-0">Nhập Kho Hàng Hóa</h2>
+        <p class="text-muted small m-0">Role tham gia: <span class="fw-bold text-dark">System</span> — nhập kho sẽ tự động tăng số lượng tồn thực tế.</p>
+    </div>
+
+    <div class="card border-0 shadow-sm p-4" style="border-radius: 15px;">
+        <form method="post" asp-action="Inbound">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 p-3 mb-4" style="border-radius: 10px;"></div>
+
+            <div class="mb-4">
+                <label class="form-label fw-semibold text-secondary">Sản phẩm cần nhập</label>
+                <select name="productId" class="form-select custom-input py-2.5" required style="border-radius: 8px;">
+                    <option value="" disabled selected>-- Chọn sản phẩm --</option>
+                    @if (products != null)
+                    {
+                        foreach (var p in products)
+                        {
+                            <option value="@p.ProductId">@p.Name (Tồn hiện tại: @p.StockQuantity)</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-semibold text-secondary">Số lượng nhập</label>
+                <input type="number" name="quantity" class="form-control custom-input py-2" min="1" placeholder="Nhập số lượng thực tế lớn hơn 0..." required style="border-radius: 8px;" />
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-semibold text-secondary">Ghi chú vận hành</label>
+                <textarea name="note" class="form-control custom-input" rows="4" placeholder="Nhập lý do nhập kho hoặc thông tin nhà cung cấp..." style="border-radius: 8px;"></textarea>
+            </div>
+
+            <div class="d-flex gap-2 pt-2">
+                <button type="submit" class="btn btn-primary px-4 py-2" style="border-radius: 8px; font-weight: 500;">
+                    Xác nhận nhập kho
+                </button>
+                <a asp-action="Index" class="btn btn-secondary px-4 py-2" style="border-radius: 8px; font-weight: 500; background-color: #6c757d;">
+                    Quay lại
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* CSS tinh chỉnh hiệu ứng focus sang trọng cho ô nhập liệu */
+    .custom-input:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+    }
+</style>

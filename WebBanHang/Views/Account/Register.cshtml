@@ -1,0 +1,96 @@
+﻿@model WebBanHang.ViewModels.RegisterVM
+@{
+    ViewData["Title"] = "Đăng ký";
+    Layout = "_AuthLayout";
+}
+
+<div class="auth-page">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+
+    <div class="glass-container">
+        <div class="glass-card">
+            <div class="brand-logo">
+                <i class="bi bi-box-seam-fill me-2"></i>PRN222
+            </div>
+
+            <div class="auth-header">
+                <h2 class="auth-title">Tạo tài khoản</h2>
+                <p class="auth-subtitle">Bắt đầu hành trình của bạn ngay hôm nay</p>
+            </div>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @ViewBag.Error
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <form method="post" asp-action="Register" asp-controller="Account">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating-custom">
+                            <label>Tên đăng nhập</label>
+                            <input asp-for="@Model.Username"  type="text" class="form-control"  placeholder="user123" autofocus />
+                            <span asp-validation-for="@Model.Username" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-floating-custom">
+                            <label>Email</label>
+                            <input asp-for="@Model.Email" type="email" class="form-control"placeholder="name@example.com" />
+                            <span asp-validation-for="@Model.Email" class="text-danger"></span>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-floating-custom">
+                    <label>Họ và tên</label>
+                    <input asp-for="@Model.FullName" type="text" class="form-control" placeholder="Nguyễn Văn A" />
+                    <span asp-validation-for="@Model.Email" class="text-danger"></span>
+
+                </div>
+
+                <div class="form-floating-custom">
+                    <label>Số điện thoại</label>
+                    <input asp-for="@Model.Phone" type="tel" class="form-control" placeholder="0123456789" />
+                    <span asp-validation-for="@Model.Phone" class="text-danger"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating-custom">
+                            <label>Mật khẩu</label>
+                            <input asp-for="@Model.Password" type="password" class="form-control" placeholder="••••••••" />
+                            <span asp-validation-for="@Model.Password" class="text-danger"></span>
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-floating-custom">
+                            <label>Nhập lại mật khẩu</label>
+                            <input asp-for="@Model.ConfirmPassword" type="password" class="form-control" placeholder="••••••••" />
+                            <span asp-validation-for="@Model.ConfirmPassword" class="text-danger"></span>
+
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-auth mt-2">
+                    Tạo tài khoản
+                </button>
+
+                <div class="auth-footer">
+                    Đã có tài khoản?
+                    <a asp-action="Login" asp-controller="Account">Đăng nhập</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

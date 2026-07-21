@@ -1,0 +1,457 @@
+﻿@using WebBanHang.BLL.Services.Interfaces
+@model List<WebBanHang.ViewModels.CartItemVM>
+
+@{
+    ViewData["Title"] = "Giỏ hàng của tôi";
+    var totalAmount = Model?.Sum(c => c.Total) ?? 0;
+    var totalItems = Model?.Sum(c => c.Quantity) ?? 0;
+}
+
+<div class="container py-5">
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h1 class="fw-bold mb-1">
+                <i class="bi bi-cart3 me-2 text-primary"></i>Giỏ hàng
+            </h1>
+            <p class="text-muted mb-0">
+                @if (Model != null && Model.Any())
+                {
+                    <span>Bạn có <strong id="headerTotalItems">@totalItems sản phẩm</strong> trong giỏ hàng</span>
+                }
+                else
+                {
+                    <span>Giỏ hàng trống</span>
+                }
+            </p>
+        </div>
+        <div class="col-auto">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+                <i class="bi bi-arrow-left me-1"></i> Tiếp tục mua sắm
+            </a>
+        </div>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="text-center py-5 my-5 bg-white rounded-4 shadow-sm">
+            <div class="mb-4">
+                <i class="bi bi-cart-x display-1 text-muted opacity-50"></i>
+            </div>
+            <h3 class="fw-bold text-secondary mb-2">Giỏ hàng trống</h3>
+            <p class="text-muted mb-4">Bạn chưa thêm sản phẩm nào vào giỏ hàng.</p>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary rounded-pill px-5">
+                <i class="bi bi-bag me-2"></i> Mua sắm ngay
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0 align-middle">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="ps-4 py-3 border-0" style="width: 50px;">
+                                            <input type="checkbox" id="selectAll" class="form-check-input" checked title="Chọn tất cả">
+                                        </th>
+                                        <th class="py-3 fw-semibold text-muted border-0">Sản phẩm</th>
+                                        <th class="py-3 fw-semibold text-muted border-0 text-center">Đơn giá</th>
+                                        <th class="py-3 fw-semibold text-muted border-0 text-center" style="width: 150px;">Số lượng</th>
+                                        <th class="py-3 fw-semibold text-muted border-0 text-center">Thành tiền</th>
+                                        <th class="pe-4 py-3 border-0 text-end"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cartTableBody">
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr id="row-@item.ProductId" class="cart-item-row">
+                                            <td class="ps-4 py-3">
+                                                <input type="checkbox" class="form-check-input item-check"
+                                                       data-id="@item.ProductId"
+                                                       data-price="@((long)item.Price)"
+                                                       data-qty="@item.Quantity"
+                                                       name="selectedProductIds"
+                                                       value="@item.ProductId"
+                                                       checked>
+                                            </td>
+                                            <td class="py-3">
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <img src="@item.ImageUrl" alt="@item.Name"
+                                                         class="rounded-3 object-fit-cover shadow-sm"
+                                                         style="width:70px; height:70px;"
+                                                         onerror="this.src='/images/no-image.png'">
+                                                    <div>
+                                                        <a asp-controller="Home" asp-action="Details" asp-route-id="@item.ProductId"
+                                                           class="fw-bold text-dark text-decoration-none" style="transition: color 0.2s;"
+                                                           onmouseover="this.className='fw-bold text-primary text-decoration-none'"
+                                                           onmouseout="this.className='fw-bold text-dark text-decoration-none'">
+                                                            @item.Name
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="fw-semibold">
+                                                    @item.Price.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) đ
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="input-group input-group-sm justify-content-center">
+                                                    <button class="btn btn-outline-secondary" type="button"
+                                                            onclick="changeQty(@item.ProductId, -1)">
+                                                        <i class="bi bi-dash"></i>
+                                                    </button>
+                                                    <input type="text" id="qty-@item.ProductId"
+                                                           class="form-control text-center border-secondary fw-bold bg-white"
+                                                           value="@item.Quantity" readonly style="max-width: 50px;">
+                                                    <button class="btn btn-outline-secondary" type="button"
+                                                            onclick="changeQty(@item.ProductId, 1)">
+                                                        <i class="bi bi-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="fw-bold text-primary" id="total-@item.ProductId">
+                                                    @item.Total.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) đ
+                                                </span>
+                                            </td>
+                                            <td class="pe-4 text-end">
+                                                <form asp-area="Customer" asp-controller="Cart" asp-action="Remove" method="post" class="d-inline" id="form-remove-@item.ProductId">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="productId" value="@item.ProductId" />
+                                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-circle shadow-sm"
+                                                            title="Xóa khỏi giỏ"
+                                                            onclick="confirmRemove(@item.ProductId, '@item.Name')">
+                                                        <i class="bi bi-trash3"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 sticky-top" style="top: 110px;">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-4">
+                            <i class="bi bi-receipt me-2 text-primary"></i>Tóm tắt đơn hàng
+                        </h5>
+
+                        <div class="d-flex justify-content-between mb-2 text-muted">
+                            <span>Đã chọn:</span>
+                            <span class="fw-semibold text-dark"><span id="summarySelectedCount">@Model.Count</span> sản phẩm</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3 text-muted">
+                            <span>Tổng tiền hàng:</span>
+                            <span class="fw-semibold text-dark">
+                                <span id="cartTotalSum">@totalAmount.ToString("N0", new System.Globalization.CultureInfo("vi-VN"))</span> đ
+                            </span>
+                        </div>
+
+                        <div id="promoDisplay" class="d-none">
+                            <div class="d-flex justify-content-between mb-2 text-success">
+                                <span>Giảm giá (Mã KM):</span>
+                                <span class="fw-semibold">-<span id="promoDiscountAmount">0</span> đ</span>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between mb-4">
+                            <span class="fw-bold fs-5">Cần thanh toán:</span>
+                            <span class="fw-bold fs-5 text-primary">
+                                <span id="payableAmount">@totalAmount.ToString("N0", new System.Globalization.CultureInfo("vi-VN"))</span> đ
+                            </span>
+                        </div>
+
+                        <form asp-area="Customer" asp-controller="Cart" asp-action="CheckoutAll" method="post" id="checkoutAllForm">
+                            @Html.AntiForgeryToken()
+                            <div id="selectedIdsHidden"></div>
+
+                            <div class="mb-4">
+                                <label class="fw-semibold mb-2 small">Mã giảm giá</label>
+                                <div class="input-group">
+                                    <input type="text" name="promoCode" id="promoCodeInput" class="form-control" placeholder="Nhập mã KM..." style="text-transform: uppercase;">
+                                    <button class="btn btn-outline-primary" type="button" id="applyPromoBtn">Áp dụng</button>
+                                </div>
+                                <div id="promoMessage" class="small mt-1 d-none"></div>
+
+                                @{
+                                    var activePromos = ViewBag.ActivePromotions as List<WebBanHang.DAL.Entities.Promotion>;
+                                }
+                                @if (activePromos != null && activePromos.Any())
+                                {
+                                    <div class="mt-3">
+                                        <label class="small text-muted mb-2">Voucher có sẵn:</label>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            @foreach (var promo in activePromos)
+                                            {
+                                                <div class="voucher-tag p-2 border border-primary border-dashed rounded-3 bg-primary-subtle d-flex align-items-center cursor-pointer"
+                                                     onclick="setVoucher('@promo.Code')" title="Click để áp dụng" style="transition: all 0.2s;">
+                                                    <i class="bi bi-ticket-perforated me-2 text-primary"></i>
+                                                    <div>
+                                                        <div class="fw-bold text-primary small voucher-code-text">@promo.Code</div>
+                                                        <div class="text-muted" style="font-size: 0.75rem;">
+                                                            Giảm @(promo.Value.ToString("N0") ?? "0") đ
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <button type="button" class="btn btn-primary w-100 btn-lg rounded-pill fw-bold shadow-sm"
+                                    id="checkoutBtn" onclick="confirmCheckout()">
+                                <i class="bi bi-bag-check me-2"></i> Đặt hàng ngay
+                            </button>
+                        </form>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-around text-muted small text-center">
+                            <div>
+                                <i class="bi bi-truck d-block fs-4 mb-2 text-secondary"></i>
+                                Giao nhanh
+                            </div>
+                            <div>
+                                <i class="bi bi-arrow-return-left d-block fs-4 mb-2 text-secondary"></i>
+                                Đổi trả 7 ngày
+                            </div>
+                            <div>
+                                <i class="bi bi-headset d-block fs-4 mb-2 text-secondary"></i>
+                                Hỗ trợ 24/7
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .voucher-tag:hover {
+        background-color: var(--bs-primary) !important;
+        border-style: solid !important;
+    }
+
+        .voucher-tag:hover .text-primary, .voucher-tag:hover .text-muted {
+            color: #fff !important;
+        }
+
+    .voucher-tag.active {
+        background-color: #0d6efd !important;
+        border-style: solid !important;
+    }
+
+        .voucher-tag.active .text-primary, .voucher-tag.active .text-muted {
+            color: #fff !important;
+        }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        let currentPromoDiscount = 0;
+        let currentCartTotal = parseFloat('@totalAmount');
+
+        function setVoucher(code) {
+            $('#promoCodeInput').val(code);
+
+            // Highlight danh sách voucher đang chọn bằng class active
+            document.querySelectorAll('.voucher-tag').forEach(el => {
+                let codeText = el.querySelector('.voucher-code-text').innerText.trim();
+                if (codeText.toUpperCase() === code.toUpperCase()) {
+                    el.classList.add('active');
+                } else {
+                    el.classList.remove('active');
+                }
+            });
+
+            $('#applyPromoBtn').click();
+        }
+
+        $(document).ready(function() {
+            // Chọn tất cả sản phẩm
+            $('#selectAll').on('change', function() {
+                $('.item-check').prop('checked', $(this).is(':checked'));
+                updateLiveTotal();
+            });
+
+            // Chọn từng sản phẩm đơn lẻ
+            $('.item-check').on('change', function() {
+                const allChecked = $('.item-check:checked').length === $('.item-check').length;
+                $('#selectAll').prop('checked', allChecked);
+                updateLiveTotal();
+            });
+
+            // Gửi Ajax áp mã giảm giá
+            $('#applyPromoBtn').on('click', function() {
+                const code = $('#promoCodeInput').val();
+                if (!code) {
+                    Swal.fire('Nhắc nhở', 'Vui lòng nhập mã giảm giá', 'info');
+                    return;
+                }
+
+                const selectedIds = [];
+                $('.item-check:checked').each(function() {
+                    selectedIds.push($(this).data('id'));
+                });
+
+                if (selectedIds.length === 0) {
+                    Swal.fire('Chú ý', 'Vui lòng chọn sản phẩm trước khi áp mã', 'warning');
+                    return;
+                }
+
+                $(this).prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
+
+                $.ajax({
+                    url: '@Url.Action("ValidatePromo", "Cart", new { area = "Customer" })',
+                    type: 'POST',
+                    data: { code: code, selectedProductIds: selectedIds },
+                    success: function(data) {
+                        $('#applyPromoBtn').prop('disabled', false).text('Áp dụng');
+                        const msg = $('#promoMessage');
+
+                        if (data.success) {
+                            currentPromoDiscount = data.discountAmount;
+                            msg.removeClass('d-none text-danger').addClass('text-success').text(data.message);
+                            $('#promoDisplay').removeClass('d-none');
+                            $('#promoDiscountAmount').text(data.discountAmountDisplay);
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Thành công',
+                                text: data.message,
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                        } else {
+                            currentPromoDiscount = 0;
+                            msg.removeClass('d-none text-success').addClass('text-danger').text(data.message);
+                            $('#promoDisplay').addClass('d-none');
+                            Swal.fire('Lỗi', data.message, 'error');
+                        }
+                        updateLiveTotal();
+                    }
+                });
+            });
+
+            // Cập nhật giá realtime lúc tải trang ban đầu
+            updateLiveTotal();
+        });
+
+        function updateLiveTotal() {
+            let total = 0;
+            let count = 0;
+            const hiddenContainer = $('#selectedIdsHidden');
+            hiddenContainer.empty();
+
+            $('.item-check:checked').each(function() {
+                const price = parseInt($(this).data('price'));
+                const qty = parseInt($(this).data('qty'));
+                const id = $(this).data('id');
+                total += price * qty;
+                count++;
+
+                // Đẩy danh sách ID sản phẩm được chọn vào thẻ hidden để submit qua controller
+                hiddenContainer.append(`<input type="hidden" name="selectedProductIds" value="${id}">`);
+            });
+
+            currentCartTotal = total;
+            $('#cartTotalSum').text(total.toLocaleString('vi-VN'));
+            $('#summarySelectedCount').text(count);
+
+            let payable = total - currentPromoDiscount;
+            if (payable < 0) payable = 0;
+
+            $('#payableAmount').text(payable.toLocaleString('vi-VN'));
+
+            // Trạng thái nút thanh toán
+            $('#checkoutBtn').prop('disabled', count === 0);
+        }
+
+        function changeQty(productId, delta) {
+            const input = document.getElementById('qty-' + productId);
+            const currentQty = parseInt(input.value);
+            const newQty = currentQty + delta;
+            if (newQty < 1) return;
+
+            input.value = newQty;
+
+            $.post('@Url.Action("UpdateQuantity", "Cart", new { area = "Customer" })', { productId: productId, quantity: newQty }, function(data) {
+                if (data.success) {
+                    document.getElementById('total-' + productId).textContent = data.newItemTotal + ' đ';
+
+                    const checkbox = $(`.item-check[data-id="${productId}"]`);
+                    checkbox.data('qty', newQty);
+
+                    updateLiveTotal();
+                    updateCartBadge();
+                } else {
+                    Swal.fire('Lỗi', data.message, 'warning');
+                    input.value = currentQty;
+                }
+            });
+        }
+
+        function confirmRemove(productId, productName) {
+            Swal.fire({
+                title: 'Xóa sản phẩm?',
+                html: `Bạn có chắc muốn bỏ <b>${productName}</b> khỏi giỏ hàng?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Có, xóa đi',
+                cancelButtonText: 'Giữ lại'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('form-remove-' + productId).submit();
+                }
+            });
+        }
+
+        function confirmCheckout() {
+            const selectedCount = $('.item-check:checked').length;
+            if (selectedCount === 0) {
+                Swal.fire('Chú ý', 'Vui lòng chọn ít nhất 1 sản phẩm để thanh toán', 'warning');
+                return;
+            }
+
+            Swal.fire({
+                title: 'Xác nhận thanh toán',
+                text: `Bạn đã chọn ${selectedCount} sản phẩm. Tiến hành tạo đơn đặt hàng?`,
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Đồng ý đặt hàng',
+                cancelButtonText: 'Kiểm tra lại'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('checkoutAllForm').submit();
+                }
+            });
+        }
+
+        function updateCartBadge() {
+            $.get('@Url.Action("Count", "Cart", new { area = "Customer" })', function(data) {
+                const b = document.getElementById('cart-badge');
+                if (b) b.textContent = data.count > 0 ? data.count : '';
+            });
+        }
+    </script>
+}

@@ -1,0 +1,68 @@
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using WebBanHang.BLL.Services.Interfaces;
+using WebBanHang.DAL.Entities;
+using WebBanHang.Filters;
+
+namespace WebBanHang.Areas.Sale.Controllers
+{
+    [Area("Sale")]
+    //[Authorize(Roles = "Sales, Admin")]
+    public class OrdersController : Controller
+    {
+        private readonly IOrderService _orderService;
+        private readonly ICustomerService _customerService;
+        private readonly IProductService _productService;
+
+        public OrdersController(IOrderService orderService, ICustomerService customerService, IProductService productService)
+        {
+            _orderService = orderService;
+            _customerService = customerService;
+            _productService = productService;
+        }
+
+        // GET: Sale/Orders
+        public async Task<IActionResult> Index(string searchString, string statusFilter, int? pageNumber)
+        {
+            var orders = await _orderService.GetOrdersOverviewAsync(searchString, statusFilter);
+            int pageSize = 10;
+            var pagedOrders = Models.PaginatedList<Order>.Create(orders.AsQueryable(), pageNumber ?? 1, pageSize);
+
+            ViewData["CurrentFilter"] = searchString;
+            ViewData["CurrentStatus"] = statusFilter;
+            return View(pagedOrders);
+        }
+
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var order = await _orderService.GetOrderDetailsAsync(id.Value);
+            if (order == null) return NotFound();
+
+            return View(order);
+        }
+
+  
+
+  
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateStatus(int id, string newStatus) 
+        {
+            int? actorUserId = HttpContext.Session.GetInt32("UserId");
+            var (success, message) = await _orderService.UpdateOrderStatusAsync(id, newStatus, actorUserId);
+
+            if (success)
+            {
+                TempData["SuccessMessage"] = message;
+            }
+            else
+            {
+                TempData["ErrorMessage"] = message;
+            }
+            return RedirectToAction(nameof(Details), new { id = id });
+        }
+    }
+}

@@ -1,0 +1,60 @@
+﻿@using WebBanHang.DAL.Entities
+@model List<AuditLog>
+@{
+    ViewData["Title"] = "Nhật ký hoạt động (Audit Log)";
+}
+
+<div class="container-fluid px-4 py-4">
+    <div class="mb-4">
+        <h2 class="fw-bold text-dark m-0">Nhật ký hoạt động</h2>
+        <p class="text-muted small m-0">Ai tạo sản phẩm / Ai sửa sản phẩm / Ai xác nhận đơn hàng</p>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-muted small text-uppercase">
+                    <tr>
+                        <th class="ps-4 py-3">Thời gian</th>
+                        <th>Đối tượng</th>
+                        <th>Hành động</th>
+                        <th>Người thực hiện</th>
+                        <th class="pe-4">Mô tả</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var log in Model)
+                        {
+                            <tr>
+                                <td class="ps-4">@log.CreatedDate.ToString("HH:mm dd/MM/yyyy")</td>
+                                <td><span class="badge bg-light text-dark border">@log.EntityName #@log.EntityId</span></td>
+                                <td>
+                                    @{
+                                        var badge = log.Action switch
+                                        {
+                                            "Create" => "bg-success",
+                                            "Update" => "bg-warning",
+                                            "Confirm" => "bg-primary",
+                                            _ => "bg-secondary"
+                                        };
+                                    }
+                                    <span class="badge @badge">@log.Action</span>
+                                </td>
+                                <td>@(log.PerformedByName ?? $"User #{log.PerformedBy}")</td>
+                                <td class="pe-4 text-muted">@log.Description</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">Chưa có nhật ký nào.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

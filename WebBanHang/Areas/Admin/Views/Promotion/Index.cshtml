@@ -1,0 +1,90 @@
+﻿@model IEnumerable<WebBanHang.ViewModels.PromotionVM>
+
+<div class="card shadow border-0 my-4 p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-dark fw-bold mb-0">Quản Lý Mã Khuyến Mãi</h2>
+        </div>
+        <div>
+            <a asp-action="Create" class="btn btn-success rounded-pill px-4 py-2">
+                <i class="bi bi-plus-circle me-2"></i> Tạo Mã Mới
+            </a>
+        </div>
+    </div>
+
+    <form asp-action="Index" method="get" class="row g-3 mb-4">
+        <div class="col-md-5">
+            <input type="text" name="searchString" value="@ViewData["CurrentSearch"]" class="form-control" placeholder="Nhập mã cần tìm..." />
+        </div>
+        <div class="col-md-3">
+            <select name="statusFilter" class="form-select">
+                <option value="">-- Tất cả trạng thái --</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+        </div>
+        <div class="col-md-4 d-flex gap-2">
+            <button type="submit" class="btn btn-primary flex-grow-1">Lọc dữ liệu</button>
+            <a asp-action="Index" class="btn btn-secondary flex-grow-1">Xóa bộ lọc</a>
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle text-center mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Mã</th>
+                    <th>Loại Giảm Giá</th>
+                    <th>Giá Trị</th>
+                    <th>Đơn Tối Thiểu</th>
+                    <th>Ngày Bắt Đầu</th>
+                    <th>Ngày Kết Thúc</th>
+                    <th>Trạng Thái</th>
+                    <th>Hành Động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold"><a asp-action="Details" asp-route-id="@item.PromotionId" class="text-decoration-none">@item.Code</a></td>
+                            <td>@item.DiscountType</td>
+                            <td class="text-success fw-semibold">
+                                @if (item.DiscountType == "Percent")
+                                {
+                                    <span>@item.Value.ToString("G0")%</span>
+                                }
+                                else
+                                {
+                                    <span>@item.Value.ToString("#,##0") đ</span>
+                                }
+                            </td>
+                            <td>@item.MinOrderValue.ToString("#,##0") đ</td>
+                            <td>@item.StartDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@item.EndDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                <span class="badge @(item.Status == "Active" ? "bg-success" : "bg-secondary")">
+                                    @item.Status
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-center gap-1">
+                                    <a asp-action="Edit" asp-route-id="@item.PromotionId" class="btn btn-sm btn-warning text-white"><i class="bi bi-pencil-square"></i></a>
+                                    <a asp-action="Delete" asp-route-id="@item.PromotionId" class="btn btn-sm btn-danger"><i class="bi bi-trash-fill"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" class="text-muted py-4">Không tìm thấy mã giảm giá nào.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,65 @@
+﻿@using WebBanHang.DAL.Entities
+@model List<Product>
+@{
+    ViewData["Title"] = "Kiểm tra tồn kho";
+    var lowStockIds = ViewBag.LowStockIds as HashSet<int> ?? new HashSet<int>();
+}
+
+<div class="container-fluid px-4 py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark m-0">Kiểm Tra Tồn Kho</h2>
+            <p class="text-muted small m-0">Cảnh báo sắp hết hàng: tồn kho hàng hóa &lt; 10 sẽ cảnh báo màu cam nhạt</p>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-primary d-flex align-items-center gap-2 px-3" style="border-radius: 10px; font-weight: 500;">
+                <i class="bi bi-arrow-left"></i> Xem lịch sử kho
+            </a>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm" style="border-radius: 15px; overflow: hidden;">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 text-center">
+                <thead class="table-dark" style="background-color: #212529;">
+                    <tr>
+                        <th class="py-3" style="width: 20%;">Mã SP</th>
+                        <th class="py-3" style="width: 40%;">Tên sản phẩm</th>
+                        <th class="py-3" style="width: 20%;">Tồn kho hiện tại</th>
+                        <th class="py-3" style="width: 20%;">Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model == null || !Model.Any())
+                    {
+                        <tr>
+                            <td colspan="4" class="py-5 text-muted">Không có sản phẩm nào</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var p in Model)
+                        {
+                            bool isLowStock = lowStockIds.Contains(p.ProductId);
+                            <tr class="@(isLowStock ? "table-warning bg-warning-subtle" : "")">
+                                <td class="py-3 font-monospace fw-bold text-secondary">@p.Code</td>
+                                <td class="py-3 fw-semibold text-dark text-start ps-4">@p.Name</td>
+                                <td class="py-3 font-monospace fw-bold @(isLowStock ? "text-danger" : "text-dark")">@p.StockQuantity</td>
+                                <td class="py-3">
+                                    @if (isLowStock)
+                                    {
+                                        <span class="badge bg-danger px-3 py-2" style="border-radius: 6px; font-weight: 500;">⚠ Sắp hết hàng</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success px-3 py-2" style="border-radius: 6px; font-weight: 500;">Còn hàng</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

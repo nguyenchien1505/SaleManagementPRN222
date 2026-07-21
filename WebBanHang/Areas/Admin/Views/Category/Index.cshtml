@@ -1,0 +1,112 @@
+﻿@model WebBanHang.ViewModels.CategoryManagementVM
+
+@{
+    ViewData["Title"] = "Quản lý danh mục";
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+        <i class="bi bi-exclamation-circle-fill me-2"></i>
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-4">
+    <div>
+        <h3 class="fw-bold text-dark">Quản lý danh mục</h3>
+        <p class="text-muted mb-0">Danh sách danh mục sản phẩm và trạng thái</p>
+    </div>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a asp-action="Create" method="get" class="btn btn-primary rounded-pill px-4 shadow-sm">
+            <i class="bi bi-plus-lg me-2"></i> Thêm danh mục
+        </a>
+    </div>
+</div>
+
+<div class="card-modern">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <form id="filterForm" asp-action="Index" method="post" class="d-flex">
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0 rounded-start-pill"><i class="bi bi-search text-secondary"></i></span>
+                <input type="text" asp-for="SearchInput" class="form-control bg-light border-start-0 ps-0" placeholder="Tìm kiếm danh mục..." style="min-width: 200px;">
+                <select asp-for="StatusFilter" class="form-select bg-light border-start-0 rounded-end-pill ms-2" style="max-width: 150px;" onchange="this.form.submit()">
+                    <option value="All" >Tất cả trạng thái</option>
+                    <option value="Active">Hoạt động</option>
+                    <option value="Inactive">Tạm ẩn</option>
+                </select>
+            </div>
+
+        </form>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table-modern">
+            <thead>
+                <tr>
+                    <th>
+                        <button form="filterForm" type="submit" name="SortStatus" value="@Model.SortStatus" class="btn btn-outline-secondary rounded-pill">
+                            <i class="bi bi-sort-down"></i> Tên danh mục
+                        </button>
+                    </th>
+                    <th>Mô tả</th>
+                    <th>Trạng thái</th>
+                    <th class="text-center">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Categories)
+                {
+                    <tr>
+                        <td class="fw-bold text-dark">@item.Name</td>
+                        <td class="text-muted" style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            @item.Description
+                        </td>
+                        <td>
+                            @if (item.Status == "Active")
+                            {
+                                <span class="badge-modern badge-success-modern">Hoạt động</span>
+                            }
+                            else
+                            {
+                                <span class="badge-modern badge-secondary">Tạm ẩn</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-light rounded-circle" type="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                    <li><a class="dropdown-item" asp-action="Edit" asp-route-id="@item.CategoryId"><i class="bi bi-pencil me-2"></i> Chỉnh sửa</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.CategoryId"><i class="bi bi-trash me-2"></i> Xóa</a></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    setTimeout(function () {
+    var alert = document.querySelector('.alert');
+    if (alert) {
+    var bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+    bsAlert.close();
+    }
+    }, 3000);
+</script>
