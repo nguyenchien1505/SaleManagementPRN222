@@ -29,30 +29,30 @@ namespace WebBanHang.BLL.Services.Implementations
 
         public async Task<DashboardDTO> GetDashboardStatsAsync()
         {
-            if (_cache.TryGetValue(
-                DashboardCacheKey,
-                out DashboardDTO? cachedData))
+            // 1. Kiểm tra Cache
+            if (_cache.TryGetValue(DashboardCacheKey, out DashboardDTO? cachedData))
             {
                 return cachedData!;
             }
 
             var currentDate = DateTime.Now;
 
-            var monthlyRevenue =
-                await _dashboardRepository.GetMonthlyRevenueAsync(
-                    currentDate.Year);
-
+            // 2. Lấy dữ liệu Doanh thu & Đơn hàng theo 12 tháng
+            var monthlyRevenue = await _dashboardRepository.GetMonthlyRevenueAsync(currentDate.Year);
             var revenueData = Enumerable.Range(1, 12)
-                .Select(month =>
-                    monthlyRevenue
-                        .FirstOrDefault(x => x.Month == month)
-                        ?.TotalRevenue ?? 0)
+                .Select(month => monthlyRevenue.FirstOrDefault(x => x.Month == month)?.TotalRevenue ?? 0)
                 .ToList();
 
-            var categories =
-                await _dashboardRepository.GetTopCategoriesAsync(5);
+            var monthlyOrderCounts = await _dashboardRepository.GetMonthlyOrderCountAsync(currentDate.Year);
+            var orderCountData = Enumerable.Range(1, 12)
+                .Select(month => monthlyOrderCounts.FirstOrDefault(x => x.Month == month)?.Count ?? 0)
+                .ToList();
 
+            // 3. Lấy dữ liệu Danh mục, Sản phẩm bán chạy & Đơn hàng gần đây
+            var categories = await _dashboardRepository.GetTopCategoriesAsync(5);
+            var topProducts = await _dashboardRepository.GetTopProductsAsync(5);
             var recentOrders = await _dashboardRepository.GetRecentOrdersAsync(5);
+
             var recentOrderDTOs = recentOrders.Select(o => new RecentOrderDTO
             {
                 OrderId = o.OrderId,
@@ -62,34 +62,40 @@ namespace WebBanHang.BLL.Services.Implementations
                 TotalAmount = o.TotalAmount,
             }).ToList();
 
+            // 4. Khởi tạo đối tượng DashboardDTO hoàn chỉnh
             var dashboard = new DashboardDTO
             {
-                TotalRevenue =
-                    await _dashboardRepository.GetTotalRevenueAsync(),
+                // Chỉ số tổng quan cơ bản
+                TotalRevenue = await _dashboardRepository.GetTotalRevenueAsync(),
+                TotalOrders = await _dashboardRepository.GetTotalOrdersAsync(),
+                PendingOrders = await _dashboardRepository.GetPendingOrdersAsync(),
+                NewUsers = await _dashboardRepository.GetNewUsersAsync(currentDate.Month, currentDate.Year),
 
-                TotalOrders =
-                    await _dashboardRepository.GetTotalOrdersAsync(),
+                // Chỉ số KPI bổ sung
+                TotalProducts = await _dashboardRepository.GetTotalProductsAsync(),
+                TotalCustomers = await _dashboardRepository.GetTotalCustomersAsync(),
+                DraftOrders = await _dashboardRepository.GetOrderCountByStatusAsync("Draft"),
+                ConfirmedOrders = await _dashboardRepository.GetOrderCountByStatusAsync("Confirmed"),
+                CompletedOrders = await _dashboardRepository.GetOrderCountByStatusAsync("Completed"),
 
-                PendingOrders =
-                    await _dashboardRepository.GetPendingOrdersAsync(),
-
-                NewUsers = await _dashboardRepository.GetNewUsersAsync(
-                        currentDate.Month,
-                        currentDate.Year),
-
+                // Dữ liệu biểu đồ & danh sách
                 RevenueData = revenueData,
+                OrderCountData = orderCountData,
 
-                CategoryLabels = categories
-                    .Select(x => x.CategoryName)
-                    .ToList(),
+                CategoryLabels = categories.Select(x => x.CategoryName).ToList(),
+                CategoryData = categories.Select(x => x.Quantity).ToList(),
 
-                CategoryData = categories
-                    .Select(x => x.Quantity)
-                    .ToList(),
+                TopProducts = topProducts.Select(x => new TopProductDTO
+                {
+                    ProductName = x.ProductName,
+                    QuantitySold = x.QuantitySold,
+                    Revenue = x.Revenue
+                }).ToList(),
+
                 RecentOrders = recentOrderDTOs
-
             };
 
+            // 5. Lưu vào Cache trong 5 phút
             _cache.Set(
                 DashboardCacheKey,
                 dashboard,
@@ -98,5 +104,4 @@ namespace WebBanHang.BLL.Services.Implementations
             return dashboard;
         }
     }
-
 }

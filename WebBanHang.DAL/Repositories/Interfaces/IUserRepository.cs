@@ -23,5 +23,7 @@ namespace WebBanHang.DAL.Repositories.Interfaces
         Task AddAsync(User user);
         Task UpdateAsync(User user);
         Task<bool> DeleteAsync(int id);
+
+        Task<User> GetByResetTokenAsync(string token);
     }
 }

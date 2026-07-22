@@ -40,7 +40,9 @@ public partial class WebBanHangContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
-    
+    public virtual DbSet<AuditLog> AuditLogs { get; set; }
+
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -288,7 +290,19 @@ public partial class WebBanHangContext : DbContext
             entity.Property(e => e.Username).HasMaxLength(50);
         });
 
-        
+
+        modelBuilder.Entity<AuditLog>(entity =>
+        {
+            entity.HasKey(e => e.AuditLogId);
+            entity.ToTable("AuditLogs");
+            entity.Property(e => e.EntityName).HasMaxLength(50);
+            entity.Property(e => e.Action).HasMaxLength(50);
+            entity.Property(e => e.PerformedByName).HasMaxLength(100);
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.CreatedDate).HasDefaultValueSql("(getdate())");
+        });
+
+
 
         OnModelCreatingPartial(modelBuilder);
     }

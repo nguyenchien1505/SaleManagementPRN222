@@ -101,5 +101,10 @@ namespace WebBanHang.DAL.Repositories.Implementations
             return await _context.SaveChangesAsync() > 0;
         }
 
+        
+        public async Task<User> GetByResetTokenAsync(string token)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.ResetPasswordToken == token);
+        }
     }
 }

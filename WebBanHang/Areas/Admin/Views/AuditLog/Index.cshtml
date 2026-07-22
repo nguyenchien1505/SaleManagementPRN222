@@ -1,0 +1,49 @@
+﻿@model List<WebBanHang.DAL.Entities.AuditLog>
+@{
+    ViewData["Title"] = "Audit Log";
+}
+
+<div class="container-fluid px-4 py-4">
+    <h2 class="fw-bold text-dark mb-4">Audit Log - Lịch sử thao tác hệ thống</h2>
+
+    <div class="card border-0 shadow-sm" style="border-radius: 15px; overflow: hidden;">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Thời gian</th>
+                        <th>Người thực hiện</th>
+                        <th>Hành động</th>
+                        <th>Đối tượng</th>
+                        <th>ID</th>
+                        <th>Mô tả</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model == null || !Model.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="py-5 text-muted">Chưa có nhật ký nào</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@item.PerformedByName</td>
+                                <td>
+                                    <span class="badge bg-primary-subtle text-primary">@item.Action</span>
+                                </td>
+                                <td>@item.EntityName</td>
+                                <td>#@item.EntityId</td>
+                                <td class="text-start ps-4">@item.Description</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

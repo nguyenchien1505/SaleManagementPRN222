@@ -106,5 +106,61 @@ namespace WebBanHang.DAL.Repositories.Implementations
                 .Take(count)
                 .ToListAsync();
         }
+
+
+        public async Task<int> GetTotalProductsAsync()
+        {
+            return await _context.Products.CountAsync(p => p.Status != "Deleted");
+        }
+
+        public async Task<int> GetTotalCustomersAsync()
+        {
+            return await _context.Customers.CountAsync();
+        }
+
+        public async Task<int> GetOrderCountByStatusAsync(string status)
+        {
+            return await _context.Orders.CountAsync(o => o.Status == status);
+        }
+
+        public async Task<List<MonthlyOrderCountResult>> GetMonthlyOrderCountAsync(int year)
+        {
+            return await _context.Orders
+                .AsNoTracking()
+                .Where(o => o.OrderDate.HasValue && o.OrderDate.Value.Year == year)
+                .GroupBy(o => o.OrderDate!.Value.Month)
+                .Select(g => new MonthlyOrderCountResult
+                {
+                    Month = g.Key,
+                    Count = g.Count()
+                })
+                .ToListAsync();
+        }
+
+        public async Task<List<TopProductResult>> GetTopProductsAsync(int count)
+        {
+            // Logic tương tự Areas/Sale/Controllers/DashBoardController.cs
+            return await _context.OrderDetails
+                .AsNoTracking()
+                .GroupBy(od => od.ProductId)
+                .Select(g => new
+                {
+                    ProductId = g.Key,
+                    QuantitySold = g.Sum(od => od.Quantity),
+                    Revenue = g.Sum(od => od.Total)
+                })
+                .OrderByDescending(x => x.QuantitySold)
+                .Take(count)
+                .Join(_context.Products,
+                      stat => stat.ProductId,
+                      p => p.ProductId,
+                      (stat, p) => new TopProductResult
+                      {
+                          ProductName = p.Name,
+                          QuantitySold = stat.QuantitySold,
+                          Revenue = stat.Revenue
+                      })
+                .ToListAsync();
+        }
     }
 }

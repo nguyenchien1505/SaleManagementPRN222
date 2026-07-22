@@ -22,5 +22,14 @@ namespace WebBanHang.DAL.Repositories.Interfaces
         Task<List<MonthlyRevenueResult>> GetMonthlyRevenueAsync(int year);
 
         Task<List<CategoryStatisticResult>> GetTopCategoriesAsync(int count);
+
+        Task<int> GetTotalProductsAsync();
+        Task<int> GetTotalCustomersAsync();
+
+        Task<int> GetOrderCountByStatusAsync(string status);
+
+        Task<List<MonthlyOrderCountResult>> GetMonthlyOrderCountAsync(int year);
+
+        Task<List<TopProductResult>> GetTopProductsAsync(int count);
     }
 }

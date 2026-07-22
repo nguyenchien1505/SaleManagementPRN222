@@ -15,9 +15,11 @@ namespace WebBanHang.BLL.Services.Implementations
     public class UserService : IUserService
     {
         private readonly IUserRepository _repo;
-        public UserService(IUserRepository userRepository)
+        private readonly IEmailService _emailService;
+        public UserService(IUserRepository userRepository, IEmailService emailService)
         {
             _repo = userRepository;
+            _emailService = emailService;
         }
 
         public async Task<UserDTO> Login(LoginDTO dto)
@@ -232,6 +234,93 @@ namespace WebBanHang.BLL.Services.Implementations
                 return false;
 
             return await _repo.HardDeleteUserAsync(user);
+        }
+
+        
+
+        public async Task<UserDTO> FindOrCreateGoogleUserAsync(string email, string fullName)
+        {
+            var existing = await _repo.GetByEmailAsync(email);
+
+            if (existing != null)
+            {
+                if (!existing.IsActive || existing.IsDeleted) return null;
+
+                return new UserDTO
+                {
+                    Id = existing.UserId,
+                    Username = existing.Username,
+                    FullName = existing.FullName,
+                    Role = existing.Role
+                };
+            }
+
+            // Chưa có tài khoản -> tự tạo tài khoản Customer mới liên kết với email Google
+            var newUser = new User
+            {
+                Username = email,                 // dùng email làm username cho tài khoản Google
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(Guid.NewGuid().ToString()), // mật khẩu ngẫu nhiên, không dùng tới vì đăng nhập qua Google
+                Email = email,
+                FullName = fullName,
+                Role = "Customer",
+                IsActive = true,
+                CreatedDate = DateTime.Now,
+                Customer = new Customer
+                {
+                    CreatedDate = DateTime.Now
+                }
+            };
+
+            await _repo.AddAsync(newUser);
+
+            return new UserDTO
+            {
+                Id = newUser.UserId,
+                Username = newUser.Username,
+                FullName = newUser.FullName,
+                Role = newUser.Role
+            };
+        }
+
+        public async Task<bool> ForgotPasswordAsync(string email)
+        {
+            var user = await _repo.GetByEmailAsync(email);
+            if (user == null || !user.IsActive || user.IsDeleted) return false;
+
+            var token = Guid.NewGuid().ToString("N");
+            user.ResetPasswordToken = token;
+            user.ResetPasswordTokenExpiry = DateTime.Now.AddMinutes(30);
+
+            await _repo.UpdateAsync(user);
+
+            var resetLink = $"https://localhost:7076/Account/ResetPassword?token={token}";
+            // Lưu ý: đổi domain trên đây thành domain thật khi deploy production
+
+            var htmlBody = $@"
+        <p>Xin chào {user.FullName},</p>
+        <p>Bạn vừa yêu cầu đặt lại mật khẩu cho tài khoản WebBanHang.</p>
+        <p>Nhấn vào link bên dưới để đặt lại mật khẩu (link có hiệu lực trong 30 phút):</p>
+        <p><a href='{resetLink}'>{resetLink}</a></p>
+        <p>Nếu bạn không yêu cầu, vui lòng bỏ qua email này.</p>";
+
+            await _emailService.SendEmailAsync(user.Email, "Đặt lại mật khẩu WebBanHang", htmlBody);
+
+            return true;
+        }
+
+        public async Task<bool> ResetPasswordAsync(string token, string newPassword)
+        {
+            var user = await _repo.GetByResetTokenAsync(token);
+
+            if (user == null || user.ResetPasswordTokenExpiry == null || user.ResetPasswordTokenExpiry < DateTime.Now)
+                return false;
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            user.ResetPasswordToken = null;
+            user.ResetPasswordTokenExpiry = null;
+
+            await _repo.UpdateAsync(user);
+            return true;
         }
     }
 }

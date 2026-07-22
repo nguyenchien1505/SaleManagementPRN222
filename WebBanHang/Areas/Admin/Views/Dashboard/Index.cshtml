@@ -4,8 +4,8 @@
     Layout = "_AdminLayout";
 }
 
+<!-- SECTION 1: STATS CARDS (Doanh thu, Đơn hàng, Đang xử lý, Người dùng mới) -->
 <div class="row g-4 mb-4">
-    <!-- Stats Cards -->
     <div class="col-xl-3 col-md-6">
         <div class="stats-card">
             <div class="d-flex align-items-center justify-content-between mb-3">
@@ -52,29 +52,111 @@
     </div>
 </div>
 
+<!-- SECTION 8a: BỔ SUNG 2 KPI CARD MỚI (Tổng sản phẩm, Tổng khách hàng) -->
 <div class="row g-4 mb-4">
-    <!-- Revenue Chart -->
-    <div class="col-xl-8 col-lg-7">
-        <div class="card-modern">
-            <h5 class="mb-4 text-dark fw-bold">Biểu đồ doanh thu</h5>
-            <div class="chart-area" style="height: 350px;">
-                <canvas id="revenueChart"></canvas>
+    <div class="col-xl-6 col-md-6">
+        <div class="stats-card">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="card-icon bg-secondary bg-opacity-10 text-secondary">
+                    <i class="bi bi-box-seam"></i>
+                </div>
             </div>
+            <h6 class="text-muted mb-1 text-uppercase small ls-1">Tổng sản phẩm</h6>
+            <h3 class="fw-bold mb-0">@Model.TotalProducts</h3>
         </div>
     </div>
+    <div class="col-xl-6 col-md-6">
+        <div class="stats-card">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="card-icon bg-primary bg-opacity-10 text-primary">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+            </div>
+            <h6 class="text-muted mb-1 text-uppercase small ls-1">Tổng khách hàng</h6>
+            <h3 class="fw-bold mb-0">@Model.TotalCustomers</h3>
+        </div>
+    </div>
+</div>
 
-    <!-- Category Chart -->
-    <div class="col-xl-4 col-lg-5">
+<!-- SECTION 8b: WIDGET THỐNG KÊ ĐƠN HÀNG THEO TRẠNG THÁI -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
         <div class="card-modern">
-            <h5 class="mb-4 text-dark fw-bold">Top danh mục</h5>
-            <div class="chart-area d-flex justify-content-center" style="height: 300px;">
-                <canvas id="pieChart"></canvas>
+            <h5 class="mb-4 text-dark fw-bold">Thống kê đơn hàng theo trạng thái</h5>
+            <div class="row text-center">
+                <div class="col-md-4">
+                    <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2">Draft</span>
+                    <h4 class="fw-bold mt-2">@Model.DraftOrders</h4>
+                </div>
+                <div class="col-md-4">
+                    <span class="badge bg-warning bg-opacity-10 text-warning px-3 py-2">Confirmed</span>
+                    <h4 class="fw-bold mt-2">@Model.ConfirmedOrders</h4>
+                </div>
+                <div class="col-md-4">
+                    <span class="badge bg-success bg-opacity-10 text-success px-3 py-2">Completed</span>
+                    <h4 class="fw-bold mt-2">@Model.CompletedOrders</h4>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row">
+<!-- SECTION 8c (Part 1): BIỂU ĐỒ DOANH THU & SỐ ĐƠN THEO THÁNG -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-8 col-lg-7">
+        <div class="card-modern">
+            <h5 class="mb-4 text-dark fw-bold">Biểu đồ doanh thu (theo tháng)</h5>
+            <div class="chart-area" style="height: 350px;">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-lg-5">
+        <div class="card-modern">
+            <h5 class="mb-4 text-dark fw-bold">Số đơn theo tháng</h5>
+            <div class="chart-area" style="height: 300px;">
+                <canvas id="orderChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SECTION 8c (Part 2): TOP SẢN PHẨM BÁN CHẠY -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card-modern">
+            <h5 class="mb-4 text-dark fw-bold">Top sản phẩm bán chạy</h5>
+            <div class="table-responsive">
+                <table class="table-modern">
+                    <thead>
+                        <tr>
+                            <th>Tên sản phẩm</th>
+                            <th>Số lượng bán</th>
+                            <th>Doanh thu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model.TopProducts)
+                        {
+                            <tr>
+                                <td>@p.ProductName</td>
+                                <td>@p.QuantitySold</td>
+                                <td>@p.Revenue.ToString("N0") xu</td>
+                            </tr>
+                        }
+                        @if (!Model.TopProducts.Any())
+                        {
+                            <tr><td colspan="3" class="text-center text-muted py-4">Chưa có dữ liệu bán hàng</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- GIAO DỊCH GẦN ĐÂY -->
+<div class="row mb-4">
     <div class="col-12">
         <div class="table-modern-wrapper">
             <h5 class="mb-4 text-dark fw-bold ps-2">Giao dịch gần đây</h5>
@@ -112,22 +194,18 @@
                                     }
                                     else if (order.Status == "Processing")
                                     {
-
                                         <span class="badge-modern badge-info-modern">Đang xử lý</span>
                                     }
                                     else if (order.Status == "Cancelled")
                                     {
-
                                         <span class="badge-modern badge-danger-modern">Đã hủy</span>
                                     }
                                     else if (order.Status == "Pending")
                                     {
-
                                         <span class="badge-modern badge-warning-modern">Chờ xử lý</span>
                                     }
                                     else
                                     {
-
                                         <span class="badge-modern badge-secondary">@order.Status</span>
                                     }
                                 </td>
@@ -152,11 +230,11 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Set new default font family and font color to mimic Bootstrap's default styling
+        // Cấu hình phông chữ & màu sắc mặc định cho Chart.js
         Chart.defaults.font.family = 'Inter';
         Chart.defaults.color = '#858796';
 
-        // Revenue Chart (Line)
+        // 1. Biểu đồ Doanh thu (Line Chart)
         var ctx = document.getElementById("revenueChart");
         var myLineChart = new Chart(ctx, {
         type: 'line',
@@ -191,7 +269,7 @@
         cornerRadius: 8,
         displayColors: false,
         callbacks: {
-        label: function(context) {
+        label: function (context) {
         return new Intl.NumberFormat('vi-VN').format(context.parsed.y) + ' xu';
         }
         }
@@ -206,46 +284,46 @@
         ticks: {
         color: '#8c9097',
         padding: 10,
-        callback: function(value) { return value.toLocaleString() + ' xu'; }
+        callback: function (value) { return value.toLocaleString() + ' xu'; }
         },
         grid: {
         color: "rgba(0,0,0,0.03)",
         borderDash: [5, 5],
         drawBorder: false
         }
-        },
+        }
         }
         }
         });
 
-        // Pie Chart
-        var ctxPool = document.getElementById("pieChart");
-        var myPieChart = new Chart(ctxPool, {
-        type: 'doughnut',
+        // 2. SECTION 8d: Biểu đồ Số đơn hàng theo tháng (Bar Chart)
+        var ctxOrder = document.getElementById("orderChart");
+        var myOrderChart = new Chart(ctxOrder, {
+        type: 'bar',
         data: {
-        labels: @Html.Raw(Json.Serialize(Model.CategoryLabels)),
+        labels: ["Th 1", "Th 2", "Th 3", "Th 4", "Th 5", "Th 6", "Th 7", "Th 8", "Th 9", "Th 10", "Th 11", "Th 12"],
         datasets: [{
-        data: @Html.Raw(Json.Serialize(Model.CategoryData)),
-        backgroundColor: ['#4361ee', '#2bbd7e', '#f7b731', '#f83f37', '#0099ff', '#8c9097'],
-        borderWidth: 0,
-        hoverOffset: 4
-        }],
+        label: "Số đơn hàng",
+        data: @Html.Raw(Json.Serialize(Model.OrderCountData)),
+        backgroundColor: "rgba(43, 189, 126, 0.7)",
+        borderRadius: 6
+        }]
         },
         options: {
         maintainAspectRatio: false,
-        cutout: '75%',
-        plugins: {
-        legend: {
-        display: true,
-        position: 'bottom',
-        labels: {
-        usePointStyle: true,
-        padding: 20,
-        font: { size: 12 }
-        }
-        }
-        }
+        plugins: { legend: { display: false } },
+        scales: {
+        x: {
+        grid: { display: false, drawBorder: false },
+        ticks: { color: '#8c9097' }
         },
+        y: {
+        beginAtZero: true,
+        ticks: { precision: 0, color: '#8c9097' },
+        grid: { color: "rgba(0,0,0,0.03)", borderDash: [5, 5] }
+        }
+        }
+        }
         });
     </script>
 }

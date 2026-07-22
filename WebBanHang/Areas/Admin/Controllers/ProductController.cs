@@ -10,22 +10,27 @@ using WebBanHang.Filters;
 using WebBanHang.ViewModels;
 using static System.Net.Mime.MediaTypeNames;
 
-
 namespace WebBanHang.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [RoleAuthorize("Admin")]
     public class ProductController : Controller
     {
-
         private readonly IProductService _service;
         private readonly ICategoryService _cateService;
         private readonly IWebHostEnvironment _env;
-        public ProductController(IProductService service, ICategoryService ceteService, IWebHostEnvironment env)
+        private readonly IAuditLogService _auditLogService; // Inject thêm AuditLogService
+
+        public ProductController(
+            IProductService service,
+            ICategoryService ceteService,
+            IWebHostEnvironment env,
+            IAuditLogService auditLogService)
         {
             _service = service;
             _cateService = ceteService;
             _env = env;
+            _auditLogService = auditLogService;
         }
 
         private async Task LoadEditData(UpdateProductVM vm)
@@ -53,6 +58,7 @@ namespace WebBanHang.Areas.Admin.Controllers
                 vm.ExistingImages ??= new List<ProductImageDTO>();
             }
         }
+
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -168,7 +174,7 @@ namespace WebBanHang.Areas.Admin.Controllers
                 Code = vm.Code,
                 Name = vm.Name,
                 CategoryId = vm.CategoryId,
-                CategoryName = vm.Categories.Select(c => c.Name).ToString(),
+                CategoryName = vm.Categories?.FirstOrDefault(c => c.Id == vm.CategoryId)?.Name ?? string.Empty,
                 Images = imageDtos,
                 Description = vm.Description,
                 ImportPrice = vm.ImportPrice,
@@ -177,6 +183,7 @@ namespace WebBanHang.Areas.Admin.Controllers
                 StockQuantity = vm.StockQuantity,
                 CreatedBy = userId ?? 0
             };
+
             var result = await _service.CreateProductAsync(dto);
             if (!result)
             {
@@ -185,9 +192,15 @@ namespace WebBanHang.Areas.Admin.Controllers
             }
 
             TempData["Success"] = "Tạo sản phẩm thành công!";
+
+            // Bước 5a: Ghi nhận Log tạo sản phẩm
+            await _auditLogService.LogAsync(
+            "Product", dto.ProductId, "CreateProduct",
+            userId ?? 0, HttpContext.Session.GetString("FullName"),
+            $"Tạo sản phẩm {dto.Code} - {dto.Name}");
+
             return RedirectToAction("Index");
         }
-
 
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
@@ -207,7 +220,7 @@ namespace WebBanHang.Areas.Admin.Controllers
                     CategoryId = x.CategoryId,
                     Name = x.Name
                 }).ToList(),
-                
+
                 ExistingImages = product.Images?.Select(x => new ProductImageDTO
                 {
                     ImageUrl = x.ImageUrl,
@@ -229,7 +242,7 @@ namespace WebBanHang.Areas.Admin.Controllers
         public async Task<IActionResult> Edit(UpdateProductVM vm)
         {
             Console.WriteLine("____________________");
-            Console.WriteLine(vm.ExistingImages.FirstOrDefault()?.ImageUrl ?? "NULL");
+            Console.WriteLine(vm.ExistingImages?.FirstOrDefault()?.ImageUrl ?? "NULL");
             if (!ModelState.IsValid)
             {
                 await LoadEditData(vm);
@@ -252,16 +265,12 @@ namespace WebBanHang.Areas.Admin.Controllers
 
             if (vm.ImageFile != null && vm.ImageFile.Length > 0)
             {
-
-                var extension = Path.GetExtension(vm.ImageFile.FileName)
-            .ToLowerInvariant();
-
+                var extension = Path.GetExtension(vm.ImageFile.FileName).ToLowerInvariant();
                 var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
 
                 if (!allowedExtensions.Contains(extension))
                 {
                     ModelState.AddModelError(nameof(UpdateProductVM.ImageFile), "Chỉ cho phép file JPG, JPEG, PNG hoặc WEBP.");
-
                     await LoadEditData(vm);
                     return View(vm);
                 }
@@ -289,7 +298,6 @@ namespace WebBanHang.Areas.Admin.Controllers
                     IsPrimary = true
                 });
             }
-
 
             var dto = new ProductDTO
             {
@@ -343,9 +351,15 @@ namespace WebBanHang.Areas.Admin.Controllers
             }
 
             TempData["Success"] = "Cập nhật sản phẩm thành công!";
+
+            // Bước 5b: Ghi nhận Log sửa sản phẩm
+            await _auditLogService.LogAsync(
+            "Product", vm.Id, "EditProduct",
+            HttpContext.Session.GetInt32("UserId") ?? 0, HttpContext.Session.GetString("FullName"),
+            $"Cập nhật sản phẩm {vm.Code}");
+
             return RedirectToAction("Index");
         }
-
 
         [HttpGet]
         public async Task<IActionResult> Detail(int id)
@@ -374,7 +388,6 @@ namespace WebBanHang.Areas.Admin.Controllers
             };
 
             return View(vm);
-
         }
 
         [HttpGet]
@@ -505,6 +518,7 @@ namespace WebBanHang.Areas.Admin.Controllers
 
             return View(vm);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> HardDelete(DeleteProductVM vm)
@@ -525,8 +539,7 @@ namespace WebBanHang.Areas.Admin.Controllers
 
             if (product.Status != "Deleted")
             {
-                TempData["Error"] =
-                    "Chỉ được xóa vĩnh viễn sản phẩm đã xóa mềm.";
+                TempData["Error"] = "Chỉ được xóa vĩnh viễn sản phẩm đã xóa mềm.";
 
                 return RedirectToAction(nameof(Index));
             }
@@ -537,7 +550,7 @@ namespace WebBanHang.Areas.Admin.Controllers
 
             if (!result)
             {
-                TempData["Error"] ="Không thể xóa vĩnh viễn. Sản phẩm có thể đang được sử dụng trong đơn hàng hoặc lịch sử kho.";
+                TempData["Error"] = "Không thể xóa vĩnh viễn. Sản phẩm có thể đang được sử dụng trong đơn hàng hoặc lịch sử kho.";
 
                 return RedirectToAction(nameof(Index));
             }
@@ -549,8 +562,7 @@ namespace WebBanHang.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private void DeleteProductImageFiles(
-    IEnumerable<string> imageUrls)
+        private void DeleteProductImageFiles(IEnumerable<string> imageUrls)
         {
             foreach (var imageUrl in imageUrls)
             {
@@ -567,7 +579,7 @@ namespace WebBanHang.Areas.Admin.Controllers
                     continue;
                 }
 
-                var filePath = Path.Combine(_env.WebRootPath,"images",fileName);
+                var filePath = Path.Combine(_env.WebRootPath, "images", fileName);
 
                 try
                 {
@@ -588,5 +600,3 @@ namespace WebBanHang.Areas.Admin.Controllers
         }
     }
 }
-
-

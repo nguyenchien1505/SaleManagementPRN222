@@ -29,6 +29,15 @@ namespace WebBanHang.Areas.Admin.Controllers
                 TotalOrders = stats.TotalOrders,
                 PendingOrders = stats.PendingOrders,
                 NewUsers = stats.NewUsers,
+
+                TotalProducts = stats.TotalProducts,
+                TotalCustomers = stats.TotalCustomers,
+                DraftOrders = stats.DraftOrders,
+                ConfirmedOrders = stats.ConfirmedOrders,
+                CompletedOrders = stats.CompletedOrders,
+                OrderCountData = stats.OrderCountData,
+                TopProducts = stats.TopProducts,
+
                 RecentOrders = stats.RecentOrders?.ToList() ?? new List<RecentOrderDTO>(),
                 RevenueData = stats.RevenueData ?? new List<decimal>(),
                 CategoryLabels = stats.CategoryLabels ?? new List<string>(),

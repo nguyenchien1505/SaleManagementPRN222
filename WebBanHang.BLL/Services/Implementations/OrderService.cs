@@ -17,14 +17,16 @@ namespace WebBanHang.BLL.Services.Implementations
         private readonly IInventoryService _inventoryService;
         private readonly WebBanHangContext _context;
         private readonly IPromotionService _promotionService;
+        private readonly IAuditLogService _auditLogService;
 
-        public OrderService(IInventoryService inventoryService, IOrderRepository orderRepository, IProductRepository productRepository, WebBanHangContext context, IPromotionService promotionService)
+        public OrderService(IInventoryService inventoryService, IOrderRepository orderRepository, IProductRepository productRepository, WebBanHangContext context, IPromotionService promotionService, IAuditLogService auditLogService)
         {
             _inventoryService = inventoryService;
             _orderRepository = orderRepository;
             _productRepository = productRepository;
             _context = context;
             _promotionService = promotionService;
+            _auditLogService = auditLogService;
         }
 
         public async Task<IEnumerable<Order>> GetMyOrdersAsync(int userId)
@@ -383,6 +385,13 @@ namespace WebBanHang.BLL.Services.Implementations
             order.Status = "Confirmed";
             _context.Orders.Update(order);
             _context.SaveChanges();
+
+            // MỚI: 2 không đổi logic ở trên
+            var performer = _context.Users.FirstOrDefault(u => u.UserId == userId);
+            _auditLogService.LogAsync(
+                "Order", order.OrderId, "ConfirmOrder",
+                userId, performer?.FullName,
+                $"Xác nhận đơn #{order.OrderCode}").GetAwaiter().GetResult();
         }
     }
 }

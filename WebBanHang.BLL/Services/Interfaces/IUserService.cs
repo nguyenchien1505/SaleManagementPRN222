@@ -21,5 +21,8 @@ namespace WebBanHang.BLL.Services.Interfaces
         Task<bool> HardDeleteUserAsync(int userId, int? currentUserId);
         Task<IEnumerable<UserDTO>> GetAllUserIncludeDeleteAsync();
         Task<UserDTO> GetUserByIdIncludeDeleteAsync(int id);
+        Task<UserDTO> FindOrCreateGoogleUserAsync(string email, string fullName);
+        Task<bool> ForgotPasswordAsync(string email);
+        Task<bool> ResetPasswordAsync(string token, string newPassword);
     }
 }

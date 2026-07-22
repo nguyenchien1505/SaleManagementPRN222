@@ -18,14 +18,13 @@ namespace WebBanHang.Filters
 
             if (string.IsNullOrEmpty(role))
             {
-                context.Result = new RedirectToActionResult( "Login",  "Account", null);
-
+                context.Result = new RedirectToActionResult("Login", "Account", new { area = "" });
                 return;
             }
 
             if (!_roles.Contains(role))
             {
-                context.Result =  new RedirectToActionResult(  "AccessDenied","Account", null);
+                context.Result = new RedirectToActionResult("AccessDenied", "Account", new { area = "" });
             }
         }
     }
