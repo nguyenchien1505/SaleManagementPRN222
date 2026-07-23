@@ -4,47 +4,145 @@
     ViewData["Title"] = "Danh sách sản phẩm";
 }
 
-<div class="container py-5">
+<style>
+    /* Bổ sung CSS cho giao diện hiện đại */
+    .hover-lift {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;
+        }
+
+    .product-img-wrapper {
+        overflow: hidden;
+        position: relative;
+    }
+
+    .product-img {
+        transition: transform 0.5s ease;
+    }
+
+    .hover-lift:hover .product-img {
+        transform: scale(1.08);
+    }
+
+    .action-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(3px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 2;
+    }
+
+    .hover-lift:hover .action-overlay {
+        opacity: 1;
+    }
+
+    .action-btn {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        color: var(--bs-primary);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        transition: all 0.2s ease;
+        border: none;
+    }
+
+        .action-btn:hover {
+            background: var(--bs-primary);
+            color: #fff;
+            transform: scale(1.1);
+        }
+
+    .category-link {
+        border-radius: 12px !important;
+        margin-bottom: 6px;
+        border: 1px solid transparent !important;
+        transition: all 0.2s;
+    }
+
+        .category-link:hover:not(.active) {
+            background-color: #f8f9fa;
+            border-color: #e9ecef !important;
+            padding-left: 1.5rem !important;
+        }
+
+        .category-link.active {
+            background: var(--bs-primary) !important;
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(var(--bs-primary-rgb), 0.3);
+        }
+
+    .search-sort-card {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+    }
+</style>
+
+<div class="container py-4 py-lg-5">
+    <!-- Header Section -->
     <div class="section-title mb-5 text-center">
-        <span class="text-primary fw-bold text-uppercase ls-1">Bộ Sưu Tập</span>
-        <h2 class="display-5 fw-bold">Danh Sách Sản Phẩm</h2>
-        <p class="text-muted w-75 mx-auto">Khám phá các sản phẩm chất lượng cao của chúng tôi.</p>
+        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fw-semibold mb-3">
+            <i class="bi bi-stars"></i> Bộ Sưu Tập Của Chúng Tôi
+        </span>
+        <h2 class="display-5 fw-bold text-dark mb-3">Khám Phá Sản Phẩm</h2>
+        <p class="text-muted w-75 mx-auto fs-5">Tìm kiếm những món đồ yêu thích với chất lượng tuyệt vời và mức giá tốt nhất.</p>
     </div>
 
-    <div class="row">
+    <div class="row g-4">
         <!-- Sidebar - Categories -->
         <div class="col-lg-3 mb-4">
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                <div class="card-header bg-primary text-white py-3">
-                    <h5 class="mb-0 fw-bold"><i class="bi bi-grid-fill me-2"></i> Danh mục</h5>
-                </div>
-                <div class="list-group list-group-flush">
-                    <a asp-action="Index"
-                       asp-route-sortOrder="@Model.SortOrder"
-                       asp-route-SearchString="@Model.SearchString"
-                       class="list-group-item list-group-item-action py-3 d-flex align-items-center @(Model.CategoryId == null ? "active bg-primary-subtle border-primary-subtle text-primary fw-bold" : "")">
-                        <i class="bi bi-collection me-3"></i> Tất cả sản phẩm
-                    </a>
-                    @foreach (var cat in Model.Categories)
-                    {
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden position-sticky" style="top: 100px;">
+                <div class="card-body p-4">
+                    <h5 class="mb-4 fw-bold text-dark d-flex align-items-center">
+                        <i class="bi bi-grid-fill me-2 text-primary fs-4"></i> Danh mục
+                    </h5>
+
+                    <div class="list-group list-group-flush border-0">
                         <a asp-action="Index"
-                           asp-route-categoryId="@cat.CategoryId"
+                           asp-route-categoryId=""
                            asp-route-sortOrder="@Model.SortOrder"
                            asp-route-SearchString="@Model.SearchString"
-                           class="list-group-item list-group-item-action py-3 d-flex align-items-center @(Model.CategoryId == cat.CategoryId ? "active bg-primary-subtle border-primary-subtle text-primary fw-bold" : "")">
-                            <i class="bi bi-chevron-right me-3 small"></i> @cat.Name
+                           class="list-group-item list-group-item-action py-3 px-3 d-flex align-items-center category-link @(Model.CategoryId == null ? "active fw-bold" : "text-secondary fw-medium")">
+                            <i class="bi bi-collection me-3 fs-5"></i> Tất cả sản phẩm
                         </a>
-                    }
+                        @foreach (var cat in Model.Categories)
+                        {
+                            <a asp-action="Index"
+                               asp-route-categoryId="@cat.CategoryId"
+                               asp-route-sortOrder="@Model.SortOrder"
+                               asp-route-SearchString="@Model.SearchString"
+                               class="list-group-item list-group-item-action py-3 px-3 d-flex align-items-center category-link @(Model.CategoryId == cat.CategoryId ? "active fw-bold" : "text-secondary fw-medium")">
+                                <i class="bi bi-dash me-2 opacity-50"></i> @cat.Name
+                            </a>
+                        }
+                    </div>
                 </div>
             </div>
 
-            <!-- Additional Filters (Optional) -->
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mt-4">
-                <div class="card-header bg-dark text-white py-3">
-                    <h5 class="mb-0 fw-bold"><i class="bi bi-funnel-fill me-2"></i> Trợ giúp</h5>
-                </div>
-                <div class="card-body">
-                    <p class="small text-muted mb-0">Chọn danh mục phù hợp để thu hẹp phạm vi tìm kiếm của bạn.</p>
+            <!-- Additional Help Card -->
+            <div class="card border-0 shadow-sm rounded-4 mt-4 bg-primary text-white">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-headset fs-2 me-3"></i>
+                        <h5 class="mb-0 fw-bold">Cần trợ giúp?</h5>
+                    </div>
+                    <p class="small mb-0 opacity-75">Liên hệ với chúng tôi để được tư vấn chọn sản phẩm phù hợp nhất.</p>
                 </div>
             </div>
         </div>
@@ -52,82 +150,113 @@
         <!-- Main Content -->
         <div class="col-lg-9">
             <!-- Search & Sort Bar -->
-            <div class="card card-modern mb-4 shadow-sm border-0 rounded-4">
-                <div class="card-body p-3">
-                    <form asp-action="Index" method="get" class="row g-2 align-items-center">
-                        <input type="hidden" name="categoryId" value="@Model.CategoryId" />
-                        <div class="col-md-7">
-                            <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-primary"></i></span>
-                                <input type="text" name="SearchString" value="@Model.SearchString" class="form-control border-start-0 ps-0" placeholder="Tìm kiếm sản phẩm...">
+            <div class="card search-sort-card mb-4 shadow-sm border-0 rounded-4">
+                <div class="card-body p-3 p-md-4">
+                    <form id="filterForm" asp-action="Index" method="get" class="row g-3 align-items-center">
+                        <!-- Giữ lại tham số CategoryId nếu đang chọn danh mục -->
+                        @if (Model.CategoryId != null)
+                        {
+                            <input type="hidden" name="categoryId" value="@Model.CategoryId" />
+                        }
+
+                        <div class="col-md-6 col-lg-7">
+                            <div class="input-group input-group-lg bg-light rounded-pill p-1 border">
+                                <span class="input-group-text bg-transparent border-0 text-muted ps-4"><i class="bi bi-search"></i></span>
+                                <input type="text" name="SearchString" value="@Model.SearchString" class="form-control bg-transparent border-0 shadow-none px-2" placeholder="Tìm kiếm tên sản phẩm...">
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <select name="sortOrder" class="form-select" onchange="this.form.submit()">
-                                <option value="">Mới nhất</option>
-                                <option value="name_desc" selected="@(Model.SortOrder == "name_desc")">Tên: Z-A</option>
-                                <option value="Price" selected="@(Model.SortOrder == "Price")">Giá: Thấp-Cao</option>
-                                <option value="price_desc" selected="@(Model.SortOrder == "price_desc")">Giá: Cao-Thấp</option>
-                            </select>
+
+                        <div class="col-md-4 col-lg-3">
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-sort-down"></i></span>
+                                <select name="sortOrder" class="form-select border-start-0 shadow-none ps-0" onchange="document.getElementById('filterForm').submit()">
+                                    <option value="">Mới nhất</option>
+                                    <option value="name_desc" selected="@(Model.SortOrder == "name_desc" ? "selected" : null)">Tên: Z-A</option>
+                                    <option value="Price" selected="@(Model.SortOrder == "Price" ? "selected" : null)">Giá: Thấp-Cao</option>
+                                    <option value="price_desc" selected="@(Model.SortOrder == "price_desc" ? "selected" : null)">Giá: Cao-Thấp</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="col-md-2">
-                            <button type="submit" class="btn btn-primary w-100">Lọc</button>
+
+                        <div class="col-md-2 col-lg-2">
+                            <button type="submit" class="btn btn-primary btn-lg w-100 rounded-3 fw-bold">Lọc</button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            @if (Model.Products.Any())
+            <!-- Product Grid -->
+            @if (Model.Products != null && Model.Products.Any())
             {
                 <div class="row g-4">
                     @foreach (var item in Model.Products)
                     {
-                        <div class="col-md-4 col-sm-6">
-                            <div class="card h-100 card-modern product-card border-0 shadow-sm rounded-4 overflow-hidden">
-                                <div class="position-relative overflow-hidden">
-                                    @if (!string.IsNullOrEmpty(item.Images.FirstOrDefault()?.ImageUrl))
+                        <div class="col-md-6 col-xl-4">
+                            <div class="card h-100 product-card border-0 shadow-sm rounded-4 hover-lift bg-white">
+                                <!-- Box Ảnh -->
+                                <div class="product-img-wrapper position-relative rounded-top-4">
+                                    @if (!string.IsNullOrEmpty(item.Images?.FirstOrDefault()?.ImageUrl))
                                     {
-                                        <a asp-controller="Home" asp-action="Details" asp-route-id="@item.ProductId" class="d-block ratio ratio-1x1">
+                                        <div class="ratio ratio-4x3">
                                             <img src="@item.Images.FirstOrDefault()?.ImageUrl" class="card-img-top product-img object-fit-cover" alt="@item.Name">
-                                        </a>
+                                        </div>
                                     }
                                     else
                                     {
-                                        <a asp-controller="Home" asp-action="Details" asp-route-id="@item.ProductId" class="d-block text-decoration-none ratio ratio-1x1">
-                                            <div class="bg-light d-flex align-items-center justify-content-center text-muted card-img-top product-img h-100">
+                                        <div class="ratio ratio-4x3 bg-light">
+                                            <div class="d-flex align-items-center justify-content-center text-muted">
                                                 <i class="bi bi-image fs-1 opacity-25"></i>
                                             </div>
-                                        </a>
+                                        </div>
                                     }
-                                    <div class="position-absolute top-0 end-0 p-2">
-                                        <span class="badge bg-white text-primary shadow-sm rounded-pill px-2 py-1 small">@item.CategoryName</span>
+
+                                    <!-- Label Category -->
+                                    <div class="position-absolute top-0 start-0 p-3 z-3">
+                                        <span class="badge bg-white text-dark shadow-sm rounded-pill px-3 py-2 fw-medium border">@item.CategoryName</span>
                                     </div>
 
-                                    <div class="product-overlay d-flex justify-content-center align-items-center gap-2">
-                                        <a asp-controller="Home" asp-action="Details" asp-route-id="@item.ProductId" class="btn btn-light rounded-circle shadow-sm p-2" title="Xem chi tiết">
-                                            <i class="bi bi-eye"></i>
+                                    <!-- Overlay Actions khi Hover -->
+                                    <div class="action-overlay">
+                                        <a asp-area="Customer" asp-controller="Home" asp-action="Detail" asp-route-id="@item.ProductId" class="action-btn text-decoration-none" title="Xem chi tiết">
+                                            <i class="bi bi-eye fs-5"></i>
                                         </a>
-                                        <button type="button" class="btn btn-primary rounded-circle shadow-sm p-2" onclick="addToCart(@item.ProductId)">
-                                            <i class="bi bi-cart"></i>
-                                        </button>
+                                        @if (item.StockQuantity > 0)
+                                        {
+                                            <button type="button" class="action-btn" onclick="addToCart(@item.ProductId)" title="Thêm vào giỏ">
+                                                <i class="bi bi-cart-plus fs-5"></i>
+                                            </button>
+                                        }
                                     </div>
                                 </div>
 
-                                <div class="card-body d-flex flex-column p-3">
-                                    <h6 class="card-title fw-bold text-truncate mb-1" title="@item.Name">
-                                        <a asp-controller="Home" asp-action="Details" asp-route-id="@item.ProductId" class="text-decoration-none text-dark">@item.Name</a>
+                                <!-- Box Thông tin -->
+                                <div class="card-body p-4 d-flex flex-column">
+                                    <h6 class="card-title fw-bold mb-2 line-clamp-2" style="height: 2.5rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;" title="@item.Name">
+                                        <a asp-area="Customer" asp-controller="Product" asp-action="Detail" asp-route-id="@item.ProductId" class="text-decoration-none text-dark">@item.Name</a>
                                     </h6>
-                                    <div class="mt-auto pt-2 d-flex justify-content-between align-items-end">
+
+                                    <!-- Đánh giá ảo trang trí -->
+                                    <div class="text-warning small mb-3">
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-half"></i>
+                                        <span class="text-muted ms-1">(12)</span>
+                                    </div>
+
+                                    <div class="mt-auto d-flex justify-content-between align-items-center">
                                         <div>
-                                            <span class="h6 mb-0 text-primary fw-bold">@((item.SellingPrice).ToString("N0", new System.Globalization.CultureInfo("vi-VN"))) <small>xu</small></span>
+                                            <span class="h5 mb-0 text-primary fw-bolder">@((item.SellingPrice).ToString("N0", new System.Globalization.CultureInfo("vi-VN"))) <small class="text-muted fs-6">xu</small></span>
                                         </div>
+
                                         @if (item.StockQuantity > 0)
                                         {
-                                            <span class="text-success small"><i class="bi bi-check-circle-fill"></i> Sẵn sàng</span>
+                                            <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1"><i class="bi bi-check2"></i> Sẵn hàng</span>
                                         }
                                         else
                                         {
-                                            <span class="text-danger small"><i class="bi bi-x-circle-fill"></i> Hết hàng</span>
+                                            <span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1"><i class="bi bi-x-circle"></i> Hết hàng</span>
                                         }
                                     </div>
                                 </div>
@@ -138,9 +267,10 @@
 
                 <!-- Pagination -->
                 <nav class="mt-5" aria-label="Page navigation">
-                    <ul class="pagination pagination-modern justify-content-center shadow-sm">
+                    <ul class="pagination justify-content-center gap-2">
                         <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
-                            <a class="page-link" asp-action="Index"
+                            <a class="page-link rounded-circle border-0 shadow-sm d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;"
+                               asp-action="Index"
                                asp-route-pageNumber="@(Model.CurrentPage - 1)"
                                asp-route-sortOrder="@Model.SortOrder"
                                asp-route-SearchString="@Model.SearchString"
@@ -152,7 +282,8 @@
                         @for (int i = 1; i <= Model.TotalPages; i++)
                         {
                             <li class="page-item @(Model.CurrentPage == i ? "active" : "")">
-                                <a class="page-link" asp-action="Index"
+                                <a class="page-link rounded-circle border-0 shadow-sm d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px;"
+                                   asp-action="Index"
                                    asp-route-pageNumber="@i"
                                    asp-route-sortOrder="@Model.SortOrder"
                                    asp-route-SearchString="@Model.SearchString"
@@ -161,7 +292,8 @@
                         }
 
                         <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-                            <a class="page-link" asp-action="Index"
+                            <a class="page-link rounded-circle border-0 shadow-sm d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;"
+                               asp-action="Index"
                                asp-route-pageNumber="@(Model.CurrentPage + 1)"
                                asp-route-sortOrder="@Model.SortOrder"
                                asp-route-SearchString="@Model.SearchString"
@@ -174,11 +306,12 @@
             }
             else
             {
-                <div class="text-center py-5 bg-light rounded-4">
-                    <i class="bi bi-search fs-1 text-muted opacity-50 mb-3 d-block"></i>
-                    <h5 class="fw-bold text-secondary">Không tìm thấy sản phẩm nào</h5>
-                    <p class="text-muted mb-4">Thử danh mục khác hoặc xóa bộ lọc.</p>
-                    <a asp-action="Index" class="btn btn-outline-primary rounded-pill px-4">Xóa tất cả bộ lọc</a>
+                <!-- Empty State -->
+                <div class="text-center py-5 bg-white shadow-sm rounded-4 border-0 mt-3">
+                    <img src="https://cdn-icons-png.flaticon.com/512/7486/7486754.png" alt="Not found" class="mb-4" style="width: 120px; opacity: 0.5;">
+                    <h4 class="fw-bold text-dark">Không tìm thấy sản phẩm nào</h4>
+                    <p class="text-muted mb-4">Rất tiếc, chúng tôi không tìm thấy sản phẩm phù hợp với tìm kiếm của bạn.</p>
+                    <a asp-action="Index" class="btn btn-outline-primary btn-lg rounded-pill px-5 fw-bold">Xóa bộ lọc & Quay lại</a>
                 </div>
             }
         </div>
@@ -189,12 +322,9 @@
     <script>
         function addToCart(productId) {
             $.ajax({
-                url: '/Cart/AddToCart',
+                url: '@Url.Action("AddToCart", "Cart", new { area = "Customer" })',
                 type: 'POST',
-                data: {
-                    productId: productId,
-                    quantity: 1
-                },
+                data: { productId: productId, quantity: 1 },
                 success: function (response) {
                     if (response.success) {
                         Swal.fire({
@@ -204,16 +334,22 @@
                             showConfirmButton: false,
                             timer: 1000,
                             timerProgressBar: true
-                        }).then(() => {
-                            // Tùy chọn: reload hoặc cập nhật UI
-                            // updateCartBadge(response.cartCount);
                         });
+                        if (typeof updateCartBadge === 'function') {
+                            updateCartBadge();
+                        }
+                    } else if (response.requireLogin) {
+                        if (typeof redirectToLogin === 'function') {
+                            redirectToLogin();
+                        } else {
+                            window.location.href = '/Account/Login';
+                        }
                     } else {
-                        Swal.fire('Lỗi!', response.message, 'error');
+                        Swal.fire('Lỗi!', response.message || 'Không thể thêm vào giỏ hàng', 'error');
                     }
                 },
                 error: function () {
-                    Swal.fire('Lỗi!', 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại jQuery.', 'error');
+                    Swal.fire('Lỗi!', 'Không thể kết nối đến máy chủ.', 'error');
                 }
             });
         }

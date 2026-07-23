@@ -21,19 +21,54 @@ namespace WebBanHang.Areas.Customer.Controllers
             _prodService = prodService;
         }
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? SearchString, string? sortOrder, int? categoryId, int pageNumber = 1)
         {
+            int pageSize = 8; 
+
             var categories = await _cateService.GetAllCateAsync();
             var products = await _prodService.GetAllProductsAsync();
 
+            if (categoryId.HasValue)
+            {
+                products = products.Where(p => p.CategoryId == categoryId.Value).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(SearchString))
+            {
+                products = products.Where(p => p.Name.Contains(SearchString, StringComparison.OrdinalIgnoreCase)
+                                            || p.Code.Contains(SearchString, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            products = sortOrder switch
+            {
+                "name_desc" => products.OrderByDescending(p => p.Name).ToList(),
+                "Price" => products.OrderBy(p => p.SellingPrice).ToList(),
+                "price_desc" => products.OrderByDescending(p => p.SellingPrice).ToList(),
+                "Date" => products.OrderBy(p => p.CreatedDate).ToList(),
+                _ => products.OrderByDescending(p => p.CreatedDate).ToList(),
+            };
+
+            int totalItems = products.Count();
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            pageNumber = pageNumber < 1 ? 1 : pageNumber;
+            pageNumber = pageNumber > totalPages && totalPages > 0 ? totalPages : pageNumber;
+
+            var pagedProducts = products.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+
             var vm = new HomeProductVM
             {
-                Products = products,
-                Categories = categories
+                Products = pagedProducts,
+                Categories = categories,
+                CategoryId = categoryId,
+                SearchString = SearchString,
+                SortOrder = sortOrder,
+                CurrentPage = pageNumber,
+                TotalPages = totalPages == 0 ? 1 : totalPages
             };
+
             return View(vm);
         }
-
         [HttpGet]
         public async Task<IActionResult> Detail(int id)
         {
