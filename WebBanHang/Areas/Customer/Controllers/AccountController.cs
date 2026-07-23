@@ -44,16 +44,15 @@ namespace WebBanHang.Areas.Customer.Controllers
             var user = await _authService.GetUserProfileAsync(userId.Value);
             if (user == null) return NotFound();
 
-            var customer = user.Customer;
 
             var model = new CustomerProfileVM
             {
                 FullName = user.FullName,
                 Email = user.Email,
-                Phone = customer?.Phone,
-                Address = customer?.Address,
+                Phone = user?.Phone,
+                Address = user?.Address,
                 CreatedDate = user.CreatedDate ?? DateTime.Now, 
-                Orders = customer?.Orders.OrderByDescending(o => o.OrderDate).Select(o => new OrderHistoryViewModel
+                Orders = user?.OrderCustomers.OrderByDescending(o => o.OrderDate).Select(o => new OrderHistoryViewModel
                 {
                     OrderId = o.OrderId,
                     OrderDate = o.OrderDate ?? DateTime.Now,

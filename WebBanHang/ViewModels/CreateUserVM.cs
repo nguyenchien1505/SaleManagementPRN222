@@ -16,5 +16,7 @@ namespace WebBanHang.ViewModels
         [Required]
         public string Role { get; set; }
         public bool IsActive { get; set; }
+
+        public string? VerificationPassword { get; set; }
     }
 }

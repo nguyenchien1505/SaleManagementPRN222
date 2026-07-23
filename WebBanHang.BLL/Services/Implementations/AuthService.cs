@@ -26,8 +26,7 @@ namespace WebBanHang.BLL.Services.Implementations
         public async Task<User?> GetUserProfileAsync(int userId)
         {
             return await _context.Users
-                .Include(u => u.Customer)
-                    .ThenInclude(c => c.Orders)
+                    .Include(c => c.OrderCustomers)
                         .ThenInclude(o => o.OrderDetails)
                             .ThenInclude(od => od.Product)
                 .FirstOrDefaultAsync(u => u.UserId == userId);
@@ -37,7 +36,7 @@ namespace WebBanHang.BLL.Services.Implementations
         {
             var user = await _context.Users.FindAsync(userId);
 
-            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.UserId == userId);
+            var customer = await _context.Users.FirstOrDefaultAsync(c => c.UserId == userId);
 
             if (user == null || customer == null) return false;
 
@@ -49,7 +48,7 @@ namespace WebBanHang.BLL.Services.Implementations
             customer.Address = address;  
 
             _context.Users.Update(user);
-            _context.Customers.Update(customer);
+            _context.Users.Update(customer);
 
             await _context.SaveChangesAsync();
             return true;

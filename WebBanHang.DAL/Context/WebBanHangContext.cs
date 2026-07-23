@@ -7,22 +7,18 @@ namespace WebBanHang.DAL.Context;
 
 public partial class WebBanHangContext : DbContext
 {
-    public WebBanHangContext()
-    {
-    }
-
     public WebBanHangContext(DbContextOptions<WebBanHangContext> options)
         : base(options)
     {
     }
+
+    public virtual DbSet<AuditLog> AuditLogs { get; set; }
 
     public virtual DbSet<Cart> Carts { get; set; }
 
     public virtual DbSet<CartItem> CartItems { get; set; }
 
     public virtual DbSet<Category> Categories { get; set; }
-
-    public virtual DbSet<Customer> Customers { get; set; }
 
     public virtual DbSet<InventoryTransaction> InventoryTransactions { get; set; }
 
@@ -40,43 +36,37 @@ public partial class WebBanHangContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
-    public virtual DbSet<AuditLog> AuditLogs { get; set; }
-
-
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<AuditLog>(entity =>
+        {
+            entity.HasKey(e => e.AuditLogId).HasName("PK__AuditLog__EB5F6CBDCE3C29AA");
 
-        modelBuilder.Entity<Product>()
-            .HasQueryFilter(p => p.Status != "Deleted");
-
-        modelBuilder.Entity<Category>()
-            .HasQueryFilter(c => c.Status != "Deleted");
-
-        modelBuilder.Entity<User>()
-            .HasQueryFilter(u => !u.IsDeleted);
+            entity.Property(e => e.Action).HasMaxLength(30);
+            entity.Property(e => e.CreatedDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.EntityName).HasMaxLength(50);
+            entity.Property(e => e.PerformedByName).HasMaxLength(100);
+        });
 
         modelBuilder.Entity<Cart>(entity =>
-            {
-                entity.HasKey(e => e.CartId).HasName("PK__Carts__51BCD7B7171E3B5F");
+        {
+            entity.Property(e => e.CreatedDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.UpdatedDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
 
-                entity.Property(e => e.CreatedDate)
-                    .HasDefaultValueSql("(getdate())")
-                    .HasColumnType("datetime");
-                entity.Property(e => e.UpdatedDate)
-                    .HasDefaultValueSql("(getdate())")
-                    .HasColumnType("datetime");
-
-                entity.HasOne(d => d.User).WithMany(p => p.Carts)
-                    .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK_Carts_Users");
-            });
+            entity.HasOne(d => d.User).WithMany(p => p.Carts)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK_Carts_Users");
+        });
 
         modelBuilder.Entity<CartItem>(entity =>
         {
-            entity.HasKey(e => e.CartItemId).HasName("PK__CartItem__488B0B0A7925C553");
-
             entity.HasOne(d => d.Cart).WithMany(p => p.CartItems)
                 .HasForeignKey(d => d.CartId)
                 .HasConstraintName("FK_CartItems_Carts");
@@ -89,7 +79,7 @@ public partial class WebBanHangContext : DbContext
 
         modelBuilder.Entity<Category>(entity =>
         {
-            entity.HasKey(e => e.CategoryId).HasName("PK__Categori__19093A0B6F73D791");
+            entity.HasKey(e => e.CategoryId).HasName("PK__Categori__19093A0BA2A856E7");
 
             entity.Property(e => e.Description).HasMaxLength(255);
             entity.Property(e => e.Name).HasMaxLength(100);
@@ -99,29 +89,12 @@ public partial class WebBanHangContext : DbContext
 
             entity.HasOne(d => d.Parent).WithMany(p => p.InverseParent)
                 .HasForeignKey(d => d.ParentId)
-                .HasConstraintName("FK__Categorie__Paren__440B1D61");
-        });
-
-        modelBuilder.Entity<Customer>(entity =>
-        {
-            entity.HasKey(e => e.CustomerId).HasName("PK__Customer__A4AE64D834C597EA");
-
-            entity.HasIndex(e => e.UserId, "UQ__Customer__1788CC4D96C174E2").IsUnique();
-
-            entity.Property(e => e.Address).HasMaxLength(255);
-            entity.Property(e => e.CreatedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.Phone).HasMaxLength(20);
-
-            entity.HasOne(d => d.User).WithOne(p => p.Customer)
-                .HasForeignKey<Customer>(d => d.UserId)
-                .HasConstraintName("FK__Customers__UserI__403A8C7D");
+                .HasConstraintName("FK_Categories_Parent");
         });
 
         modelBuilder.Entity<InventoryTransaction>(entity =>
         {
-            entity.HasKey(e => e.TransactionId).HasName("PK__Inventor__55433A6BCB81D4E0");
+            entity.HasKey(e => e.TransactionId).HasName("PK__Inventor__55433A6B3457E96D");
 
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")
@@ -142,9 +115,9 @@ public partial class WebBanHangContext : DbContext
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BCF0A34A255");
+            entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BCF475772B3");
 
-            entity.HasIndex(e => e.OrderCode, "UQ__Orders__999B5229AF50F1D4").IsUnique();
+            entity.HasIndex(e => e.OrderCode, "UQ__Orders__999B522956BCB11E").IsUnique();
 
             entity.Property(e => e.DiscountAmount)
                 .HasDefaultValue(0m)
@@ -167,20 +140,20 @@ public partial class WebBanHangContext : DbContext
                 .HasDefaultValue(0m)
                 .HasColumnType("decimal(18, 2)");
 
-            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.Orders)
+            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.OrderCreatedByNavigations)
                 .HasForeignKey(d => d.CreatedBy)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Orders__CreatedB__60A75C0F");
 
-            entity.HasOne(d => d.Customer).WithMany(p => p.Orders)
+            entity.HasOne(d => d.Customer).WithMany(p => p.OrderCustomers)
                 .HasForeignKey(d => d.CustomerId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Orders__Customer__5FB337D6");
+                .HasConstraintName("FK_Orders_Customers");
         });
 
         modelBuilder.Entity<OrderDetail>(entity =>
         {
-            entity.HasKey(e => e.OrderDetailId).HasName("PK__OrderDet__D3B9D36CAB1E61A6");
+            entity.HasKey(e => e.OrderDetailId).HasName("PK__OrderDet__D3B9D36C8A0DCD72");
 
             entity.Property(e => e.Total).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 2)");
@@ -197,7 +170,7 @@ public partial class WebBanHangContext : DbContext
 
         modelBuilder.Entity<OrderPromotion>(entity =>
         {
-            entity.HasKey(e => e.OrderPromotionId).HasName("PK__OrderPro__CE84A1017E83C757");
+            entity.HasKey(e => e.OrderPromotionId).HasName("PK__OrderPro__CE84A101B8D500F4");
 
             entity.Property(e => e.AppliedValue).HasColumnType("decimal(18, 2)");
 
@@ -213,9 +186,9 @@ public partial class WebBanHangContext : DbContext
 
         modelBuilder.Entity<Product>(entity =>
         {
-            entity.HasKey(e => e.ProductId).HasName("PK__Products__B40CC6CDD8D43F1E");
+            entity.HasKey(e => e.ProductId).HasName("PK__Products__B40CC6CD5FED6024");
 
-            entity.HasIndex(e => e.Code, "UQ__Products__A25C5AA7A39AF39C").IsUnique();
+            entity.HasIndex(e => e.Code, "UQ__Products__A25C5AA718F3B209").IsUnique();
 
             entity.Property(e => e.Code).HasMaxLength(50);
             entity.Property(e => e.CreatedDate)
@@ -241,10 +214,9 @@ public partial class WebBanHangContext : DbContext
 
         modelBuilder.Entity<ProductImage>(entity =>
         {
-            entity.HasKey(e => e.ImageId).HasName("PK__ProductI__7516F70C832E86A2");
+            entity.HasKey(e => e.ImageId).HasName("PK__ProductI__7516F70C64A0B1DD");
 
             entity.Property(e => e.ImageUrl).HasMaxLength(255);
-            entity.Property(e => e.IsPrimary).HasDefaultValue(false);
 
             entity.HasOne(d => d.Product).WithMany(p => p.ProductImages)
                 .HasForeignKey(d => d.ProductId)
@@ -253,9 +225,9 @@ public partial class WebBanHangContext : DbContext
 
         modelBuilder.Entity<Promotion>(entity =>
         {
-            entity.HasKey(e => e.PromotionId).HasName("PK__Promotio__52C42FCF23F9F0D6");
+            entity.HasKey(e => e.PromotionId).HasName("PK__Promotio__52C42FCF3CA37AA3");
 
-            entity.HasIndex(e => e.Code, "UQ__Promotio__A25C5AA74F88A676").IsUnique();
+            entity.HasIndex(e => e.Code, "UQ__Promotio__A25C5AA78CAE69E5").IsUnique();
 
             entity.Property(e => e.Code).HasMaxLength(20);
             entity.Property(e => e.DiscountType).HasMaxLength(20);
@@ -272,12 +244,11 @@ public partial class WebBanHangContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4C89771F98");
+            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4CE1A10ECC");
 
-            entity.HasIndex(e => e.Username, "UQ__Users__536C85E4FF1C900E").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__Users__A9D10534BC827076").IsUnique();
 
-            entity.HasIndex(e => e.Email, "UQ__Users__A9D10534CCD89E06").IsUnique();
-
+            entity.Property(e => e.Address).HasMaxLength(255);
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
@@ -286,23 +257,11 @@ public partial class WebBanHangContext : DbContext
             entity.Property(e => e.FullName).HasMaxLength(100);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.PasswordHash).HasMaxLength(255);
+            entity.Property(e => e.Phone).HasMaxLength(20);
+            entity.Property(e => e.ResetPasswordToken).HasMaxLength(200);
+            entity.Property(e => e.ResetPasswordTokenExpiry).HasColumnType("datetime");
             entity.Property(e => e.Role).HasMaxLength(20);
-            entity.Property(e => e.Username).HasMaxLength(50);
         });
-
-
-        modelBuilder.Entity<AuditLog>(entity =>
-        {
-            entity.HasKey(e => e.AuditLogId);
-            entity.ToTable("AuditLogs");
-            entity.Property(e => e.EntityName).HasMaxLength(50);
-            entity.Property(e => e.Action).HasMaxLength(50);
-            entity.Property(e => e.PerformedByName).HasMaxLength(100);
-            entity.Property(e => e.Description).HasMaxLength(500);
-            entity.Property(e => e.CreatedDate).HasDefaultValueSql("(getdate())");
-        });
-
-
 
         OnModelCreatingPartial(modelBuilder);
     }

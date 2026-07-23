@@ -33,7 +33,7 @@ namespace WebBanHang.Controllers
 
             var dto = new LoginDTO
             {
-                Username = vm.Username,
+                Email = vm.Email,
                 Password = vm.Password,
             };
 
@@ -47,7 +47,7 @@ namespace WebBanHang.Controllers
 
             HttpContext.Session.SetInt32("UserId", user.Id);
             HttpContext.Session.SetString("Role", user.Role);
-            HttpContext.Session.SetString("Username", user.Username);
+            HttpContext.Session.SetString("Email", user.Email);
             HttpContext.Session.SetString("FullName", user.FullName);
 
 
@@ -70,9 +70,6 @@ namespace WebBanHang.Controllers
         {
             HttpContext.Session.Clear();
 
-            // Dọn luôn cookie tạm của Google (nếu có), tránh cookie rác tích tụ
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
             TempData["Success"] = "Đăng xuất thành công";
 
             return RedirectToAction(nameof(Login), new { area = "" });
@@ -91,7 +88,6 @@ namespace WebBanHang.Controllers
 
             var dto = new RegisterDTO
             {
-                Username = vm.Username,
                 Email = vm.Email,
                 FullName = vm.FullName,
                 Phone = vm.Phone,
@@ -157,7 +153,6 @@ namespace WebBanHang.Controllers
             // Set session y hệt luồng Login thường (giữ nguyên logic phân quyền cũ)
             HttpContext.Session.SetInt32("UserId", user.Id);
             HttpContext.Session.SetString("Role", user.Role);
-            HttpContext.Session.SetString("Username", user.Username);
             HttpContext.Session.SetString("FullName", user.FullName);
 
             if (user.Role == "Admin")

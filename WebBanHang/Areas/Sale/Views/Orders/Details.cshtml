@@ -116,17 +116,17 @@
             <div class="card-body">
                 <div class="d-flex align-items-center mb-3">
                     <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; font-size: 1.2rem; flex-shrink: 0;">
-                        @(string.IsNullOrEmpty(Model.Customer?.User?.FullName) ? "U" : Model.Customer.User.FullName.Substring(0, 1).ToUpper())
+                        @(string.IsNullOrEmpty(Model.Customer?.FullName) ? "U" : Model.Customer.FullName.Substring(0, 1).ToUpper())
                     </div>
                     <div>
-                        <h6 class="fw-bold mb-0">@(Model.Customer?.User?.FullName ?? "Khách hàng ẩn danh")</h6>
+                        <h6 class="fw-bold mb-0">@(Model.Customer?.FullName ?? "Khách hàng ẩn danh")</h6>
                         <small class="text-muted">Mã KH: #@Model.CustomerId</small>
                     </div>
                 </div>
                 <hr class="my-3">
                 <div class="mb-2">
                     <small class="text-muted d-block">Email tài khoản</small>
-                    <span>@(Model.Customer?.User?.Email ?? "N/A")</span>
+                    <span>@(Model.Customer?.Email ?? "N/A")</span>
                 </div>
                 <div class="mb-2">
                     <small class="text-muted d-block">Số điện thoại nhận hàng</small>

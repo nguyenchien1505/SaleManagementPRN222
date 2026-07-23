@@ -31,13 +31,13 @@ namespace WebBanHang.BLL.Services.Implementations
 
         public async Task<IEnumerable<Order>> GetMyOrdersAsync(int userId)
         {
-            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.UserId == userId);
+            var customer = await _context.Users.FirstOrDefaultAsync(c => c.UserId == userId);
             if (customer == null) return new List<Order>();
 
             return await _context.Orders
                 .Include(o => o.OrderDetails)
                 .ThenInclude(d => d.Product)
-                .Where(o => o.CustomerId == customer.CustomerId)
+                .Where(o => o.CustomerId == customer.UserId)
                 .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
         }
@@ -45,8 +45,7 @@ namespace WebBanHang.BLL.Services.Implementations
         public async Task<Order?> GetOrderDetailsAsync(int orderId)
         {
             return await _context.Orders
-                .Include(o => o.Customer)
-                    .ThenInclude(c => c.User)
+                    .Include(c => c.Customer)
                 .Include(o => o.CreatedByNavigation)
                 .Include(o => o.OrderDetails)
                     .ThenInclude(od => od.Product)
@@ -69,7 +68,7 @@ namespace WebBanHang.BLL.Services.Implementations
                     if (product.StockQuantity < quantity)
                         return (false, "Sản phẩm không đủ số lượng trong kho!", 0);
 
-                    var customer = await _context.Customers.FirstOrDefaultAsync(c => c.UserId == userId);
+                    var customer = await _context.Users.FirstOrDefaultAsync(c => c.UserId == userId);
                     if (customer == null)
                         return (false, "Bạn cần hoàn thiện hồ sơ khách hàng trước khi mua hàng!", 0);
 
@@ -86,7 +85,7 @@ namespace WebBanHang.BLL.Services.Implementations
                     var order = new Order
                     {
                         OrderCode = uniqueOrderCode,
-                        CustomerId = customer.CustomerId,
+                        CustomerId = customer.UserId,
                         OrderDate = DateTime.Now,
                         SubTotal = subTotal,
                         DiscountAmount = 0,
@@ -145,7 +144,7 @@ namespace WebBanHang.BLL.Services.Implementations
             {
                 try
                 {
-                    var customer = await _context.Customers.FirstOrDefaultAsync(c => c.UserId == userId);
+                    var customer = await _context.Users.FirstOrDefaultAsync(c => c.UserId == userId);
                     if (customer == null)
                         return (false, "Bạn cần hoàn thiện hồ sơ khách hàng trước khi mua hàng!", 0);
 
@@ -197,7 +196,7 @@ namespace WebBanHang.BLL.Services.Implementations
                     var order = new Order
                     {
                         OrderCode = uniqueOrderCode,
-                        CustomerId = customer.CustomerId,
+                        CustomerId = customer.UserId,
                         CreatedBy = safeCreatedBy,
                         OrderDate = DateTime.Now,
                         SubTotal = totalOrderAmount,      // Giá gốc trước giảm

@@ -60,7 +60,7 @@ namespace WebBanHang.Areas.Admin.Controllers
 
         //    var dto = new RegisterVM
         //    {
-        //        Username = vm.Username,
+        //        Email = vm.Email,
         //        FullName = vm.FullName,
         //        Email = vm.Email,
         //        Password = vm.Password,

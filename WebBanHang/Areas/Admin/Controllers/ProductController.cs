@@ -241,8 +241,6 @@ namespace WebBanHang.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(UpdateProductVM vm)
         {
-            Console.WriteLine("____________________");
-            Console.WriteLine(vm.ExistingImages?.FirstOrDefault()?.ImageUrl ?? "NULL");
             if (!ModelState.IsValid)
             {
                 await LoadEditData(vm);

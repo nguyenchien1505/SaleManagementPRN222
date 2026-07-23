@@ -228,7 +228,7 @@
                         </button>
 
                         <!-- Form Mua ngay -->
-                        <form id="buyNowForm" asp-area="Customer" asp-controller="Orders" asp-action="Checkout" method="post" class="flex-grow-1">
+                        <form id="buyNowForm" asp-area="Customer" asp-controller="Order" asp-action="Checkout" method="post" class="flex-grow-1">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="productId" value="@Model.ProductId" />
                             <input type="hidden" name="quantity" id="hiddenQuantity" value="1" />

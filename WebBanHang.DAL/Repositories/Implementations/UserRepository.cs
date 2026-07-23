@@ -50,10 +50,6 @@ namespace WebBanHang.DAL.Repositories.Implementations
             return await _context.Users.FirstOrDefaultAsync(x => x.UserId == id);
         }
 
-        public async Task<User> GetByUsernameAsync(string username)
-        {
-            return await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
-        }
 
         public async Task UpdateAsync(User user)
         {
@@ -77,13 +73,9 @@ namespace WebBanHang.DAL.Repositories.Implementations
             return await _context.Users.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.UserId == id);
         }
 
-        public async Task<User> GetByUsernameIncludeDeleteAsync(string username)
-        {
-            return await _context.Users.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Username == username);
-        }
         public async Task<bool> HasHistoricalReferencesAsync(int userId)
         {
-            var customerId = await _context.Customers.Where(c => c.UserId == userId).Select(c => (int?)c.CustomerId).FirstOrDefaultAsync();
+            var customerId = await _context.Users.Where(c => (c.UserId == userId && c.Role == "Customer")).Select(c => (int?)c.UserId).FirstOrDefaultAsync();
 
             var hasCustomerOrders = customerId.HasValue && await _context.Orders.AnyAsync(o => o.CustomerId == customerId.Value);
 
@@ -99,6 +91,15 @@ namespace WebBanHang.DAL.Repositories.Implementations
             _context.Users.Remove(user);
 
             return await _context.SaveChangesAsync() > 0;
+        }
+        public async Task<int> CountActiveAdminsAsync()
+        {
+            return await _context.Users
+                .IgnoreQueryFilters()
+                .CountAsync(u =>
+                    !u.IsDeleted &&
+                    u.IsActive &&
+                    u.Role == "Admin");
         }
 
         

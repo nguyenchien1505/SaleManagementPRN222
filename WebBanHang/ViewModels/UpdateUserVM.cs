@@ -5,7 +5,6 @@ namespace WebBanHang.ViewModels
     public class UpdateUserVM
     {
         public int UserId { get; set; }
-        public string Username { get; set; }
         [MinLength(6)]
         [DataType(DataType.Password)]
         public string? Password { get; set; }
@@ -18,6 +17,7 @@ namespace WebBanHang.ViewModels
         public string Role { get; set; }
         //public string Phone{ get; set; }
         public bool IsActive { get; set; }
-    
+        public string? VerificationPassword { get; set; }
+
     }
 }
