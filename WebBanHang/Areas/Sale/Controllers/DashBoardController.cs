@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
 using WebBanHang.DAL.Context;
 
 namespace WebBanHang.Areas.Sale.Controllers
