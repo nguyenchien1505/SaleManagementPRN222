@@ -22,6 +22,7 @@ namespace WebBanHang.BLL.Services.Interfaces
         Task<CategoryDTO> GetCateByNameIncludeDeleteAsync(string name);
         Task<bool> RestoreCateAsync(int categoryId);
         Task<bool> HardDeleteCateAsync(int categoryId);
-
+        Task<byte[]> ExportCategoriesToExcelAsync();
+        Task<int> ImportCategoriesFromExcelAsync(Stream fileStream);
     }
 }

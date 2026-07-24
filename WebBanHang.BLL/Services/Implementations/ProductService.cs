@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 using Microsoft.EntityFrameworkCore;
+=======
+﻿using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
+>>>>>>> 71db194 (Update UI, VNPAY, EXCEL)
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +14,8 @@ using WebBanHang.BLL.Services.Interfaces;
 using WebBanHang.DAL.Entities;
 using WebBanHang.DAL.Repositories.Implementations;
 using WebBanHang.DAL.Repositories.Interfaces;
-
+using OfficeOpenXml;
+using System.IO;
 namespace WebBanHang.BLL.Services.Implementations
 {
     public class ProductService : IProductService
@@ -193,6 +199,7 @@ namespace WebBanHang.BLL.Services.Implementations
                 ProductId = u.ProductId,
                 Name = u.Name,
                 Code = u.Code,
+                ImportPrice=u.ImportPrice,
                 SellingPrice = u.SellingPrice,
                 Status = u.Status,
                 StockQuantity = u.StockQuantity,
@@ -298,6 +305,127 @@ namespace WebBanHang.BLL.Services.Implementations
 
             return await _repo.HardDeleteAsync(product);
         }
+        public async Task<byte[]> ExportProductsToExcelAsync()
+        {
+            ExcelPackage.License.SetNonCommercialPersonal("Admin");
+            var products = await GetAllProductsIncludeDeleteAsync();
 
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Danh_Sach_SanPham");
+
+                worksheet.Cells[1, 1].Value = "Mã Sản Phẩm";
+                worksheet.Cells[1, 2].Value = "Tên Sản Phẩm";
+                worksheet.Cells[1, 3].Value = "Tên Danh Mục";
+                worksheet.Cells[1, 4].Value = "Giá Nhập";
+                worksheet.Cells[1, 5].Value = "Giá Bán";
+                worksheet.Cells[1, 6].Value = "Số Lượng Tồn";
+                worksheet.Cells[1, 7].Value = "Mô Tả";
+                worksheet.Cells[1, 8].Value = "Trạng Thái";
+
+                worksheet.Cells["A1:H1"].Style.Font.Bold = true;
+                worksheet.Cells["A1:H1"].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                worksheet.Cells["A1:H1"].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+
+                int row = 2;
+                foreach (var item in products)
+                {
+                    worksheet.Cells[row, 1].Value = item.Code;
+                    worksheet.Cells[row, 2].Value = item.Name;
+
+                    worksheet.Cells[row, 3].Value = item.CategoryName;
+
+                    worksheet.Cells[row, 4].Value = item.ImportPrice;
+                    worksheet.Cells[row, 5].Value = item.SellingPrice;
+                    worksheet.Cells[row, 6].Value = item.StockQuantity;
+                    worksheet.Cells[row, 7].Value = item.Description;
+                    worksheet.Cells[row, 8].Value = item.Status;
+                    row++;
+                }
+
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+                return await package.GetAsByteArrayAsync();
+            }
+        }
+
+        public async Task<int> ImportProductsFromExcelAsync(Stream fileStream, int userId)
+        {
+            ExcelPackage.License.SetNonCommercialPersonal("Admin");
+            int importedCount = 0;
+
+            var allCategories = await _cateRepo.GetAllAsync(); 
+
+            using (var package = new ExcelPackage(fileStream))
+            {
+                if (package.Workbook.Worksheets.Count == 0)
+                    throw new Exception("File Excel trống, không có dữ liệu.");
+
+                var worksheet = package.Workbook.Worksheets[0];
+                int rowCount = worksheet.Dimension?.Rows ?? 0;
+                int colCount = worksheet.Dimension?.Columns ?? 0;
+
+                if (colCount < 8)
+                    throw new Exception("File Excel sai biểu mẫu. Biểu mẫu chuẩn phải có ít nhất 8 cột.");
+
+                var col1Header = worksheet.Cells[1, 1].Value?.ToString()?.Trim().ToLower();
+                var col3Header = worksheet.Cells[1, 3].Value?.ToString()?.Trim().ToLower();
+
+                if (col1Header != "mã sản phẩm" || col3Header != "tên danh mục")
+                {
+                    throw new Exception("File Excel sai cấu trúc (Cột C phải là 'Tên Danh Mục'). Vui lòng Xuất Excel để lấy biểu mẫu chuẩn.");
+                }
+
+                if (rowCount < 2)
+                    throw new Exception("File Excel không có dòng dữ liệu nào để nhập.");
+
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    var code = worksheet.Cells[row, 1].Value?.ToString()?.Trim();
+                    var name = worksheet.Cells[row, 2].Value?.ToString()?.Trim();
+
+                    if (string.IsNullOrEmpty(code) || string.IsNullOrEmpty(name)) continue;
+
+
+                    var categoryNameInExcel = worksheet.Cells[row, 3].Value?.ToString()?.Trim();
+                    int mappedCategoryId = 1; 
+                    if (!string.IsNullOrEmpty(categoryNameInExcel))
+                    {
+                        var matchedCategory = allCategories.FirstOrDefault(c =>
+                            c.Name.Equals(categoryNameInExcel, StringComparison.OrdinalIgnoreCase));
+
+                        if (matchedCategory != null)
+                        {
+                            mappedCategoryId = matchedCategory.CategoryId; 
+                        }
+                    }
+
+                    _ = decimal.TryParse(worksheet.Cells[row, 4].Value?.ToString()?.Trim(), out decimal importPrice);
+                    _ = decimal.TryParse(worksheet.Cells[row, 5].Value?.ToString()?.Trim(), out decimal sellingPrice);
+                    _ = int.TryParse(worksheet.Cells[row, 6].Value?.ToString()?.Trim(), out int stockQuantity);
+
+                    var desc = worksheet.Cells[row, 7].Value?.ToString()?.Trim();
+                    var status = worksheet.Cells[row, 8].Value?.ToString()?.Trim() ?? "Active";
+
+                    var dto = new ProductDTO
+                    {
+                        Code = code,
+                        Name = name,
+                        CategoryId = mappedCategoryId, 
+                        ImportPrice = importPrice,
+                        SellingPrice = sellingPrice,
+                        StockQuantity = stockQuantity,
+                        Description = desc,
+                        Status = status,
+                        CreatedBy = userId,
+                        Images = new List<ProductImageDTO>()
+                    };
+
+                    bool isAdded = await CreateProductAsync(dto);
+                    if (isAdded) importedCount++;
+                }
+            }
+
+            return importedCount;
+        }
     }
 }

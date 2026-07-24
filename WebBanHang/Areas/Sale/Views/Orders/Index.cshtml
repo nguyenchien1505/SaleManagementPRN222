@@ -3,7 +3,8 @@
 @{
     ViewData["Title"] = "Quản lý đơn hàng";
     Layout = "_SaleLayout";
-    var statuses = new List<string> { "Draft", "Confirmed", "Completed", "Cancelled" };
+    // 🌟 BỔ SUNG: Thêm "Shipping" vào danh sách trạng thái lọc
+    var statuses = new List<string> { "Draft", "Confirmed", "Shipping", "Completed", "Cancelled" };
 }
 
 <div class="card border-0 shadow-sm" style="border-radius: 12px;">
@@ -12,7 +13,6 @@
     </div>
     <div class="card-body">
 
-        <!-- Filter & Search -->
         <form asp-action="Index" method="get" class="mb-4">
             <div class="row g-2">
                 <div class="col-md-3">
@@ -20,11 +20,11 @@
                         <option value="">Tất cả trạng thái</option>
                         @foreach (var s in statuses)
                         {
-                            // Dịch trực tiếp từ khóa tiếng Anh sang tiếng Việt để hiển thị ra giao diện
                             var textVn = s switch
                             {
                                 "Draft" => "Chờ xác nhận",
                                 "Confirmed" => "Đã xác nhận",
+                                "Shipping" => "Đang giao hàng", // 🌟 Thêm nhãn tiếng Việt
                                 "Completed" => "Hoàn thành",
                                 "Cancelled" => "Đã hủy",
                                 _ => s
@@ -58,7 +58,8 @@
                         <th>Khách hàng</th>
                         <th>Ngày đặt</th>
                         <th>Tổng tiền</th>
-                        <th>Trạng thái</th>
+                        <th>Thanh toán</th> <!-- Cột thanh toán mới -->
+                        <th>Trạng thái đơn</th>
                         <th class="text-end">Thao tác</th>
                     </tr>
                 </thead>
@@ -70,7 +71,7 @@
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-2 text-primary fw-bold" style="width: 35px; height: 35px; font-size: 0.9rem;">
-                                        @item.Customer?.FullName?.Substring(0, 1)
+                                        @(string.IsNullOrEmpty(item.Customer?.FullName) ? "U" : item.Customer.FullName.Substring(0, 1))
                                     </div>
                                     <div class="d-flex flex-column">
                                         <span class="fw-medium">@item.Customer?.FullName</span>
@@ -80,12 +81,35 @@
                             </td>
                             <td>@item.OrderDate?.ToString("dd/MM/yyyy HH:mm")</td>
                             <td class="fw-bold">@item.TotalAmount?.ToString("N0") ₫</td>
+
+                            <!-- 🌟 HIỂN THỊ THÔNG TIN THANH TOÁN (METHOD & STATUS) -->
+                            <td>
+                                <div class="d-flex flex-column gap-1">
+                                    <span class="badge bg-light text-dark border rounded-pill px-2 py-1 w-fit" style="font-size: 0.7rem;">
+                                        <i class="bi bi-wallet2 me-1"></i> @(string.IsNullOrEmpty(item.PaymentMethod) ? "COD" : item.PaymentMethod)
+                                    </span>
+                                    @if (item.PaymentStatus == "Paid")
+                                    {
+                                        <span class="badge bg-success text-white rounded-pill px-2 py-1 w-fit" style="font-size: 0.7rem;">Đã thanh toán</span>
+                                    }
+                                    else if (item.PaymentStatus == "Failed")
+                                    {
+                                        <span class="badge bg-danger text-white rounded-pill px-2 py-1 w-fit" style="font-size: 0.7rem;">Thanh toán lỗi</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark rounded-pill px-2 py-1 w-fit" style="font-size: 0.7rem;">Chờ thanh toán</span>
+                                    }
+                                </div>
+                            </td>
+
                             <td>
                                 @{
                                     var (badgeClass, statusText) = item.Status switch
                                     {
                                         "Draft" => ("bg-secondary text-white", "Chờ xác nhận"),
                                         "Confirmed" => ("bg-info text-dark", "Đã xác nhận"),
+                                        "Shipping" => ("bg-warning text-dark", "Đang giao hàng"), // 🌟 Xử lý màu cho Shipping
                                         "Completed" => ("bg-success text-white", "Hoàn thành"),
                                         "Cancelled" => ("bg-danger text-white", "Đã hủy"),
                                         _ => ("bg-light text-dark", item.Status ?? "Không rõ")
@@ -93,7 +117,7 @@
                                 }
                                 <span class="badge @badgeClass bg-opacity-75 rounded-pill">@statusText</span>
                             </td>
-                        
+
                             <td class="text-end">
                                 <a asp-action="Details" asp-route-id="@item.OrderId" class="btn btn-sm btn-light border"><i class="bi bi-eye"></i> Xem</a>
                             </td>

@@ -230,9 +230,8 @@ namespace WebBanHang.Areas.Customer.Controllers
         // ──────────────────────────────────────────────
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CheckoutAll(List<int> selectedProductIds, string? promoCode = null)
+        public async Task<IActionResult> CheckoutAll(List<int> selectedProductIds, string? promoCode = null, string paymentMethod = "COD")
         {
-       
             int? userId = HttpContext.Session.GetInt32("UserId");
             if (!userId.HasValue)
                 return RedirectToAction("Login", "Account", new { area = "" });
@@ -262,18 +261,23 @@ namespace WebBanHang.Areas.Customer.Controllers
                     await _cartService.RemoveFromCartAsync(userId.Value, id);
                 }
 
-                TempData["Success"] = result.Message;
+                int newOrderId = result.OrderId;
+                string initialPaymentStatus = (paymentMethod == "VNPay") ? "Pending" : "Pending";
+                await _orderService.UpdatePaymentInfoAsync(newOrderId, paymentMethod, initialPaymentStatus);
 
-                return RedirectToAction("MyOrders", "Order", new { area = "Customer" });
+                if (paymentMethod == "VNPay")
+                {
+                    return RedirectToAction("CreatePayment", "Payment", new { orderId = newOrderId, area = "" });
+                }
+                else
+                {
+                    TempData["Success"] = result.Message;
+                    return RedirectToAction("MyOrders", "Order", new { area = "Customer" });
+                }
             }
             else
             {
-                // BẮT BỆNH: Nếu lỗi trả về có chứa Exception ngầm, lôi tin nhắn thật của SQL ra hiển thị
                 TempData["Error"] = result.Message;
-
-                // In thêm thông báo lỗi hệ thống nếu lỗi chung chung để bạn đọc được ngay trên giao diện giỏ hàng
-
-
                 return RedirectToAction(nameof(Index));
             }
         }

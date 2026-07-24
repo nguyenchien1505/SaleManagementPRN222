@@ -20,6 +20,9 @@ namespace WebBanHang.BLL.Services.Interfaces
         Task<IEnumerable<Order>> GetOrdersOverviewAsync(string? searchString, string? statusFilter);
 
         void ConfirmOrder(int orderId, int userId);
+        Task<Order?> GetOrderByIdAsync(int orderId);
+        Task UpdatePaymentInfoAsync(int orderId, string paymentMethod, string paymentStatus);
+        Task UpdatePaymentStatusAsync(int orderId, string paymentStatus);
 
     }
 }

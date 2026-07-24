@@ -186,5 +186,59 @@ namespace WebBanHang.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // ──────────────────────────────────────────────
+        // CHỨC NĂNG EXCEL
+        // ──────────────────────────────────────────────
+        [HttpGet]
+        public async Task<IActionResult> ExportExcel()
+        {
+            try
+            {
+                var fileContent = await _cateService.ExportCategoriesToExcelAsync();
+
+                string fileName = $"Danh_Muc_SP_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+                return File(fileContent, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Lỗi khi xuất file: " + ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ImportExcel(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                TempData["Error"] = "Vui lòng chọn file Excel!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (!Path.GetExtension(file.FileName).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["Error"] = "Hệ thống chỉ hỗ trợ định dạng file .xlsx!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
+            {
+                using (var stream = new MemoryStream())
+                {
+                    await file.CopyToAsync(stream);
+
+                    int importedCount = await _cateService.ImportCategoriesFromExcelAsync(stream);
+
+                    TempData["Success"] = $"Đã nhập thành công {importedCount} danh mục từ file Excel!";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Lỗi xử lý file Excel: " + ex.Message;
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

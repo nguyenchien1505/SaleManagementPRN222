@@ -385,12 +385,37 @@ namespace WebBanHang.BLL.Services.Implementations
             _context.Orders.Update(order);
             _context.SaveChanges();
 
-            // MỚI: 2 không đổi logic ở trên
             var performer = _context.Users.FirstOrDefault(u => u.UserId == userId);
             _auditLogService.LogAsync(
                 "Order", order.OrderId, "ConfirmOrder",
                 userId, performer?.FullName,
                 $"Xác nhận đơn #{order.OrderCode}").GetAwaiter().GetResult();
+        }
+        public async Task<Order?> GetOrderByIdAsync(int orderId)
+        {
+            return await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId);
+        }
+
+        public async Task UpdatePaymentInfoAsync(int orderId, string paymentMethod, string paymentStatus)
+        {
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId);
+            if (order != null)
+            {
+                order.PaymentMethod = paymentMethod;
+                order.PaymentStatus = paymentStatus;
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task UpdatePaymentStatusAsync(int orderId, string paymentStatus)
+        {
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId);
+            if (order != null)
+            {
+                order.PaymentStatus = paymentStatus;
+
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

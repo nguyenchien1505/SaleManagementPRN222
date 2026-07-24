@@ -229,12 +229,6 @@
                                         <a asp-action="Detail" asp-route-id="@item.ProductId" class="action-btn" title="Xem chi tiết">
                                             <i class="bi bi-eye fs-5"></i>
                                         </a>
-                                        @if (item.StockQuantity > 0)
-                                        {
-                                            <button type="button" class="action-btn" onclick="addToCart(@item.ProductId)" title="Thêm vào giỏ">
-                                                <i class="bi bi-cart-plus fs-5"></i>
-                                            </button>
-                                        }
                                     </div>
                                 </div>
 

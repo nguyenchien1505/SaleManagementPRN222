@@ -18,5 +18,6 @@ namespace WebBanHang.BLL.Services.Interfaces
         bool CanSell(int productId, int quantityOrdered);
 
         List<Product> GetLowStockWarnings();
+        Task<int> ImportInboundFromExcelAsync(Stream fileStream, int userId);
     }
 }

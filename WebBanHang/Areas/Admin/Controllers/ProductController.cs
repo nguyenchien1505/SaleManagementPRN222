@@ -596,5 +596,67 @@ namespace WebBanHang.Areas.Admin.Controllers
                 }
             }
         }
+        // ──────────────────────────────────────────────
+        // CHỨC NĂNG EXCEL
+        // ──────────────────────────────────────────────
+        [HttpGet]
+        public async Task<IActionResult> ExportExcel()
+        {
+            try
+            {
+                var fileContent = await _service.ExportProductsToExcelAsync();
+
+                string fileName = $"Danh_Sach_SanPham_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+                return File(fileContent, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Lỗi khi xuất file Excel: " + ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ImportExcel(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                TempData["Error"] = "Vui lòng chọn file Excel!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (!Path.GetExtension(file.FileName).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["Error"] = "Hệ thống chỉ hỗ trợ định dạng file .xlsx!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
+            {
+                int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+
+                using (var stream = new MemoryStream())
+                {
+                    await file.CopyToAsync(stream);
+
+                    int importedCount = await _service.ImportProductsFromExcelAsync(stream, userId);
+
+                    TempData["Success"] = $"Đã nhập thành công {importedCount} sản phẩm từ file Excel!";
+
+                    await _auditLogService.LogAsync(
+                        "Product", 0, "ImportExcel",
+                        userId, HttpContext.Session.GetString("FullName"),
+                        $"Đã Import {importedCount} sản phẩm bằng file Excel"
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Lỗi xử lý file Excel: " + ex.Message;
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

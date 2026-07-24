@@ -176,6 +176,25 @@
                             @Html.AntiForgeryToken()
                             <div id="selectedIdsHidden"></div>
 
+                            <!-- Lựa chọn phương thức thanh toán -->
+                            <div class="mb-4">
+                                <label class="fw-semibold mb-2 small text-secondary">Phương thức thanh toán</label>
+                                <div class="d-flex flex-column gap-2">
+                                    <div class="form-check border rounded-3 p-3 bg-light cursor-pointer">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="payCod" value="COD" checked>
+                                        <label class="form-check-label fw-semibold text-dark w-100 cursor-pointer" for="payCod">
+                                            <i class="bi bi-truck me-2 text-secondary"></i> Thanh toán khi nhận hàng (COD)
+                                        </label>
+                                    </div>
+                                    <div class="form-check border rounded-3 p-3 bg-light cursor-pointer">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="payVnPay" value="VNPay">
+                                        <label class="form-check-label fw-semibold text-primary w-100 cursor-pointer" for="payVnPay">
+                                            <i class="bi bi-wallet2 me-2"></i> Thanh toán trực tuyến qua VNPay
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="mb-4">
                                 <label class="fw-semibold mb-2 small">Mã giảm giá</label>
                                 <div class="input-group">
@@ -271,7 +290,6 @@
         function setVoucher(code) {
             $('#promoCodeInput').val(code);
 
-            // Highlight danh sách voucher đang chọn bằng class active
             document.querySelectorAll('.voucher-tag').forEach(el => {
                 let codeText = el.querySelector('.voucher-code-text').innerText.trim();
                 if (codeText.toUpperCase() === code.toUpperCase()) {
@@ -285,20 +303,17 @@
         }
 
         $(document).ready(function() {
-            // Chọn tất cả sản phẩm
             $('#selectAll').on('change', function() {
                 $('.item-check').prop('checked', $(this).is(':checked'));
                 updateLiveTotal();
             });
 
-            // Chọn từng sản phẩm đơn lẻ
             $('.item-check').on('change', function() {
                 const allChecked = $('.item-check:checked').length === $('.item-check').length;
                 $('#selectAll').prop('checked', allChecked);
                 updateLiveTotal();
             });
 
-            // Gửi Ajax áp mã giảm giá
             $('#applyPromoBtn').on('click', function() {
                 const code = $('#promoCodeInput').val();
                 if (!code) {
@@ -349,7 +364,6 @@
                 });
             });
 
-            // Cập nhật giá realtime lúc tải trang ban đầu
             updateLiveTotal();
         });
 
@@ -366,7 +380,6 @@
                 total += price * qty;
                 count++;
 
-                // Đẩy danh sách ID sản phẩm được chọn vào thẻ hidden để submit qua controller
                 hiddenContainer.append(`<input type="hidden" name="selectedProductIds" value="${id}">`);
             });
 
@@ -378,8 +391,6 @@
             if (payable < 0) payable = 0;
 
             $('#payableAmount').text(payable.toLocaleString('vi-VN'));
-
-            // Trạng thái nút thanh toán
             $('#checkoutBtn').prop('disabled', count === 0);
         }
 
@@ -431,9 +442,12 @@
                 return;
             }
 
+            const paymentMethod = $('input[name="paymentMethod"]:checked').val();
+            const paymentText = paymentMethod === 'VNPay' ? 'Thanh toán trực tuyến qua VNPay' : 'Thanh toán khi nhận hàng (COD)';
+
             Swal.fire({
                 title: 'Xác nhận thanh toán',
-                text: `Bạn đã chọn ${selectedCount} sản phẩm. Tiến hành tạo đơn đặt hàng?`,
+                html: `Bạn đã chọn <b>${selectedCount} sản phẩm</b>.<br>Hình thức: <b class="text-primary">${paymentText}</b>`,
                 icon: 'info',
                 showCancelButton: true,
                 confirmButtonColor: '#28a745',
@@ -442,7 +456,10 @@
                 cancelButtonText: 'Kiểm tra lại'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    document.getElementById('checkoutAllForm').submit();
+                    const form = document.getElementById('checkoutAllForm');
+                    form.action = '@Url.Action("CheckoutAll", "Cart", new { area = "Customer" })';
+                    form.method = 'post'; 
+                    form.submit();
                 }
             });
         }

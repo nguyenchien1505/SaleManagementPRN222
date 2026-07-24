@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,8 @@ using WebBanHang.BLL.Services.Interfaces;
 using WebBanHang.DAL.Entities;
 using WebBanHang.DAL.Repositories.Implementations;
 using WebBanHang.DAL.Repositories.Interfaces;
-
+using OfficeOpenXml;
+using System.IO;
 namespace WebBanHang.BLL.Services.Implementations
 {
     public class CategoryService : ICategoryService
@@ -105,7 +107,7 @@ namespace WebBanHang.BLL.Services.Implementations
         public async Task<bool> DeleteCateAsync(int id)
         {
             var cate = await _repo.GetByIdAsync(id);
-            if(cate == null) return false;
+            if (cate == null) return false;
             await _repo.DeleteAsync(id);
             return true;
         }
@@ -227,6 +229,98 @@ namespace WebBanHang.BLL.Services.Implementations
                 return false;
             }
         }
+        public async Task<byte[]> ExportCategoriesToExcelAsync()
+        {
+            var categories = await GetAllCateIncludeDeleteAsync();
 
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Danh_Muc");
+
+                worksheet.Cells[1, 1].Value = "Mã Danh Mục";
+                worksheet.Cells[1, 2].Value = "Tên Danh Mục";
+                worksheet.Cells[1, 3].Value = "Mô Tả";
+                worksheet.Cells[1, 4].Value = "Trạng Thái";
+
+                worksheet.Cells["A1:D1"].Style.Font.Bold = true;
+                worksheet.Cells["A1:D1"].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                worksheet.Cells["A1:D1"].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+
+                int row = 2;
+                foreach (var item in categories)
+                {
+                    worksheet.Cells[row, 1].Value = item.CategoryId;
+                    worksheet.Cells[row, 2].Value = item.Name;
+                    worksheet.Cells[row, 3].Value = item.Description;
+                    worksheet.Cells[row, 4].Value = item.Status;
+                    row++;
+                }
+
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+                return await package.GetAsByteArrayAsync();
+            }
+        }
+
+        public async Task<int> ImportCategoriesFromExcelAsync(Stream fileStream)
+        {
+            int importedCount = 0;
+
+            using (var package = new ExcelPackage(fileStream))
+            {
+                if (package.Workbook.Worksheets.Count == 0)
+                {
+                    throw new Exception("File Excel trống, không có dữ liệu.");
+                }
+
+                var worksheet = package.Workbook.Worksheets[0];
+
+                int rowCount = worksheet.Dimension?.Rows ?? 0;
+                int colCount = worksheet.Dimension?.Columns ?? 0;
+
+                if (colCount < 4)
+                {
+                    throw new Exception("File Excel sai biểu mẫu. Biểu mẫu chuẩn phải có ít nhất 4 cột.");
+                }
+
+                var col2Header = worksheet.Cells[1, 2].Value?.ToString()?.Trim().ToLower();
+                var col3Header = worksheet.Cells[1, 3].Value?.ToString()?.Trim().ToLower();
+                var col4Header = worksheet.Cells[1, 4].Value?.ToString()?.Trim().ToLower();
+
+                if (col2Header != "tên danh mục" ||
+                    col3Header != "mô tả" ||
+                    col4Header != "trạng thái")
+                {
+                    throw new Exception("File Excel sai cấu trúc cột. Vui lòng Xuất Excel để lấy biểu mẫu chuẩn (Cột B: Tên Danh Mục, Cột C: Mô Tả, Cột D: Trạng Thái).");
+                }
+
+                if (rowCount < 2)
+                {
+                    throw new Exception("File Excel không có dữ liệu để nhập.");
+                }
+
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    var name = worksheet.Cells[row, 2].Value?.ToString()?.Trim();
+                    if (string.IsNullOrEmpty(name)) continue;
+
+                    var desc = worksheet.Cells[row, 3].Value?.ToString()?.Trim();
+                    var status = worksheet.Cells[row, 4].Value?.ToString()?.Trim() ?? "Active";
+
+                    var dto = new CreateCategoryDTO
+                    {
+                        Name = name,
+                        Description = desc,
+                        Status = status
+                    };
+
+                    bool isAdded = await AddCateAsync(dto);
+                    if (isAdded) importedCount++;
+                }
+            }
+
+            return importedCount;
+        }
+        
     }
 }
