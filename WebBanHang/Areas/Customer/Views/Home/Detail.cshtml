@@ -1,4 +1,4 @@
-﻿@model WebBanHang.ViewModels.ProductDetailVM
+@model WebBanHang.ViewModels.ProductDetailVM
 @using Microsoft.AspNetCore.Http
 
 @{
@@ -6,6 +6,8 @@
 
     int? sessionUserId = Context.Session.GetInt32("UserId");
     bool isUserLoggedIn = sessionUserId.HasValue;
+    string? userRole = Context.Session.GetString("Role");
+    bool isAdmin = userRole == "Admin";
 
     string loginUrl = Url.Action("Login", "Account", new { area = "", returnUrl = Context.Request.Path + Context.Request.QueryString })!;
 
@@ -122,6 +124,30 @@
 </style>
 
 <div class="container py-4 py-lg-5">
+    @if (isAdmin)
+    {
+        <div class="alert alert-warning border-0 rounded-4 p-3 mb-4 d-flex flex-wrap align-items-center justify-content-between shadow-sm">
+            <div class="d-flex align-items-center me-3 my-1">
+                <i class="bi bi-shield-lock-fill fs-3 text-warning me-3"></i>
+                <div>
+                    <strong class="d-block text-dark">Thanh Quản Trị Nhanh (Admin Quick Bar)</strong>
+                    <small class="text-secondary">Bạn đang xem sản phẩm này với tư cách Admin trên giao diện Khách hàng</small>
+                </div>
+            </div>
+            <div class="d-flex flex-wrap gap-2 my-1">
+                <a asp-area="Admin" asp-controller="Product" asp-action="Edit" asp-route-id="@Model.ProductId" class="btn btn-warning fw-bold rounded-pill px-3 shadow-sm">
+                    <i class="bi bi-pencil-square me-1"></i> Sửa sản phẩm này
+                </a>
+                <a asp-area="Admin" asp-controller="Inventory" asp-action="Index" class="btn btn-outline-dark fw-bold rounded-pill px-3">
+                    <i class="bi bi-boxes me-1"></i> Quản lý kho
+                </a>
+                <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="btn btn-dark fw-bold rounded-pill px-3">
+                    <i class="bi bi-speedometer2 me-1"></i> Về Dashboard
+                </a>
+            </div>
+        </div>
+    }
+
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb fw-medium">
@@ -206,7 +232,17 @@
 
                 <hr class="my-4 text-black-50">
 
-                @if (Model.StockQuantity > 0 && Model.Status == "Active")
+                @if (isAdmin)
+                {
+                    <div class="alert alert-info rounded-4 p-4 border-0 d-flex align-items-center mb-4 shadow-sm" role="alert">
+                        <i class="bi bi-info-circle-fill fs-2 text-info me-3"></i>
+                        <div>
+                            <h6 class="fw-bold mb-1">Dành cho Quản trị viên (Admin)</h6>
+                            <p class="mb-0 small text-secondary">Tài khoản Admin chỉ dùng để quản lý và vận hành hệ thống, không thực hiện đặt hàng để đảm bảo tính chính xác của báo cáo doanh thu. Để thử nghiệm mua sắm, vui lòng đăng ký/sử dụng tài khoản Khách hàng (Customer).</p>
+                        </div>
+                    </div>
+                }
+                else if (Model.StockQuantity > 0 && Model.Status == "Active")
                 {
                     <div class="mb-5">
                         <div class="d-flex align-items-center gap-4">

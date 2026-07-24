@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
@@ -108,6 +108,18 @@
                                     </li>
 
                                     <li><hr class="dropdown-divider"></li>
+
+                                    @* MENU ĐIỀU HƯỚNG DÀNH CHO ADMIN *@
+                                    @if (Context.Session.GetString("Role") == "Admin")
+                                    {
+                                        <li>
+                                            <a class="dropdown-item text-danger fw-bold" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                                                <i class="bi bi-speedometer2 me-2"></i>
+                                                Trang Quản trị (Admin)
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                    }
 
                                     @* MENU ĐIỀU HƯỚNG KHO DÀNH CHO ADMIN HOẶC SALES *@
                                     @if (Context.Session.GetString("Role") == "Admin" || Context.Session.GetString("Role") == "Sales")

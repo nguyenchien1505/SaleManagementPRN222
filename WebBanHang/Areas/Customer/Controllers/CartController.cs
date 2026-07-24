@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -92,6 +92,11 @@ namespace WebBanHang.Areas.Customer.Controllers
         [HttpPost]
         public async Task<IActionResult> AddToCart(int productId, int quantity = 1)
         {
+            if (HttpContext.Session.GetString("Role") == "Admin")
+            {
+                return Json(new { success = false, message = "Tài khoản Quản trị viên (Admin) chỉ dùng để quản lý hệ thống, không thể đặt hàng mua sắm." });
+            }
+
             if (quantity < 1) quantity = 1;
 
             var product = await _productService.GetProductByIdAsync(productId);

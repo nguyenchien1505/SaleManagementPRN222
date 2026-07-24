@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -119,7 +119,7 @@ namespace WebBanHang.BLL.Services.Implementations
                     .Select(x => new ProductImage
                     {
                         ImageUrl = x.ImageUrl,
-                        IsPrimary = x.IsPrimary
+                        IsPrimary = x.IsPrimary ?? false
                     }).ToList(),
                 SellingPrice = dto.SellingPrice,
                 ImportPrice = dto.ImportPrice,
@@ -160,7 +160,7 @@ namespace WebBanHang.BLL.Services.Implementations
 
                 if (correspondingImage != null)
                 {
-                    existingImage.IsPrimary = correspondingImage.IsPrimary;
+                    existingImage.IsPrimary = correspondingImage.IsPrimary ?? false;
                 }
             }
 

@@ -193,11 +193,11 @@ namespace WebBanHang.Areas.Admin.Controllers
 
             TempData["Success"] = "Tạo sản phẩm thành công!";
 
-            // Bước 5a: Ghi nhận Log tạo sản phẩm
-            await _auditLogService.LogAsync(
-            "Product", dto.ProductId, "CreateProduct",
-            userId ?? 0, HttpContext.Session.GetString("FullName"),
-            $"Tạo sản phẩm {dto.Code} - {dto.Name}");
+            // Ghi nhận Log tạo sản phẩm
+            //await _auditLogService.LogAsync(
+            //"Product", dto.ProductId, "CreateProduct",
+            //userId ?? 0, HttpContext.Session.GetString("FullName"),
+            //$"Tạo sản phẩm {dto.Code} - {dto.Name}");
 
             return RedirectToAction("Index");
         }
@@ -351,10 +351,10 @@ namespace WebBanHang.Areas.Admin.Controllers
             TempData["Success"] = "Cập nhật sản phẩm thành công!";
 
             // Bước 5b: Ghi nhận Log sửa sản phẩm
-            await _auditLogService.LogAsync(
-            "Product", vm.Id, "EditProduct",
-            HttpContext.Session.GetInt32("UserId") ?? 0, HttpContext.Session.GetString("FullName"),
-            $"Cập nhật sản phẩm {vm.Code}");
+            //await _auditLogService.LogAsync(
+            //"Product", vm.Id, "EditProduct",
+            //HttpContext.Session.GetInt32("UserId") ?? 0, HttpContext.Session.GetString("FullName"),
+            //$"Cập nhật sản phẩm {vm.Code}");
 
             return RedirectToAction("Index");
         }

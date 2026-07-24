@@ -1,4 +1,4 @@
-﻿@model WebBanHang.ViewModels.AdminDashboardVM
+@model WebBanHang.ViewModels.AdminDashboardVM
 @{
     ViewData["Title"] = "Quản trị hệ thống";
     Layout = "_AdminLayout";
@@ -210,9 +210,9 @@
                                     }
                                 </td>
                                 <td class="text-center">
-                                    <a asp-area="" asp-controller="Orders" asp-action="Detail" asp-route-id="@order.OrderId" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                    <button type="button" onclick="showTransactionDetail(@order.OrderId)" class="btn btn-sm btn-outline-primary rounded-pill px-3">
                                         <i class="bi bi-eye"></i> Xem
-                                    </a>
+                                    </button>
                                 </td>
                             </tr>
                         }
@@ -222,6 +222,84 @@
                         }
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Chi Tiết Giao Dịch Đơn Hàng -->
+<div class="modal fade" id="transactionDetailModal" tabindex="-1" aria-labelledby="transactionDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-dark text-white rounded-top-4">
+                <h5 class="modal-title fw-bold" id="transactionDetailModalLabel">
+                    <i class="bi bi-receipt text-primary me-2"></i>Chi tiết Giao dịch Đơn hàng #<span id="txOrderCode"></span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <!-- Status & Date Header -->
+                <div class="row g-3 mb-4 bg-light p-3 rounded-3 border">
+                    <div class="col-md-6">
+                        <small class="text-muted d-block">Trạng thái đơn hàng</small>
+                        <span id="txStatusBadge"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted d-block">Ngày đặt hàng</small>
+                        <span id="txOrderDate" class="fw-semibold text-dark"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted d-block">Khách hàng</small>
+                        <span id="txCustomerName" class="fw-semibold text-dark"></span>
+                        <div id="txCustomerContact" class="small text-muted"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted d-block">Địa chỉ giao hàng & Số ĐT</small>
+                        <div id="txShippingInfo" class="fw-semibold text-dark"></div>
+                    </div>
+                </div>
+
+                <!-- Products Table -->
+                <h6 class="fw-bold text-dark mb-3"><i class="bi bi-box-seam me-2 text-primary"></i>Danh sách sản phẩm</h6>
+                <div class="table-responsive mb-3">
+                    <table class="table table-hover align-middle mb-0 text-center">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="text-start">Sản phẩm</th>
+                                <th>Đơn giá</th>
+                                <th>Số lượng</th>
+                                <th class="text-end">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody id="txItemsList">
+                            <!-- Items populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Summary Total -->
+                <div class="row justify-content-end">
+                    <div class="col-md-5">
+                        <div class="bg-light p-3 rounded-3 border">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">Tạm tính:</span>
+                                <span id="txSubTotal" class="fw-semibold"></span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Giảm giá:</span>
+                                <span id="txDiscount" class="text-danger fw-semibold"></span>
+                            </div>
+                            <hr class="my-2">
+                            <div class="d-flex justify-content-between">
+                                <strong class="text-dark">Tổng thanh toán:</strong>
+                                <strong id="txTotalAmount" class="text-primary fs-5"></strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-light rounded-bottom-4">
+                <button type="button" class="btn btn-secondary px-4 rounded-3" data-bs-dismiss="modal">Đóng</button>
             </div>
         </div>
     </div>
@@ -325,5 +403,76 @@
         }
         }
         });
+
+        // 3. Hàm AJAX hiển thị Chi tiết Giao dịch Đơn hàng gần đây
+        function showTransactionDetail(orderId) {
+            fetch(`/Admin/Dashboard/GetOrderDetail/${orderId}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Không tìm thấy giao dịch');
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('txOrderCode').textContent = data.orderCode || data.orderId;
+                    document.getElementById('txOrderDate').textContent = data.orderDate || 'N/A';
+                    document.getElementById('txCustomerName').textContent = data.customerName;
+                    document.getElementById('txCustomerContact').textContent = (data.customerEmail || '') + (data.customerPhone ? ' | ' + data.customerPhone : '');
+                    document.getElementById('txShippingInfo').textContent = data.shippingAddress + ' (SĐT: ' + data.shippingPhone + ')';
+
+                    // Format Status Badge
+                    const statusEl = document.getElementById('txStatusBadge');
+                    let statusBadge = '<span class="badge bg-secondary">' + data.status + '</span>';
+                    if (data.status === 'Completed' || data.status === 'Paid') {
+                        statusBadge = '<span class="badge bg-success px-3 py-2">Hoàn thành</span>';
+                    } else if (data.status === 'Confirmed' || data.status === 'Processing') {
+                        statusBadge = '<span class="badge bg-primary px-3 py-2">Đang xử lý / Đã xác nhận</span>';
+                    } else if (data.status === 'Cancelled') {
+                        statusBadge = '<span class="badge bg-danger px-3 py-2">Đã hủy</span>';
+                    } else if (data.status === 'Draft' || data.status === 'Pending') {
+                        statusBadge = '<span class="badge bg-warning text-dark px-3 py-2">Chờ xử lý</span>';
+                    }
+                    statusEl.innerHTML = statusBadge;
+
+                    // Items List
+                    const itemsBody = document.getElementById('txItemsList');
+                    itemsBody.innerHTML = '';
+                    if (data.items && data.items.length > 0) {
+                        data.items.forEach(item => {
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td class="text-start">
+                                    <div class="d-flex align-items-center">
+                                        <img src="${item.imageUrl}" class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                        <div>
+                                            <div class="fw-semibold text-dark">${item.productName}</div>
+                                            <small class="text-muted">${item.productCode ? 'Mã: ' + item.productCode : ''}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>${Number(item.unitPrice).toLocaleString('vi-VN')} xu</td>
+                                <td class="fw-bold">${item.quantity}</td>
+                                <td class="text-end fw-bold text-dark">${Number(item.total).toLocaleString('vi-VN')} xu</td>
+                            `;
+                            itemsBody.appendChild(tr);
+                        });
+                    } else {
+                        itemsBody.innerHTML = '<tr><td colspan="4" class="text-muted py-3">Không có chi tiết sản phẩm</td></tr>';
+                    }
+
+                    // Format Summary
+                    document.getElementById('txSubTotal').textContent = Number(data.subTotal).toLocaleString('vi-VN') + ' xu';
+                    document.getElementById('txDiscount').textContent = '-' + Number(data.discountAmount).toLocaleString('vi-VN') + ' xu';
+                    document.getElementById('txTotalAmount').textContent = Number(data.totalAmount).toLocaleString('vi-VN') + ' xu';
+
+                    const modal = new bootstrap.Modal(document.getElementById('transactionDetailModal'));
+                    modal.show();
+                })
+                .catch(err => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: err.message || 'Không thể tải chi tiết giao dịch này.'
+                    });
+                });
+        }
     </script>
 }

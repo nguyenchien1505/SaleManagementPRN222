@@ -7,6 +7,10 @@ namespace WebBanHang.DAL.Context;
 
 public partial class WebBanHangContext : DbContext
 {
+    public WebBanHangContext()
+    {
+    }
+
     public WebBanHangContext(DbContextOptions<WebBanHangContext> options)
         : base(options)
     {
@@ -36,6 +40,10 @@ public partial class WebBanHangContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Data Source=DESKTOP-18IRBA5;Initial Catalog=WebBanHang;Trusted_Connection=True;Encrypt=False;TrustServerCertificate=True");
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<AuditLog>(entity =>
@@ -48,7 +56,14 @@ public partial class WebBanHangContext : DbContext
                 .HasColumnType("datetime");
             entity.Property(e => e.Description).HasMaxLength(500);
             entity.Property(e => e.EntityName).HasMaxLength(50);
+            entity.Property(e => e.IpAddress)
+                .HasMaxLength(45)
+                .IsUnicode(false);
             entity.Property(e => e.PerformedByName).HasMaxLength(100);
+            entity.Property(e => e.PerformedByRole)
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.RequestPath).HasMaxLength(300);
         });
 
         modelBuilder.Entity<Cart>(entity =>
@@ -126,6 +141,12 @@ public partial class WebBanHangContext : DbContext
             entity.Property(e => e.OrderDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+            entity.Property(e => e.PaymentMethod)
+                .HasMaxLength(50)
+                .HasDefaultValue("COD");
+            entity.Property(e => e.PaymentStatus)
+                .HasMaxLength(50)
+                .HasDefaultValue("Pending");
             entity.Property(e => e.ShippingAddress).HasMaxLength(500);
             entity.Property(e => e.ShippingPhone)
                 .HasMaxLength(20)

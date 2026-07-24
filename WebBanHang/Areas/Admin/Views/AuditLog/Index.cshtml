@@ -1,49 +1,352 @@
-﻿@model List<WebBanHang.DAL.Entities.AuditLog>
+@model List<WebBanHang.DAL.Entities.AuditLog>
 @{
-    ViewData["Title"] = "Audit Log";
+    ViewData["Title"] = "Nhật ký hệ thống (Audit Log)";
+    string search = ViewBag.Search as string ?? "";
+    string actionName = ViewBag.ActionName as string ?? "";
+    string entityName = ViewBag.EntityName as string ?? "";
+    string fromDate = ViewBag.FromDate as string ?? "";
+    string toDate = ViewBag.ToDate as string ?? "";
+    int currentPage = ViewBag.Page ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    int totalCount = ViewBag.TotalCount ?? 0;
+    var actionsList = ViewBag.Actions as List<string> ?? new List<string>();
+    var entityNamesList = ViewBag.EntityNames as List<string> ?? new List<string>();
 }
 
 <div class="container-fluid px-4 py-4">
-    <h2 class="fw-bold text-dark mb-4">Audit Log - Lịch sử thao tác hệ thống</h2>
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">
+                <i class="bi bi-journal-text text-primary me-2"></i>Nhật ký hệ thống (Audit Log)
+            </h2>
+            <p class="text-muted mb-0">Theo dõi toàn bộ lịch sử thao tác, thay đổi dữ liệu và người thực hiện</p>
+        </div>
+        <div>
+            <span class="badge bg-primary fs-6 px-3 py-2 rounded-pill shadow-sm">
+                <i class="bi bi-database me-1"></i>Tổng số: @totalCount bản ghi
+            </span>
+        </div>
+    </div>
 
-    <div class="card border-0 shadow-sm" style="border-radius: 15px; overflow: hidden;">
+    <!-- Filter Form -->
+    <div class="card border-0 shadow-sm mb-4 rounded-4">
+        <div class="card-body p-4">
+            <form method="get" asp-action="Index" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold text-secondary">Từ khóa tìm kiếm</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" name="search" class="form-control bg-light border-start-0" placeholder="Tên, mô tả, ID..." value="@search" />
+                    </div>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold text-secondary">Hành động</label>
+                    <select name="actionName" class="form-select bg-light">
+                        <option value="">-- Tất cả --</option>
+                        @foreach (var act in actionsList)
+                        {
+                            <option value="@act" selected="@(actionName == act ? "selected" : null)">@act</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold text-secondary">Đối tượng (Entity)</label>
+                    <select name="entityName" class="form-select bg-light">
+                        <option value="">-- Tất cả --</option>
+                        @foreach (var ent in entityNamesList)
+                        {
+                            <option value="@ent" selected="@(entityName == ent ? "selected" : null)">@ent</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold text-secondary">Từ ngày</label>
+                    <input type="date" name="fromDate" class="form-control bg-light" value="@fromDate" />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold text-secondary">Đến ngày</label>
+                    <input type="date" name="toDate" class="form-control bg-light" value="@toDate" />
+                </div>
+
+                <div class="col-md-1 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-primary w-100 fw-semibold rounded-3" title="Lọc dữ liệu">
+                        <i class="bi bi-funnel-fill"></i> Lọc
+                    </button>
+                </div>
+            </form>
+            @if (!string.IsNullOrEmpty(search) || !string.IsNullOrEmpty(actionName) || !string.IsNullOrEmpty(entityName) || !string.IsNullOrEmpty(fromDate) || !string.IsNullOrEmpty(toDate))
+            {
+                <div class="mt-3 pt-2 border-top d-flex align-items-center justify-content-between">
+                    <span class="text-muted small"><i class="bi bi-info-circle me-1"></i>Đang hiển thị kết quả theo bộ lọc</span>
+                    <a asp-action="Index" class="btn btn-link text-danger p-0 small text-decoration-none fw-semibold">
+                        <i class="bi bi-x-circle me-1"></i>Xóa bộ lọc
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Data Table Card -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0 text-center">
-                <thead class="table-dark">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-dark text-white text-center">
                     <tr>
-                        <th>Thời gian</th>
-                        <th>Người thực hiện</th>
-                        <th>Hành động</th>
-                        <th>Đối tượng</th>
-                        <th>ID</th>
-                        <th>Mô tả</th>
+                        <th class="py-3 px-3">#ID</th>
+                        <th class="py-3">Thời gian</th>
+                        <th class="py-3 text-start">Người thực hiện</th>
+                        <th class="py-3">Hành động</th>
+                        <th class="py-3 text-start">Đối tượng</th>
+                        <th class="py-3 text-start">Mô tả</th>
+                        <th class="py-3">Chi tiết</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="text-center">
                     @if (Model == null || !Model.Any())
                     {
                         <tr>
-                            <td colspan="6" class="py-5 text-muted">Chưa có nhật ký nào</td>
+                            <td colspan="7" class="py-5 text-muted">
+                                <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
+                                Không tìm thấy nhật ký thao tác nào phù hợp
+                            </td>
                         </tr>
                     }
                     else
                     {
                         foreach (var item in Model)
                         {
+                            string badgeClass = item.Action switch
+                            {
+                                "CREATE" => "bg-success-subtle text-success border border-success-subtle",
+                                "UPDATE" => "bg-primary-subtle text-primary border border-primary-subtle",
+                                "DELETE" => "bg-danger-subtle text-danger border border-danger-subtle",
+                                "ConfirmOrder" => "bg-info-subtle text-info border border-info-subtle",
+                                _ => "bg-secondary-subtle text-secondary border border-secondary-subtle"
+                            };
+
+                            string actionIcon = item.Action switch
+                            {
+                                "CREATE" => "bi-plus-circle-fill",
+                                "UPDATE" => "bi-pencil-square",
+                                "DELETE" => "bi-trash-fill",
+                                _ => "bi-activity"
+                            };
+
                             <tr>
-                                <td>@item.CreatedDate.ToString("dd/MM/yyyy HH:mm")</td>
-                                <td>@item.PerformedByName</td>
-                                <td>
-                                    <span class="badge bg-primary-subtle text-primary">@item.Action</span>
+                                <td class="fw-bold text-secondary">#@item.AuditLogId</td>
+                                <td class="text-nowrap text-muted small">
+                                    <i class="bi bi-clock me-1"></i>@item.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss")
                                 </td>
-                                <td>@item.EntityName</td>
-                                <td>#@item.EntityId</td>
-                                <td class="text-start ps-4">@item.Description</td>
+                                <td class="text-start">
+                                    <div class="fw-semibold text-dark">@(string.IsNullOrEmpty(item.PerformedByName) ? "Hệ thống" : item.PerformedByName)</div>
+                                    @if (!string.IsNullOrEmpty(item.PerformedByRole))
+                                    {
+                                        <span class="badge bg-light text-dark border small fw-normal">@item.PerformedByRole</span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="badge @badgeClass px-2 py-1 fs-7 fw-semibold">
+                                        <i class="bi @actionIcon me-1"></i>@item.Action
+                                    </span>
+                                </td>
+                                <td class="text-start">
+                                    <span class="fw-semibold text-dark">@item.EntityName</span>
+                                    @if (item.EntityId.HasValue && item.EntityId > 0)
+                                    {
+                                        <span class="badge bg-dark-subtle text-dark ms-1">#@item.EntityId</span>
+                                    }
+                                </td>
+                                <td class="text-start text-truncate max-w-200" title="@item.Description">
+                                    @(item.Description ?? "N/A")
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-outline-primary rounded-circle"
+                                            title="Xem chi tiết thay đổi"
+                                            onclick="showAuditDetail(this)"
+                                            data-id="@item.AuditLogId"
+                                            data-action="@item.Action"
+                                            data-entity="@item.EntityName"
+                                            data-entityid="@item.EntityId"
+                                            data-user="@item.PerformedByName"
+                                            data-role="@item.PerformedByRole"
+                                            data-time="@item.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss")"
+                                            data-ip="@item.IpAddress"
+                                            data-path="@item.RequestPath"
+                                            data-desc="@item.Description"
+                                            data-oldvalues="@item.OldValues"
+                                            data-newvalues="@item.NewValues">
+                                        <i class="bi bi-eye-fill"></i>
+                                    </button>
+                                </td>
                             </tr>
                         }
                     }
                 </tbody>
             </table>
         </div>
+
+        <!-- Pagination -->
+        @if (totalPages > 1)
+        {
+            <div class="card-footer bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center">
+                <span class="text-muted small">Trang <strong>@currentPage</strong> / <strong>@totalPages</strong></span>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@(currentPage - 1)"
+                               asp-route-search="@search"
+                               asp-route-actionName="@actionName"
+                               asp-route-entityName="@entityName"
+                               asp-route-fromDate="@fromDate"
+                               asp-route-toDate="@toDate">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        @for (int i = 1; i <= totalPages; i++)
+                        {
+                            if (i == 1 || i == totalPages || (i >= currentPage - 2 && i <= currentPage + 2))
+                            {
+                                <li class="page-item @(i == currentPage ? "active" : "")">
+                                    <a class="page-link" asp-action="Index"
+                                       asp-route-page="@i"
+                                       asp-route-search="@search"
+                                       asp-route-actionName="@actionName"
+                                       asp-route-entityName="@entityName"
+                                       asp-route-fromDate="@fromDate"
+                                       asp-route-toDate="@toDate">@i</a>
+                                </li>
+                            }
+                            else if (i == currentPage - 3 || i == currentPage + 3)
+                            {
+                                <li class="page-item disabled"><span class="page-link">...</span></li>
+                            }
+                        }
+                        <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@(currentPage + 1)"
+                               asp-route-search="@search"
+                               asp-route-actionName="@actionName"
+                               asp-route-entityName="@entityName"
+                               asp-route-fromDate="@fromDate"
+                               asp-route-toDate="@toDate">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
     </div>
 </div>
+
+<!-- Modal Chi tiết Audit Log -->
+<div class="modal fade" id="auditDetailModal" tabindex="-1" aria-labelledby="auditDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-dark text-white rounded-top-4">
+                <h5 class="modal-title fw-bold" id="auditDetailModalLabel">
+                    <i class="bi bi-info-circle text-primary me-2"></i>Chi tiết bản ghi Nhật ký #<span id="modalLogId"></span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <!-- Overview Row -->
+                <div class="row g-3 mb-4 bg-light p-3 rounded-3 border">
+                    <div class="col-md-6">
+                        <small class="text-muted d-block">Hành động & Đối tượng</small>
+                        <span id="modalAction" class="badge bg-primary"></span>
+                        <strong id="modalEntity" class="text-dark ms-2"></strong>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted d-block">Thời gian thực hiện</small>
+                        <span id="modalTime" class="fw-semibold text-dark"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted d-block">Người thực hiện</small>
+                        <span id="modalUser" class="fw-semibold text-dark"></span>
+                        <span id="modalRole" class="badge bg-secondary ms-1"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted d-block">Địa chỉ IP & Request Path</small>
+                        <span id="modalIpPath" class="text-dark font-monospace small"></span>
+                    </div>
+                    <div class="col-12">
+                        <small class="text-muted d-block">Mô tả</small>
+                        <div id="modalDesc" class="fw-semibold text-dark"></div>
+                    </div>
+                </div>
+
+                <!-- Values Diff Section -->
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="card h-100 border-danger-subtle bg-danger-subtle bg-opacity-10">
+                            <div class="card-header bg-danger text-white fw-bold py-2">
+                                <i class="bi bi-dash-circle me-1"></i>Giá trị cũ (Old Values)
+                            </div>
+                            <div class="card-body p-2">
+                                <pre id="modalOldValues" class="mb-0 p-2 font-monospace small bg-white rounded border overflow-auto" style="max-height: 250px;"></pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100 border-success-subtle bg-success-subtle bg-opacity-10">
+                            <div class="card-header bg-success text-white fw-bold py-2">
+                                <i class="bi bi-plus-circle me-1"></i>Giá trị mới (New Values)
+                            </div>
+                            <div class="card-body p-2">
+                                <pre id="modalNewValues" class="mb-0 p-2 font-monospace small bg-white rounded border overflow-auto" style="max-height: 250px;"></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-light rounded-bottom-4">
+                <button type="button" class="btn btn-secondary px-4 rounded-3" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showAuditDetail(btn) {
+        const dataset = btn.dataset;
+
+        document.getElementById('modalLogId').textContent = dataset.id;
+        document.getElementById('modalAction').textContent = dataset.action;
+        document.getElementById('modalEntity').textContent = dataset.entity + (dataset.entityid ? ' #' + dataset.entityid : '');
+        document.getElementById('modalTime').textContent = dataset.time;
+        document.getElementById('modalUser').textContent = dataset.user || 'Hệ thống';
+        document.getElementById('modalRole').textContent = dataset.role || 'System';
+        document.getElementById('modalIpPath').textContent = (dataset.ip || 'N/A') + ' (' + (dataset.path || 'N/A') + ')';
+        document.getElementById('modalDesc').textContent = dataset.desc || 'N/A';
+
+        formatJsonDisplay(dataset.oldvalues, 'modalOldValues');
+        formatJsonDisplay(dataset.newvalues, 'modalNewValues');
+
+        const modal = new bootstrap.Modal(document.getElementById('auditDetailModal'));
+        modal.show();
+    }
+
+    function formatJsonDisplay(rawJson, elementId) {
+        const el = document.getElementById(elementId);
+        if (!rawJson || rawJson === 'null' || rawJson.trim() === '') {
+            el.textContent = 'Không có dữ liệu';
+            el.classList.add('text-muted');
+            return;
+        }
+
+        el.classList.remove('text-muted');
+        try {
+            const parsed = JSON.parse(rawJson);
+            el.textContent = JSON.stringify(parsed, null, 2);
+        } catch (e) {
+            el.textContent = rawJson;
+        }
+    }
+</script>

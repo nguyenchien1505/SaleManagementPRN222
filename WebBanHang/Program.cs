@@ -1,23 +1,35 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.EntityFrameworkCore;
 using WebBanHang.BLL.Services.Implementations;
 using WebBanHang.BLL.Services.Interfaces;
+using WebBanHang.DAL.Abstractions;
 using WebBanHang.DAL.Context;
+using WebBanHang.DAL.Interceptors;
 using WebBanHang.DAL.Repositories.Implementations;
 using WebBanHang.DAL.Repositories.Interfaces;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
+using WebBanHang.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddMemoryCache();
-builder.Services.AddDbContext<WebBanHangContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("MyCnn")));
+
+builder.Services.AddScoped<ICurrentUserContext, CurrentUserContext>();
+builder.Services.AddScoped<AuditSaveChangesInterceptor>();
+builder.Services.AddDbContext<WebBanHangContext>((serviceProvider, options)
+    =>
+    {
+        var connectionString = builder.Configuration.GetConnectionString("MyCnn");
+        options.UseSqlServer(connectionString);
+        options.AddInterceptors(serviceProvider.GetRequiredService<AuditSaveChangesInterceptor>());
+    });
 //Dky session
 builder.Services.AddSession();
 //Dky service
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();

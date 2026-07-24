@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -29,6 +29,12 @@ namespace WebBanHang.Areas.Customer.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Checkout(int productId, int quantity = 1)
         {
+            if (HttpContext.Session.GetString("Role") == "Admin")
+            {
+                TempData["Error"] = "Tài khoản Quản trị viên (Admin) chỉ dùng để quản lý hệ thống, không thể đặt hàng mua sắm.";
+                return RedirectToAction("Index", "Home", new { area = "Customer" });
+            }
+
             int? userId = HttpContext.Session.GetInt32("UserId");
             if (!userId.HasValue)
                 return RedirectToAction("Login", "Account", new { area = "" });

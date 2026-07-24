@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WebBanHang.BLL.DTOs;
 using WebBanHang.BLL.Services.Interfaces;
@@ -45,6 +45,41 @@ namespace WebBanHang.Areas.Admin.Controllers
             };
 
             return View(viewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetOrderDetail(int id, [FromServices] IOrderService orderService)
+        {
+            var order = await orderService.GetOrderDetailsAsync(id);
+            if (order == null)
+                return NotFound(new { message = "Không tìm thấy thông tin đơn hàng." });
+
+            var result = new
+            {
+                orderId = order.OrderId,
+                orderCode = order.OrderCode,
+                orderDate = order.OrderDate?.ToString("dd/MM/yyyy HH:mm:ss"),
+                status = order.Status,
+                totalAmount = order.TotalAmount ?? 0m,
+                subTotal = order.SubTotal ?? 0m,
+                discountAmount = order.DiscountAmount ?? 0m,
+                shippingAddress = order.ShippingAddress ?? "N/A",
+                shippingPhone = order.ShippingPhone ?? "N/A",
+                customerName = order.Customer?.FullName ?? "Unknown",
+                customerEmail = order.Customer?.Email ?? "N/A",
+                customerPhone = order.Customer?.Phone ?? "N/A",
+                items = order.OrderDetails.Select(od => new
+                {
+                    productName = od.Product?.Name ?? "Sản phẩm",
+                    productCode = od.Product?.Code ?? "",
+                    quantity = od.Quantity,
+                    unitPrice = od.UnitPrice,
+                    total = od.Total,
+                    imageUrl = od.Product?.ProductImages?.FirstOrDefault()?.ImageUrl ?? "/images/no-image.png"
+                })
+            };
+
+            return Json(result);
         }
 
         [HttpGet]
