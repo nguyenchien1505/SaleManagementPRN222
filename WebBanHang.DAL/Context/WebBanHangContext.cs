@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using WebBanHang.DAL.Entities;
@@ -40,12 +40,8 @@ public partial class WebBanHangContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
-<<<<<<< HEAD
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Data Source=DESKTOP-18IRBA5;Initial Catalog=WebBanHang;Trusted_Connection=True;Encrypt=False;TrustServerCertificate=True");
-=======
->>>>>>> 71db194 (Update UI, VNPAY, EXCEL)
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -275,8 +271,6 @@ public partial class WebBanHangContext : DbContext
         {
             entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4C89771F98");
 
-            entity.HasIndex(e => e.Username, "UQ__Users__536C85E4FF1C900E").IsUnique();
-
             entity.HasIndex(e => e.Email, "UQ__Users__A9D10534CCD89E06").IsUnique();
 
             entity.Property(e => e.Address).HasMaxLength(255);
@@ -292,7 +286,6 @@ public partial class WebBanHangContext : DbContext
             entity.Property(e => e.ResetPasswordToken).HasMaxLength(200);
             entity.Property(e => e.ResetPasswordTokenExpiry).HasColumnType("datetime");
             entity.Property(e => e.Role).HasMaxLength(20);
-            entity.Property(e => e.Username).HasMaxLength(50);
         });
 
         OnModelCreatingPartial(modelBuilder);

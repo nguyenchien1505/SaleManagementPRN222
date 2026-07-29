@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using WebBanHang.BLL.DTOs;
@@ -18,7 +18,6 @@ namespace WebBanHang.Controllers
             _service = userService;
         }
         //Login, Logout, Register
-        [HttpGet]
         [HttpGet]
         public IActionResult Login()
         {
@@ -179,7 +178,7 @@ namespace WebBanHang.Controllers
 
             // Luôn hiện thông báo giống nhau dù email có tồn tại hay không,
             // để tránh lộ thông tin email nào đã đăng ký trong hệ thống.
-            TempData["Success"] = "Nếu email tồn tại trong hệ thống, chúng tôi đã gửi link đặt lại mật khẩu. Vui lòng kiểm tra hộp thư.";
+            TempData["Success"] = "Nếu email đã đăng ký và tồn tại trong hệ thống, chúng tôi đã gửi link đặt lại mật khẩu. Vui lòng kiểm tra hộp thư (bao gồm cả thư mục Spam / Thư rác).";
             return RedirectToAction(nameof(Login), new { area = "" });
         }
 

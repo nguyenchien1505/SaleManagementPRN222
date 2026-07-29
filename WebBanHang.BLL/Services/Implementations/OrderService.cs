@@ -175,11 +175,11 @@ namespace WebBanHang.BLL.Services.Implementations
                         processedItems.Add((product, item.quantity));
                     }
 
-                    // 🌟 ĐÃ SỬA: Tính toán tiền giảm giá thực tế từ mã Promotion được gửi lên
+                 
                     decimal discountFromPromo = 0;
                     if (!string.IsNullOrWhiteSpace(promoCode))
                     {
-                        // Gọi qua PromotionService để kiểm tra tính hợp lệ và lấy số tiền giảm
+             
                         var promoResult = await _promotionService.ValidatePromotionAsync(promoCode, totalOrderAmount);
                         if (promoResult.Success)
                         {
@@ -187,7 +187,7 @@ namespace WebBanHang.BLL.Services.Implementations
                         }
                     }
 
-                    // Tính số tiền cuối cùng khách cần trả sau khi trừ khuyến mãi
+                 
                     decimal finalPayableAmount = totalOrderAmount - discountFromPromo;
                     if (finalPayableAmount < 0) finalPayableAmount = 0;
 
@@ -199,9 +199,9 @@ namespace WebBanHang.BLL.Services.Implementations
                         CustomerId = customer.UserId,
                         CreatedBy = safeCreatedBy,
                         OrderDate = DateTime.Now,
-                        SubTotal = totalOrderAmount,      // Giá gốc trước giảm
-                        DiscountAmount = discountFromPromo, // Lưu vết số tiền giảm giá
-                        TotalAmount = finalPayableAmount,   // Giá thực tế phải thu
+                        SubTotal = totalOrderAmount,      
+                        DiscountAmount = discountFromPromo, 
+                        TotalAmount = finalPayableAmount,  
                         Status = "Draft",
 
                         ShippingAddress = customer.Address,

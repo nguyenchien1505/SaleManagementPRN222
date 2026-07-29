@@ -1,21 +1,8 @@
-<<<<<<< HEAD
-using Microsoft.EntityFrameworkCore;
-=======
-﻿using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
->>>>>>> 71db194 (Update UI, VNPAY, EXCEL)
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WebBanHang.BLL.DTOs;
 using WebBanHang.BLL.Services.Interfaces;
 using WebBanHang.DAL.Entities;
-using WebBanHang.DAL.Repositories.Implementations;
 using WebBanHang.DAL.Repositories.Interfaces;
-using OfficeOpenXml;
-using System.IO;
 namespace WebBanHang.BLL.Services.Implementations
 {
     public class ProductService : IProductService

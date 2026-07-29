@@ -68,8 +68,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddCookie(options =>
 {
-    // Cookie này chỉ dùng tạm để hoàn tất bắt tay OAuth với Google,
-    // không thay thế Session hiện tại của app.
+ 
     options.Cookie.Name = "GoogleExternalLogin";
 })
 .AddGoogle(options =>

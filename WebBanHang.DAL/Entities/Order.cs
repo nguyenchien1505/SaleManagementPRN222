@@ -31,10 +31,6 @@ public partial class Order
 
     public string? PaymentStatus { get; set; }
 
-    public string? PaymentMethod { get; set; }
-
-    public string? PaymentStatus { get; set; }
-
     public virtual User CreatedByNavigation { get; set; } = null!;
 
     public virtual User Customer { get; set; } = null!;

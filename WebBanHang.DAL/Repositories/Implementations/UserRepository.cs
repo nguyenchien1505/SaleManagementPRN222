@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,7 +42,9 @@ namespace WebBanHang.DAL.Repositories.Implementations
 
         public async Task<User> GetByEmailAsync(string email)
         {
-            return await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
+            if (string.IsNullOrWhiteSpace(email)) return null;
+            var trimmed = email.Trim().ToLower();
+            return await _context.Users.FirstOrDefaultAsync(x => x.Email.ToLower() == trimmed);
         }
 
         public async Task<User> GetByIdAsync(int id)
@@ -65,7 +67,9 @@ namespace WebBanHang.DAL.Repositories.Implementations
 
         public async Task<User> GetByEmailIncludeDeleteAsync(string email)
         {
-            return await _context.Users.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Email == email);
+            if (string.IsNullOrWhiteSpace(email)) return null;
+            var trimmed = email.Trim().ToLower();
+            return await _context.Users.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Email.ToLower() == trimmed);
         }
 
         public async Task<User> GetByIdIncludeDeleteAsync(int id)
