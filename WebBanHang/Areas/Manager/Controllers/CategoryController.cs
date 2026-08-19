@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using WebBanHang.BLL.DTOs;
@@ -7,10 +7,10 @@ using WebBanHang.BLL.Services.Interfaces;
 using WebBanHang.Filters;
 using WebBanHang.ViewModels;
 
-namespace WebBanHang.Areas.Admin.Controllers
+namespace WebBanHang.Areas.Manager.Controllers
 {
-    [Area("Admin")]
-    [RoleAuthorize("Admin")]
+    [Area("Manager")]
+    [RoleAuthorize("Manager")]
     public class CategoryController : Controller
     {
         private readonly ICategoryService _cateService;

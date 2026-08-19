@@ -109,11 +109,11 @@
 
                                     <li><hr class="dropdown-divider"></li>
 
-                                    @* MENU ĐIỀU HƯỚNG DÀNH CHO ADMIN *@
-                                    @if (Context.Session.GetString("Role") == "Admin")
+                                    @* MENU ĐIỀU HƯỚNG DÀNH CHO Manager *@
+                                    @if (Context.Session.GetString("Role") == "Manager")
                                     {
                                         <li>
-                                            <a class="dropdown-item text-danger fw-bold" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                                            <a class="dropdown-item text-danger fw-bold" asp-area="Manager" asp-controller="Dashboard" asp-action="Index">
                                                 <i class="bi bi-speedometer2 me-2"></i>
                                                 Trang Quản trị (Admin)
                                             </a>
@@ -121,20 +121,20 @@
                                         <li><hr class="dropdown-divider"></li>
                                     }
 
-                                    @* MENU ĐIỀU HƯỚNG KHO DÀNH CHO ADMIN HOẶC SALES *@
-                                    @if (Context.Session.GetString("Role") == "Admin" || Context.Session.GetString("Role") == "Sales")
+                                    @* MENU ĐIỀU HƯỚNG KHO DÀNH CHO Manager HOẶC SALES *@
+                                    @if (Context.Session.GetString("Role") == "Manager" || Context.Session.GetString("Role") == "Sales")
                                     {
                                         <li>
-                                            <a class="dropdown-item text-primary fw-bold" asp-area="Admin" asp-controller="Inventory" asp-action="Stock">
+                                            <a class="dropdown-item text-primary fw-bold" asp-area="Manager" asp-controller="Inventory" asp-action="Stock">
                                                 <i class="bi bi-boxes me-2"></i>
                                                 Xem Tồn Kho (Stock)
                                             </a>
                                         </li>
 
-                                        @if (Context.Session.GetString("Role") == "Admin")
+                                        @if (Context.Session.GetString("Role") == "Manager")
                                         {
                                             <li>
-                                                <a class="dropdown-item text-success fw-bold" asp-area="Admin" asp-controller="Inventory" asp-action="Inbound">
+                                                <a class="dropdown-item text-success fw-bold" asp-area="Manager" asp-controller="Inventory" asp-action="Inbound">
                                                     <i class="bi bi-download me-2"></i>
                                                     Nhập Kho (Inbound)
                                                     Chin

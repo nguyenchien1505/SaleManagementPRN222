@@ -1,4 +1,4 @@
-﻿@model WebBanHang.ViewModels.DeleteProductVM
+@model WebBanHang.ViewModels.DeleteProductVM
 
 @{
     ViewData["Title"] = "Delete Product";
@@ -7,7 +7,7 @@
 <div class="container-fluid px-4">
     <h1 class="mt-4">Delete Product</h1>
     <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Product" asp-action="Index">Products</a></li>
+        <li class="breadcrumb-item"><a asp-area="Manager" asp-controller="Product" asp-action="Index">Products</a></li>
         <li class="breadcrumb-item active">Delete</li>
     </ol>
 
@@ -17,7 +17,7 @@
     </div>
 
     <div class="card mb-4">
-        <p>ProductId hiện tại: @Model.ProductId</p>
+        <p>ProductId hi?n t?i: @Model.ProductId</p>
         <div class="card-header">
             Product Details 
         </div>

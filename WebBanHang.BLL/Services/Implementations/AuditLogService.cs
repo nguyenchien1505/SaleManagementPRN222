@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebBanHang.BLL.Services.Interfaces;
-using WebBanHang.DAL.Abstractions;
 using WebBanHang.DAL.Context;
 using WebBanHang.DAL.Entities;
 
@@ -13,12 +12,10 @@ namespace WebBanHang.BLL.Services.Implementations
     public class AuditLogService : IAuditLogService
     {
         private readonly WebBanHangContext _context;
-        private readonly ICurrentUserContext _currentUser;
 
-        public AuditLogService(WebBanHangContext context, ICurrentUserContext currentUser) 
+        public AuditLogService(WebBanHangContext context)
         {
             _context = context;
-            _currentUser = currentUser;
         }
 
         public async Task LogAsync(string entityName, int entityId, string action, int performedBy, string? performedByName, string? description = null)
@@ -30,10 +27,7 @@ namespace WebBanHang.BLL.Services.Implementations
                 Action = action,
                 PerformedBy = performedBy,
                 PerformedByName = performedByName,
-                PerformedByRole = _currentUser.Role,
                 Description = description,
-                IpAddress = _currentUser.IpAddress,
-                RequestPath = _currentUser.RequestPath,
                 CreatedDate = DateTime.Now
             });
             await _context.SaveChangesAsync();
@@ -62,7 +56,7 @@ namespace WebBanHang.BLL.Services.Implementations
                     (x.Description != null && x.Description.Contains(search)) ||
                     (x.EntityName != null && x.EntityName.Contains(search)) ||
                     (x.Action != null && x.Action.Contains(search)) ||
-                    (x.EntityId != null && x.EntityId.ToString()!.Contains(search)));
+                    x.EntityId.ToString().Contains(search));
             }
 
             if (!string.IsNullOrWhiteSpace(actionName))

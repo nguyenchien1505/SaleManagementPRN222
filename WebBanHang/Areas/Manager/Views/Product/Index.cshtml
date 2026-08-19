@@ -172,12 +172,12 @@
                                             @if (item.Status == "Deleted")
                                             {
                                                 <li>
-                                                    <a class="dropdown-item py-2 text-success"  asp-area="Admin"   asp-controller="Product" asp-action="Restore" method="get" asp-route-id="@item.ProductId">
+                                                    <a class="dropdown-item py-2 text-success"  asp-area="Manager"   asp-controller="Product" asp-action="Restore" method="get" asp-route-id="@item.ProductId">
                                                         <i class="fas fa-undo-alt me-2"></i>Khôi phục
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a class="dropdown-item py-2 text-danger fw-bold" asp-area="Admin" asp-controller="Product" asp-action="HardDelete" asp-route-id="@item.ProductId">
+                                                    <a class="dropdown-item py-2 text-danger fw-bold" asp-area="Manager" asp-controller="Product" asp-action="HardDelete" asp-route-id="@item.ProductId">
                                                         <i class="fas fa-trash-alt me-2"></i>Xóa vĩnh viễn
                                                     </a>
                                                 </li>
@@ -188,7 +188,7 @@
                                                 <li><a class="dropdown-item py-2" asp-action="Detail" asp-route-id="@item.ProductId"><i class="fas fa-info-circle me-2 text-info"></i>Chi tiết</a></li>
                                                 <li><hr class="dropdown-divider"></li>
                                                 <li>
-                                                    <a class="dropdown-item py-2 text-danger" asp-area="Admin" asp-controller="Product" asp-action="Delete" asp-route-id="@item.ProductId">
+                                                    <a class="dropdown-item py-2 text-danger" asp-area="Manager" asp-controller="Product" asp-action="Delete" asp-route-id="@item.ProductId">
                                                         <i class="fas fa-trash me-2"></i>Xóa
                                                     </a>
                                                 </li>

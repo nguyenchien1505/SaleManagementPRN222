@@ -55,14 +55,7 @@ public partial class WebBanHangContext : DbContext
                 .HasColumnType("datetime");
             entity.Property(e => e.Description).HasMaxLength(500);
             entity.Property(e => e.EntityName).HasMaxLength(50);
-            entity.Property(e => e.IpAddress)
-                .HasMaxLength(45)
-                .IsUnicode(false);
             entity.Property(e => e.PerformedByName).HasMaxLength(100);
-            entity.Property(e => e.PerformedByRole)
-                .HasMaxLength(20)
-                .IsUnicode(false);
-            entity.Property(e => e.RequestPath).HasMaxLength(300);
         });
 
         modelBuilder.Entity<Cart>(entity =>

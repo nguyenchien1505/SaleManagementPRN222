@@ -9,7 +9,7 @@
 
     <ol class="breadcrumb mb-4">
         <li class="breadcrumb-item">
-            <a asp-area="Admin"
+            <a asp-area="Manager"
                asp-controller="Product"
                asp-action="Index">
                 Sản phẩm
@@ -86,7 +86,7 @@
                 </dd>
             </dl>
 
-            <form asp-area="Admin"
+            <form asp-area="Manager"
                   asp-controller="Product"
                   asp-action="Restore"
                   method="post">
@@ -95,7 +95,7 @@
 
                 <input type="hidden" asp-for="ProductId" />
 
-                <a asp-area="Admin"
+                <a asp-area="Manager"
                    asp-controller="Product"
                    asp-action="Index"
                    class="btn btn-secondary me-2">

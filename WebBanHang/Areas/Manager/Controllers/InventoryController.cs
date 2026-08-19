@@ -6,10 +6,10 @@ using WebBanHang.BLL.Services.Interfaces;
 using WebBanHang.DAL.Repositories.Interfaces;
 using WebBanHang.Filters;
 
-namespace WebBanHang.Areas.Admin.Controllers
+namespace WebBanHang.Areas.Manager.Controllers
 {
-    [Area("Admin")]
-    //[Route("Admin/[controller]")] // Định nghĩa gốc: Admin/Inventory
+    [Area("Manager")]
+    //[Route("Manager/[controller]")] // Định nghĩa gốc: Manager/Inventory
     public class InventoryController : Controller
     {
         private readonly IInventoryService _inventoryService;
@@ -25,10 +25,10 @@ namespace WebBanHang.Areas.Admin.Controllers
         // 1. TRANG LỊCH SỬ KHO (Index)
         // Chấp nhận: /Admin/Inventory hoặc /Admin/Inventory/Index
         // ==========================================
-        [RoleAuthorize("Admin", "Sales")]
+        [RoleAuthorize("Manager", "Sales")]
         [HttpGet]
-        [Route("")]
-        [Route("Index")]
+        [Route("Manager/Inventory")]
+        [Route("Manager/Inventory/Index")]
         public IActionResult Index()
         {
             var history = _inventoryService.GetHistory();
@@ -41,21 +41,21 @@ namespace WebBanHang.Areas.Admin.Controllers
         // -> /Admin/Inventory/Inbound 
         // -> /Admin/Inventory/NhapKho
         // ==========================================
-        [RoleAuthorize("Admin")]
+        [RoleAuthorize("Manager")]
         [HttpGet]
-        [Route("Inbound")]
-        [Route("NhapKho")]
+        [Route("Manager/Inventory/Inbound")]
+        [Route("Manager/Inventory/NhapKho")]
         public IActionResult Inbound()
         {
             ViewBag.Products = _productRepository.GetAll();
             return View(); // Khớp hoàn hảo với file Inbound.cshtml của bạn
         }
 
-        [RoleAuthorize("Admin")]
+        [RoleAuthorize("Manager")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Route("Inbound")]
-        [Route("NhapKho")]
+        [Route("Manager/Inventory/Inbound")]
+        [Route("Manager/Inventory/NhapKho")]
         public IActionResult Inbound(int productId, int quantity, string note)
         {
             var userId = HttpContext.Session.GetInt32("UserId") ?? 0;
@@ -87,10 +87,10 @@ namespace WebBanHang.Areas.Admin.Controllers
         // -> /Admin/Inventory/Stock 
         // -> /Admin/Inventory/TonKho
         // ==========================================
-        [RoleAuthorize("Admin", "Sales")]
+        [RoleAuthorize("Manager", "Sales")]
         [HttpGet]
-        [Route("Stock")]
-        [Route("TonKho")]
+        [Route("Manager/Inventory/Stock")]
+        [Route("Manager/Inventory/TonKho")]
         public IActionResult Stock()
         {
             var products = _productRepository.GetAll();
@@ -103,10 +103,10 @@ namespace WebBanHang.Areas.Admin.Controllers
             return View(products); // Khớp hoàn hảo với file Stock.cshtml của bạn
         }
 
-        [RoleAuthorize("Admin")]
+        [RoleAuthorize("Manager")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Route("ImportInboundExcel")]
+        [Route("Manager/Inventory/ImportInboundExcel")]
         public async Task<IActionResult> ImportInboundExcel(IFormFile file)
         {
             if (file == null || file.Length == 0)

@@ -144,10 +144,6 @@
                                 </td>
                                 <td class="text-start">
                                     <div class="fw-semibold text-dark">@(string.IsNullOrEmpty(item.PerformedByName) ? "Hệ thống" : item.PerformedByName)</div>
-                                    @if (!string.IsNullOrEmpty(item.PerformedByRole))
-                                    {
-                                        <span class="badge bg-light text-dark border small fw-normal">@item.PerformedByRole</span>
-                                    }
                                 </td>
                                 <td>
                                     <span class="badge @badgeClass px-2 py-1 fs-7 fw-semibold">
@@ -156,7 +152,7 @@
                                 </td>
                                 <td class="text-start">
                                     <span class="fw-semibold text-dark">@item.EntityName</span>
-                                    @if (item.EntityId.HasValue && item.EntityId > 0)
+                                    @if (item.EntityId > 0)
                                     {
                                         <span class="badge bg-dark-subtle text-dark ms-1">#@item.EntityId</span>
                                     }
@@ -173,13 +169,8 @@
                                             data-entity="@item.EntityName"
                                             data-entityid="@item.EntityId"
                                             data-user="@item.PerformedByName"
-                                            data-role="@item.PerformedByRole"
                                             data-time="@item.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss")"
-                                            data-ip="@item.IpAddress"
-                                            data-path="@item.RequestPath"
-                                            data-desc="@item.Description"
-                                            data-oldvalues="@item.OldValues"
-                                            data-newvalues="@item.NewValues">
+                                            data-desc="@item.Description">
                                         <i class="bi bi-eye-fill"></i>
                                     </button>
                                 </td>
@@ -322,12 +313,12 @@
         document.getElementById('modalEntity').textContent = dataset.entity + (dataset.entityid ? ' #' + dataset.entityid : '');
         document.getElementById('modalTime').textContent = dataset.time;
         document.getElementById('modalUser').textContent = dataset.user || 'Hệ thống';
-        document.getElementById('modalRole').textContent = dataset.role || 'System';
-        document.getElementById('modalIpPath').textContent = (dataset.ip || 'N/A') + ' (' + (dataset.path || 'N/A') + ')';
+        document.getElementById('modalRole').textContent = 'N/A';
+        document.getElementById('modalIpPath').textContent = 'N/A';
         document.getElementById('modalDesc').textContent = dataset.desc || 'N/A';
 
-        formatJsonDisplay(dataset.oldvalues, 'modalOldValues');
-        formatJsonDisplay(dataset.newvalues, 'modalNewValues');
+        document.getElementById('modalOldValues').textContent = 'Không có dữ liệu';
+        document.getElementById('modalNewValues').textContent = 'Không có dữ liệu';
 
         const modal = new bootstrap.Modal(document.getElementById('auditDetailModal'));
         modal.show();

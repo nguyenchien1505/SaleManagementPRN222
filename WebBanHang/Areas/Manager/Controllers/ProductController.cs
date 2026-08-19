@@ -10,10 +10,10 @@ using WebBanHang.Filters;
 using WebBanHang.ViewModels;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace WebBanHang.Areas.Admin.Controllers
+namespace WebBanHang.Areas.Manager.Controllers
 {
-    [Area("Admin")]
-    [RoleAuthorize("Admin")]
+    [Area("Manager")]
+    [RoleAuthorize("Manager")]
     public class ProductController : Controller
     {
         private readonly IProductService _service;

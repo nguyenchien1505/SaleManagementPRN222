@@ -1,0 +1,152 @@
+﻿@model WebBanHang.Areas.Sale.Models.PaginatedList<WebBanHang.DAL.Entities.Order>
+
+@{
+    ViewData["Title"] = "Quản lý đơn hàng";
+    Layout = "_AdminLayout";
+    // 🌟 BỔ SUNG: Thêm "Shipping" vào danh sách trạng thái lọc
+    var statuses = new List<string> { "Draft", "Confirmed", "Shipping", "Completed", "Cancelled" };
+}
+
+<div class="card border-0 shadow-sm" style="border-radius: 12px;">
+    <div class="card-header bg-white border-0 py-3">
+        <h5 class="fw-bold mb-0">Danh sách đơn hàng</h5>
+    </div>
+    <div class="card-body">
+
+        <form asp-action="Index" method="get" class="mb-4">
+            <div class="row g-2">
+                <div class="col-md-3">
+                    <select name="statusFilter" class="form-select" onchange="this.form.submit()">
+                        <option value="">Tất cả trạng thái</option>
+                        @foreach (var s in statuses)
+                        {
+                            var textVn = s switch
+                            {
+                                "Draft" => "Chờ xác nhận",
+                                "Confirmed" => "Đã xác nhận",
+                                "Shipping" => "Đang giao hàng", // 🌟 Thêm nhãn tiếng Việt
+                                "Completed" => "Hoàn thành",
+                                "Cancelled" => "Đã hủy",
+                                _ => s
+                            };
+
+                            if (ViewData["CurrentStatus"] as string == s)
+                            {
+                                <option value="@s" selected>@textVn</option>
+                            }
+                            else
+                            {
+                                <option value="@s">@textVn</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" class="form-control" placeholder="Tìm kiếm theo Mã đơn hoặc Tên khách...">
+                        <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4">Mã đơn</th>
+                        <th>Khách hàng</th>
+                        <th>Ngày đặt</th>
+                        <th>Tổng tiền</th>
+                        <th>Thanh toán</th> <!-- Cột thanh toán mới -->
+                        <th>Trạng thái đơn</th>
+                        <th class="text-end">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr style="cursor: pointer;" onclick="window.location='@Url.Action("Details", new { id = item.OrderId })'">
+                            <td class="ps-4 fw-bold text-primary">#@item.OrderId</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-2 text-primary fw-bold" style="width: 35px; height: 35px; font-size: 0.9rem;">
+                                        @(string.IsNullOrEmpty(item.Customer?.FullName) ? "U" : item.Customer.FullName.Substring(0, 1))
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-medium">@item.Customer?.FullName</span>
+                                        <small class="text-muted">@item.Customer?.Phone</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>@item.OrderDate?.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="fw-bold">@item.TotalAmount?.ToString("N0") ₫</td>
+
+                            <!-- 🌟 HIỂN THỊ THÔNG TIN THANH TOÁN (METHOD & STATUS) -->
+                            <td>
+                                <div class="d-flex flex-column gap-1">
+                                    <span class="badge bg-light text-dark border rounded-pill px-2 py-1 w-fit" style="font-size: 0.7rem;">
+                                        <i class="bi bi-wallet2 me-1"></i> @(string.IsNullOrEmpty(item.PaymentMethod) ? "COD" : item.PaymentMethod)
+                                    </span>
+                                    @if (item.PaymentStatus == "Paid")
+                                    {
+                                        <span class="badge bg-success text-white rounded-pill px-2 py-1 w-fit" style="font-size: 0.7rem;">Đã thanh toán</span>
+                                    }
+                                    else if (item.PaymentStatus == "Failed")
+                                    {
+                                        <span class="badge bg-danger text-white rounded-pill px-2 py-1 w-fit" style="font-size: 0.7rem;">Thanh toán lỗi</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark rounded-pill px-2 py-1 w-fit" style="font-size: 0.7rem;">Chờ thanh toán</span>
+                                    }
+                                </div>
+                            </td>
+
+                            <td>
+                                @{
+                                    var (badgeClass, statusText) = item.Status switch
+                                    {
+                                        "Draft" => ("bg-secondary text-white", "Chờ xác nhận"),
+                                        "Confirmed" => ("bg-info text-dark", "Đã xác nhận"),
+                                        "Shipping" => ("bg-warning text-dark", "Đang giao hàng"), // 🌟 Xử lý màu cho Shipping
+                                        "Completed" => ("bg-success text-white", "Hoàn thành"),
+                                        "Cancelled" => ("bg-danger text-white", "Đã hủy"),
+                                        _ => ("bg-light text-dark", item.Status ?? "Không rõ")
+                                    };
+                                }
+                                <span class="badge @badgeClass bg-opacity-75 rounded-pill">@statusText</span>
+                            </td>
+
+                            <td class="text-end">
+                                <a asp-action="Details" asp-route-id="@item.OrderId" class="btn btn-sm btn-light border"><i class="bi bi-eye"></i> Xem</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <div class="text-muted small">
+                Trang @Model.PageIndex / @Model.TotalPages
+            </div>
+            <div>
+                <a asp-action="Index"
+                   asp-route-pageNumber="@(Model.PageIndex - 1)"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   asp-route-status="@ViewData["CurrentStatus"]"
+                   class="btn btn-sm btn-outline-secondary @(!Model.HasPreviousPage ? "disabled" : "")">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+                <a asp-action="Index"
+                   asp-route-pageNumber="@(Model.PageIndex + 1)"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   asp-route-status="@ViewData["CurrentStatus"]"
+                   class="btn btn-sm btn-outline-secondary @(!Model.HasNextPage ? "disabled" : "")">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

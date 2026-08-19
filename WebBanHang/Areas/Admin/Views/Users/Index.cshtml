@@ -51,6 +51,7 @@
                 <ul class="dropdown-menu">
                     <li><button type="button" class="dropdown-item" onclick="setRole('All')">Tất cả</button></li>
                     <li><button type="button" class="dropdown-item" onclick="setRole('Admin')">Admin</button></li>
+                    <li><button type="button" class="dropdown-item" onclick="setRole('Manager')">Manager</button></li>
                     <li><button type="button" class="dropdown-item" onclick="setRole('Sales')">Sales</button></li>
                     <li><button type="button" class="dropdown-item" onclick="setRole('Customer')">Customer</button></li>
                 </ul>
@@ -98,6 +99,10 @@
                                 @if (item.Role == "Admin")
                                 {
                                     <span class="badge-modern badge-danger-modern">Admin</span>
+                                }
+                                else if (item.Role == "Manager")
+                                {
+                                    <span class="badge-modern badge-warning-modern">Manager</span>
                                 }
                                 else if (item.Role == "Sales")
                                 {

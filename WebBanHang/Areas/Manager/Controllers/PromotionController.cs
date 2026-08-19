@@ -6,10 +6,10 @@ using WebBanHang.BLL.Services.Interfaces;
 using WebBanHang.Filters;
 using WebBanHang.ViewModels;
 
-namespace WebBanHang.Areas.Admin.Controllers
+namespace WebBanHang.Areas.Manager.Controllers
 {
-    [Area("Admin")]
-    [RoleAuthorize("Admin")]
+    [Area("Manager")]
+    [RoleAuthorize("Manager")]
     public class PromotionController : Controller
     {
         private readonly IPromotionService _promotionService;

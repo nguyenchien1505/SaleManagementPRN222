@@ -72,6 +72,7 @@ namespace WebBanHang.BLL.Services.Implementations
 
             User user = new User
             {
+                Username = dto.FullName,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
                 Email = dto.Email,
                 FullName = dto.FullName,
@@ -147,6 +148,7 @@ namespace WebBanHang.BLL.Services.Implementations
 
             var user = new User
             {
+                Username = dto.FullName.Trim(),
                 PasswordHash =
                     BCrypt.Net.BCrypt.HashPassword(dto.Password),
 

@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using WebBanHang.DAL.Abstractions;
@@ -97,9 +96,9 @@ namespace WebBanHang.DAL.Interceptors
 
             foreach (var (auditLog, entry) in entriesToSave)
             {
-                if (auditLog.EntityId == null || auditLog.EntityId == 0)
+                if (auditLog.EntityId == 0)
                 {
-                    auditLog.EntityId = GetPrimaryKey(entry);
+                    auditLog.EntityId = GetPrimaryKey(entry) ?? 0;
                 }
                 logsToAdd.Add(auditLog);
             }
@@ -126,9 +125,9 @@ namespace WebBanHang.DAL.Interceptors
 
             foreach (var (auditLog, entry) in entriesToSave)
             {
-                if (auditLog.EntityId == null || auditLog.EntityId == 0)
+                if (auditLog.EntityId == 0)
                 {
-                    auditLog.EntityId = GetPrimaryKey(entry);
+                    auditLog.EntityId = GetPrimaryKey(entry) ?? 0;
                 }
                 logsToAdd.Add(auditLog);
             }
@@ -152,65 +151,14 @@ namespace WebBanHang.DAL.Interceptors
 
         private AuditLog CreateAuditLog(EntityEntry entry)
         {
-            var oldValues = new Dictionary<string, object?>();
-            var newValues = new Dictionary<string, object?>();
-
-            foreach (var property in entry.Properties)
-            {
-                if (SensitiveProperties.Contains(property.Metadata.Name))
-                {
-                    continue;
-                }
-
-                switch (entry.State)
-                {
-                    case EntityState.Added:
-                        newValues[property.Metadata.Name] = property.CurrentValue;
-                        break;
-
-                    case EntityState.Deleted:
-                        oldValues[property.Metadata.Name] = property.OriginalValue;
-                        break;
-
-                    case EntityState.Modified:
-                        if (!property.IsModified)
-                        {
-                            continue;
-                        }
-
-                        if (Equals(property.OriginalValue, property.CurrentValue))
-                        {
-                            continue;
-                        }
-
-                        oldValues[property.Metadata.Name] = property.OriginalValue;
-                        newValues[property.Metadata.Name] = property.CurrentValue;
-                        break;
-                }
-            }
-
             return new AuditLog
             {
                 Action = GetAction(entry.State),
                 EntityName = entry.Metadata.ClrType.Name,
-                EntityId = GetPrimaryKey(entry),
-
-                PerformedBy = _currentUser.UserId,
+                EntityId = GetPrimaryKey(entry) ?? 0,
+                PerformedBy = _currentUser.UserId ?? 0,
                 PerformedByName = _currentUser.UserName,
-                PerformedByRole = _currentUser.Role,
-
-                OldValues = oldValues.Count == 0
-                    ? null
-                    : JsonSerializer.Serialize(oldValues),
-
-                NewValues = newValues.Count == 0
-                    ? null
-                    : JsonSerializer.Serialize(newValues),
-
                 Description = BuildDescription(entry),
-                IpAddress = _currentUser.IpAddress,
-                RequestPath = _currentUser.RequestPath,
-
                 CreatedDate = DateTime.Now
             };
         }
