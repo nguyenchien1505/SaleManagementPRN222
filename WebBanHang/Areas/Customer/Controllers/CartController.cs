@@ -92,11 +92,6 @@ namespace WebBanHang.Areas.Customer.Controllers
         [HttpPost]
         public async Task<IActionResult> AddToCart(int productId, int quantity = 1)
         {
-            if (HttpContext.Session.GetString("Role") == "Admin")
-            {
-                return Json(new { success = false, message = "Tài khoản Quản trị viên (Admin) chỉ dùng để quản lý hệ thống, không thể đặt hàng mua sắm." });
-            }
-
             if (quantity < 1) quantity = 1;
 
             var product = await _productService.GetProductByIdAsync(productId);
@@ -252,25 +247,28 @@ namespace WebBanHang.Areas.Customer.Controllers
 
             var itemsToCheckout = selectedItems.Select(c => (c.ProductId, c.Quantity)).ToList();
 
-            var result = await _orderService.CheckoutCartAsync(userId.Value, itemsToCheckout, promoCode);
+            // 🌟 Kiểm tra nếu là VNPay thì isPayment = true (không trừ kho ngay)
+            bool isVNPay = (paymentMethod == "VNPay");
+
+            var result = await _orderService.CheckoutCartAsync(userId.Value, itemsToCheckout, promoCode, isVNPay);
 
             if (result.Success)
             {
-                foreach (var id in selectedProductIds)
-                {
-                    await _cartService.RemoveFromCartAsync(userId.Value, id);
-                }
-
                 int newOrderId = result.OrderId;
-                string initialPaymentStatus = (paymentMethod == "VNPay") ? "Pending" : "Pending";
-                await _orderService.UpdatePaymentInfoAsync(newOrderId, paymentMethod, initialPaymentStatus);
+                await _orderService.UpdatePaymentInfoAsync(newOrderId, paymentMethod, "Pending");
 
-                if (paymentMethod == "VNPay")
+                if (isVNPay)
                 {
+                    // VNPay: Chuyển sang trang thanh toán, KHÔNG xóa giỏ hàng vội
                     return RedirectToAction("CreatePayment", "Payment", new { orderId = newOrderId, area = "" });
                 }
                 else
                 {
+                    // COD: Trừ kho đã thực hiện trong CheckoutCartAsync, giờ xóa giỏ hàng và hoàn tất
+                    foreach (var id in selectedProductIds)
+                    {
+                        await _cartService.RemoveFromCartAsync(userId.Value, id);
+                    }
                     TempData["Success"] = result.Message;
                     return RedirectToAction("MyOrders", "Order", new { area = "Customer" });
                 }

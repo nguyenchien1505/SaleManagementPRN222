@@ -109,6 +109,7 @@
 
                                     <li><hr class="dropdown-divider"></li>
 
+
                                     @* MENU ĐIỀU HƯỚNG DÀNH CHO Manager *@
                                     @if (Context.Session.GetString("Role") == "Manager")
                                     {
@@ -144,22 +145,23 @@
 
                                         <li><hr class="dropdown-divider"></li>
                                     }
+                                    @if (Context.Session.GetString("Role") == "Customer")
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" asp-area="Customer" asp-controller="Account" asp-action="Profile">
+                                                <i class="bi bi-person me-2"></i>
+                                                Hồ sơ
+                                            </a>
+                                        </li>
 
-                                    <li>
-                                        <a class="dropdown-item" asp-area="Customer" asp-controller="Account" asp-action="Profile">
-                                            <i class="bi bi-person me-2"></i>
-                                            Hồ sơ
-                                        </a>
-                                    </li>
 
 
+                                        <li><a class="dropdown-item" asp-area="Customer" asp-controller="Cart" asp-action="Index"><i class="bi bi-cart3 me-2"></i> Giỏ hàng của tôi</a></li>
 
-                                    <li><a class="dropdown-item" asp-area="Customer" asp-controller="Cart" asp-action="Index"><i class="bi bi-cart3 me-2"></i> Giỏ hàng của tôi</a></li>
+                                        <li><a class="dropdown-item" asp-area="Customer" asp-controller="Order" asp-action="MyOrders"><i class="bi bi-bag-check me-2"></i> Đơn hàng của tôi </a></li>
 
-                                    <li><a class="dropdown-item" asp-area="Customer" asp-controller="Order" asp-action="MyOrders"><i class="bi bi-bag-check me-2"></i> Đơn hàng của tôi </a></li>
-
-                                    <li><hr class="dropdown-divider"></li>
-
+                                        <li><hr class="dropdown-divider"></li>
+                                    }
                                     <li>
                                         <form asp-controller="Account" asp-action="Logout" asp-area="" method="post" class="m-0 p-0">
                                             <button type="submit"
