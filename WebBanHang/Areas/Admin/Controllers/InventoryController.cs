@@ -102,5 +102,45 @@ namespace WebBanHang.Areas.Admin.Controllers
             ViewBag.LowStockIds = lowStockIds;
             return View(products); // Khớp hoàn hảo với file Stock.cshtml của bạn
         }
+
+        [RoleAuthorize("Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("ImportInboundExcel")]
+        public async Task<IActionResult> ImportInboundExcel(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                TempData["Error"] = "Vui lòng chọn file Excel!";
+                return RedirectToAction(nameof(Inbound));
+            }
+
+            if (!Path.GetExtension(file.FileName).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["Error"] = "Hệ thống chỉ hỗ trợ định dạng file .xlsx!";
+                return RedirectToAction(nameof(Inbound));
+            }
+
+            try
+            {
+                int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+
+                using (var stream = new MemoryStream())
+                {
+                    await file.CopyToAsync(stream);
+
+                    // Gọi hàm xử lý đọc file Excel và cộng kho ở tầng Service (đã viết ở bước trước)
+                    int count = await _inventoryService.ImportInboundFromExcelAsync(stream, userId);
+
+                    TempData["Success"] = $"Đã nhập kho thành công cho {count} mặt hàng từ file Excel!";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Lỗi xử lý file Excel: " + ex.Message;
+            }
+
+            return RedirectToAction(nameof(Index)); 
+        }
     }
 }

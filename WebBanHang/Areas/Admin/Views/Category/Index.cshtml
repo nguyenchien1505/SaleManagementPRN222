@@ -27,12 +27,26 @@
         <h3 class="fw-bold text-dark">Quản lý danh mục</h3>
         <p class="text-muted mb-0">Danh sách danh mục sản phẩm và trạng thái</p>
     </div>
-    <div class="btn-toolbar mb-2 mb-md-0">
-        <a asp-action="Create" method="get" class="btn btn-primary rounded-pill px-4 shadow-sm">
+    <div class="d-flex flex-wrap gap-2 mb-2 mb-md-0 align-items-center">
+
+        <form id="importExcelForm" asp-action="ImportExcel" method="post" enctype="multipart/form-data" class="m-0">
+            <input type="file" id="fileInput" name="file" accept=".xlsx" class="d-none" onchange="handleExcelUpload(this)" />
+            <label for="fileInput" class="btn btn-info text-white rounded-pill px-4 shadow-sm m-0" style="cursor: pointer;">
+                <i class="bi bi-upload me-2"></i> Nhập Excel
+            </label>
+        </form>
+
+        <a asp-action="ExportExcel" class="btn btn-success rounded-pill px-4 shadow-sm m-0">
+            <i class="bi bi-file-earmark-excel me-2"></i> Xuất Excel
+        </a>
+
+        <a asp-action="Create" method="get" class="btn btn-primary rounded-pill px-4 shadow-sm m-0">
             <i class="bi bi-plus-lg me-2"></i> Thêm danh mục
         </a>
+
     </div>
 </div>
+
 
 <div class="card-modern">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -41,7 +55,7 @@
                 <span class="input-group-text bg-light border-end-0 rounded-start-pill"><i class="bi bi-search text-secondary"></i></span>
                 <input type="text" asp-for="SearchInput" class="form-control bg-light border-start-0 ps-0" placeholder="Tìm kiếm danh mục..." style="min-width: 200px;">
                 <select asp-for="StatusFilter" class="form-select bg-light border-start-0 rounded-end-pill ms-2" style="max-width: 150px;" onchange="this.form.submit()">
-                    <option value="All" >Tất cả trạng thái</option>
+                    <option value="All">Tất cả trạng thái</option>
                     <option value="Active">Hoạt động</option>
                     <option value="Inactive">Tạm ẩn</option>
                 </select>
@@ -77,7 +91,8 @@
                             {
                                 <span class="badge-modern badge-success-modern">Hoạt động</span>
                             }
-                            else if(item.Status == "Deleted"){
+                            else if (item.Status == "Deleted")
+                            {
                                 <span class="badge-modern badge-danger-modern">Đã xóa mềm</span>
                             }
                             else
@@ -170,12 +185,61 @@
     </div>
 </div>
 
-<script>
-    setTimeout(function () {
-    var alert = document.querySelector('.alert');
-    if (alert) {
-    var bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
-    bsAlert.close();
-    }
-    }, 3000);
-</script>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        setTimeout(function () {
+            var alert = document.querySelector('.alert');
+            if (alert) {
+                var bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+                bsAlert.close();
+            }
+        }, 3000);
+
+        function handleExcelUpload(input) {
+            if (input.files && input.files.length > 0) {
+                var file = input.files[0];
+                var fileName = file.name;
+                var fileExtension = fileName.split('.').pop().toLowerCase();
+
+                if (fileExtension !== 'xlsx') {
+                    Swal.fire({
+                        title: 'Định dạng không hợp lệ!',
+                        text: 'Vui lòng chỉ chọn file Excel có đuôi .xlsx',
+                        icon: 'error',
+                        confirmButtonText: 'Đã hiểu'
+                    });
+                    input.value = ''; 
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Xác nhận tải lên?',
+                    html: `Bạn đang chuẩn bị nhập dữ liệu từ file:<br><b class="text-info">${fileName}</b>`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#0dcaf0',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Đồng ý, nhập ngay',
+                    cancelButtonText: 'Hủy bỏ'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Đang xử lý dữ liệu...',
+                            text: 'Vui lòng không đóng trình duyệt',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        document.getElementById('importExcelForm').submit();
+                    } else {
+                        input.value = '';
+                    }
+                });
+            }
+        }
+    </script>
+}

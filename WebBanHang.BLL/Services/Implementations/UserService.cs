@@ -14,6 +14,27 @@ namespace WebBanHang.BLL.Services.Implementations
 {
     public class UserService : IUserService
     {
+        public enum UpdateUserResult
+        {
+            Success,
+            UserNotFound,
+            EmailAlreadyExists,
+            CannotModifyOwnRoleOrStatus,
+            CannotRemoveLastAdmin,
+            VerificationRequired,
+            InvalidVerificationPassword,
+            CurrentUserNotFound,
+            CurrentUserNotAuthorized
+        }
+        public enum CreateUserResult
+        {
+            Success,
+            EmailAlreadyExists,
+            VerificationRequired,
+            InvalidVerificationPassword,
+            CurrentUserNotFound,
+            CurrentUserNotAuthorized
+        }
         private readonly IUserRepository _repo;
         private readonly IEmailService _emailService;
         public UserService(IUserRepository userRepository, IEmailService emailService)
@@ -25,7 +46,7 @@ namespace WebBanHang.BLL.Services.Implementations
         public async Task<UserDTO> Login(LoginDTO dto)
         {
 
-            var user = await _repo.GetByUsernameIncludeDeleteAsync(dto.Username);
+            var user = await _repo.GetByEmailIncludeDeleteAsync(dto.Email);
 
             if (user == null || !user.IsActive || user.IsDeleted) return null;
 
@@ -36,7 +57,7 @@ namespace WebBanHang.BLL.Services.Implementations
             return new UserDTO
             {
                 Id = user.UserId,
-                Username = user.Username,
+                Email = user.Email,
                 FullName = user.FullName,
                 Role = user.Role
             };
@@ -44,26 +65,21 @@ namespace WebBanHang.BLL.Services.Implementations
 
         public async Task<bool> Register(RegisterDTO dto)
         {
-            var exitedUser = await _repo.GetByUsernameIncludeDeleteAsync(dto.Username);
+            var exitedUser = await _repo.GetByEmailIncludeDeleteAsync(dto.Email);
             var exitedEmail = await _repo.GetByEmailIncludeDeleteAsync(dto.Email);
 
             if (exitedUser != null || exitedEmail != null) return false;
 
             User user = new User
             {
-                Username = dto.Username,
+                Username= dto.FullName,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
                 Email = dto.Email,
                 FullName = dto.FullName,
                 Role = "Customer",
                 IsActive = true,
                 CreatedDate = DateTime.Now,
-
-                Customer = new Customer
-                {
-                    Phone = dto.Phone,
-                    CreatedDate = DateTime.Now
-                }
+                Phone = dto.Phone,
             };
 
             await _repo.AddAsync(user);
@@ -79,7 +95,6 @@ namespace WebBanHang.BLL.Services.Implementations
             return users.Select(u => new UserDTO
             {
                 Id = u.UserId,
-                Username = u.Username,
                 FullName = u.FullName,
                 Email = u.Email,
                 Role = u.Role,
@@ -90,48 +105,159 @@ namespace WebBanHang.BLL.Services.Implementations
 
         }
 
-        public async Task<bool> CreateUserAsync(CreateUserDTO dto)
+        public async Task<CreateUserResult> CreateUserAsync( CreateUserDTO dto, int? currentUserId)
         {
-            var exitedUser = await _repo.GetByUsernameAsync(dto.Username);
-            var exitedEmail = await _repo.GetByEmailAsync(dto.Email);
+            var existedUser = await _repo.GetByEmailIncludeDeleteAsync(dto.Email.Trim());
 
-            if(exitedUser != null || exitedEmail != null) return false;
+            if (existedUser != null)
+                return CreateUserResult.EmailAlreadyExists;
+
+            var isCreatingAdmin = string.Equals(
+                dto.Role,
+                "Admin",
+                StringComparison.OrdinalIgnoreCase);
+
+            if (isCreatingAdmin)
+            {
+                if (!currentUserId.HasValue)
+                    return CreateUserResult.CurrentUserNotFound;
+
+                if (string.IsNullOrWhiteSpace(dto.VerificationPassword))
+                    return CreateUserResult.VerificationRequired;
+
+                var currentUser = await _repo.GetByIdAsync(currentUserId.Value);
+
+                if (currentUser == null || currentUser.IsDeleted || !currentUser.IsActive)
+                {
+                    return CreateUserResult.CurrentUserNotFound;
+                }
+
+                var currentUserIsAdmin = string.Equals(
+                    currentUser.Role,
+                    "Admin",
+                    StringComparison.OrdinalIgnoreCase);
+
+                if (!currentUserIsAdmin)
+                    return CreateUserResult.CurrentUserNotAuthorized;
+
+                var passwordIsValid = BCrypt.Net.BCrypt.Verify( dto.VerificationPassword, currentUser.PasswordHash);
+
+                if (!passwordIsValid)
+                    return CreateUserResult.InvalidVerificationPassword;
+            }
 
             var user = new User
             {
-                Username = dto.Username,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-                Email = dto.Email,
-                FullName = dto.FullName,
+                PasswordHash =
+                    BCrypt.Net.BCrypt.HashPassword(dto.Password),
+
+                Email = dto.Email.Trim(),
+                FullName = dto.FullName.Trim(),
                 Role = dto.Role,
                 IsActive = dto.IsActive,
                 CreatedDate = DateTime.Now
             };
+
             await _repo.AddAsync(user);
 
-            return true;
+            return CreateUserResult.Success;
         }
 
-        public async Task<bool> UpdateUserAsync(UpdateUserDTO dto)
+        public async Task<UpdateUserResult> UpdateUserAsync(UpdateUserDTO dto, int? currentUserId)
         {
             var user = await _repo.GetByIdAsync(dto.Id);
-            if(user == null) return false;
 
-            var existedEmail = await _repo.GetByEmailIncludeDeleteAsync(dto.Email);
-            if(existedEmail != null && existedEmail.UserId != dto.Id) return false;
+            if (user == null || user.IsDeleted)
+                return UpdateUserResult.UserNotFound;
 
-            user.Email = dto.Email;
-            user.FullName = dto.FullName;
+            var existedEmail = await _repo.GetByEmailIncludeDeleteAsync(dto.Email.Trim());
+
+            if (existedEmail != null && existedEmail.UserId != dto.Id)
+                return UpdateUserResult.EmailAlreadyExists;
+
+            var isCurrentRoleAdmin = string.Equals( user.Role, "Admin",StringComparison.OrdinalIgnoreCase);
+
+            var isNewRoleAdmin = string.Equals( dto.Role,"Admin",StringComparison.OrdinalIgnoreCase);
+
+            var roleChanged = !string.Equals(user.Role, dto.Role, StringComparison.OrdinalIgnoreCase);
+
+            var activeStatusChanged = user.IsActive != dto.IsActive;
+
+            // Không cho người dùng tự đổi role hoặc tự khóa tài khoản
+            if (currentUserId.HasValue && user.UserId == currentUserId.Value &&
+                (roleChanged || activeStatusChanged))
+            {
+                return UpdateUserResult.CannotModifyOwnRoleOrStatus;
+            }
+
+            var requiresPasswordVerification = (roleChanged && (isCurrentRoleAdmin || isNewRoleAdmin))
+                                         ||    (activeStatusChanged && isCurrentRoleAdmin);
+
+
+            if (requiresPasswordVerification)
+            {
+                if (!currentUserId.HasValue)
+                {
+                    return UpdateUserResult.CurrentUserNotFound;
+                }
+
+                if (string.IsNullOrWhiteSpace(dto.VerificationPassword))
+                {
+                    return UpdateUserResult.VerificationRequired;
+                }
+
+                var currentUser = await _repo.GetByIdAsync(currentUserId.Value);
+
+                if (currentUser == null || currentUser.IsDeleted || !currentUser.IsActive)
+                {
+                    return UpdateUserResult.CurrentUserNotFound;
+                }
+
+                var currentUserIsAdmin = string.Equals(
+                    currentUser.Role,
+                    "Admin",
+                    StringComparison.OrdinalIgnoreCase);
+
+                if (!currentUserIsAdmin)
+                {
+                    return UpdateUserResult.CurrentUserNotAuthorized;
+                }
+
+                var passwordIsValid = BCrypt.Net.BCrypt.Verify(
+                    dto.VerificationPassword,
+                    currentUser.PasswordHash);
+
+                if (!passwordIsValid)
+                {
+                    return UpdateUserResult.InvalidVerificationPassword;
+                }
+            }
+
+
+            var wasActiveAdmin = isCurrentRoleAdmin && user.IsActive;
+            var willBeActiveAdmin = isNewRoleAdmin && dto.IsActive;
+
+            if (wasActiveAdmin && !willBeActiveAdmin)
+            {
+                var activeAdminCount = await _repo.CountActiveAdminsAsync();
+
+                if (activeAdminCount <= 1)
+                    return UpdateUserResult.CannotRemoveLastAdmin;
+            }
+
+            user.Email = dto.Email.Trim();
+            user.FullName = dto.FullName.Trim();
             user.Role = dto.Role;
             user.IsActive = dto.IsActive;
 
-            if(!dto.Password.IsNullOrEmpty())
+            if (!string.IsNullOrWhiteSpace(dto.Password))
             {
                 user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
             }
 
             await _repo.UpdateAsync(user);
-            return true;
+
+            return UpdateUserResult.Success;
         }
 
         public async Task<UserDTO> GetUserByIdAsync(int id)
@@ -142,7 +268,6 @@ namespace WebBanHang.BLL.Services.Implementations
             return new UserDTO
             {
                 Id = user.UserId,
-                Username = user.Username,
                 FullName = user.FullName,
                 Email = user.Email,
                 CreatedAt = user.CreatedDate,
@@ -151,12 +276,14 @@ namespace WebBanHang.BLL.Services.Implementations
             };
         }
 
-        public async Task<bool> DeleteUserAsync(int id)
+        public async Task<bool> DeleteUserAsync(int id, int? currentUserId)
         {
             var user = await _repo.GetByIdAsync(id);
             if (user == null) return false;
 
             if (user.Role == "Admin") return false;
+
+            if(user.UserId == currentUserId) return false;
 
             return await _repo.DeleteAsync(id);
         }
@@ -168,7 +295,6 @@ namespace WebBanHang.BLL.Services.Implementations
             return users.Select(u => new UserDTO
             {
                 Id = u.UserId,
-                Username = u.Username,
                 FullName = u.FullName,
                 Email = u.Email,
                 Role = u.Role,
@@ -187,7 +313,6 @@ namespace WebBanHang.BLL.Services.Implementations
             return new UserDTO
             {
                 Id = user.UserId,
-                Username = user.Username,
                 FullName = user.FullName,
                 Email = user.Email,
                 CreatedAt = user.CreatedDate,
@@ -200,10 +325,10 @@ namespace WebBanHang.BLL.Services.Implementations
         public async Task<bool> RestoreUserAsync(int id)
         {
             var user = await _repo.GetByIdIncludeDeleteAsync(id);
-            if (user == null) return false;
+            if (user == null || !user.IsDeleted) return false;
             user.IsDeleted = false;
             user.DeletedDate = null;
-            user.IsActive = true;
+            user.IsActive = false;
             await _repo.UpdateAsync(user);
             return true;
         }
@@ -249,7 +374,7 @@ namespace WebBanHang.BLL.Services.Implementations
                 return new UserDTO
                 {
                     Id = existing.UserId,
-                    Username = existing.Username,
+                    Email = existing.Email,
                     FullName = existing.FullName,
                     Role = existing.Role
                 };
@@ -258,17 +383,13 @@ namespace WebBanHang.BLL.Services.Implementations
             // Chưa có tài khoản -> tự tạo tài khoản Customer mới liên kết với email Google
             var newUser = new User
             {
-                Username = email,                 // dùng email làm username cho tài khoản Google
+                //Username = email,                 // dùng email làm username cho tài khoản Google
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(Guid.NewGuid().ToString()), // mật khẩu ngẫu nhiên, không dùng tới vì đăng nhập qua Google
                 Email = email,
                 FullName = fullName,
                 Role = "Customer",
                 IsActive = true,
                 CreatedDate = DateTime.Now,
-                Customer = new Customer
-                {
-                    CreatedDate = DateTime.Now
-                }
             };
 
             await _repo.AddAsync(newUser);
@@ -276,7 +397,7 @@ namespace WebBanHang.BLL.Services.Implementations
             return new UserDTO
             {
                 Id = newUser.UserId,
-                Username = newUser.Username,
+                Email = newUser.Email,
                 FullName = newUser.FullName,
                 Role = newUser.Role
             };

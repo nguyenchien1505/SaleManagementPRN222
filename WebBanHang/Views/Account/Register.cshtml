@@ -30,24 +30,14 @@
             <form method="post" asp-action="Register" asp-controller="Account">
                 <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
                 
-                <div class="row">
-                    <div class="col-md-6">
+                
                         <div class="form-floating-custom">
-                            <label>Tên đăng nhập</label>
-                            <input asp-for="@Model.Username"  type="text" class="form-control"  placeholder="user123" autofocus />
-                            <span asp-validation-for="@Model.Username" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="form-floating-custom">
-                            <label>Email</label>
+                            <label>Tên đăng nhập (Email)</label>
                             <input asp-for="@Model.Email" type="email" class="form-control"placeholder="name@example.com" />
                             <span asp-validation-for="@Model.Email" class="text-danger"></span>
 
                         </div>
-                    </div>
-                </div>
+             
 
                 <div class="form-floating-custom">
                     <label>Họ và tên</label>

@@ -83,12 +83,12 @@
                             <td>
                                 <div class="d-flex align-items-center">
                                     @{
-                                        var avatarUrl = !string.IsNullOrEmpty(item.Avatar) ? item.Avatar : $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(item.FullName ?? item.Username)}&background=random";
+                                        var avatarUrl = !string.IsNullOrEmpty(item.Avatar) ? item.Avatar : $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(item.FullName ?? item.Email)}&background=random";
                                     }
                                     <img src="@avatarUrl" class="rounded-circle me-3" width="40" height="40" alt="Avatar">
                                     <div>
-                                        <div class="fw-bold">@(item.FullName ?? item.Username)</div>
-                                        <div class="small text-muted">@item.Username</div>
+                                        <div class="fw-bold">@(item.FullName ?? item.Email)</div>
+                                        <div class="small text-muted">@item.Email</div>
                                     </div>
                                 </div>
                             </td>

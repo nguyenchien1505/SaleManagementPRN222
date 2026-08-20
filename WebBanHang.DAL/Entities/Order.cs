@@ -9,8 +9,6 @@ public partial class Order
 
     public string OrderCode { get; set; } = null!;
 
-    public int CustomerId { get; set; }
-
     public int CreatedBy { get; set; }
 
     public DateTime? OrderDate { get; set; }
@@ -26,9 +24,16 @@ public partial class Order
     public string? ShippingAddress { get; set; }
 
     public string? ShippingPhone { get; set; }
+
+    public int CustomerId { get; set; }
+
+    public string? PaymentMethod { get; set; }
+
+    public string? PaymentStatus { get; set; }
+
     public virtual User CreatedByNavigation { get; set; } = null!;
 
-    public virtual Customer Customer { get; set; } = null!;
+    public virtual User Customer { get; set; } = null!;
 
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 

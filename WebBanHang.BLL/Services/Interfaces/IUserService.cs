@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WebBanHang.BLL.DTOs;
+using WebBanHang.BLL.Services.Implementations;
 using WebBanHang.DAL.Entities;
+using static WebBanHang.BLL.Services.Implementations.UserService;
 
 namespace WebBanHang.BLL.Services.Interfaces
 {
@@ -13,10 +15,10 @@ namespace WebBanHang.BLL.Services.Interfaces
         Task<UserDTO> Login(LoginDTO dto);
         Task<bool> Register(RegisterDTO model);
         Task<IEnumerable<UserDTO>> GetAllUserAsync();
-        Task<bool> CreateUserAsync(CreateUserDTO dto);
+        Task<UserService.CreateUserResult> CreateUserAsync( CreateUserDTO dto,int? currentUserId);
         Task<UserDTO> GetUserByIdAsync(int id);
-        Task<bool> UpdateUserAsync(UpdateUserDTO dto);
-        Task<bool> DeleteUserAsync(int id);
+        Task<UpdateUserResult> UpdateUserAsync(UpdateUserDTO dto, int? currentUserId);
+        Task<bool> DeleteUserAsync(int id, int? currentUserId);
         Task<bool> RestoreUserAsync(int id);
         Task<bool> HardDeleteUserAsync(int userId, int? currentUserId);
         Task<IEnumerable<UserDTO>> GetAllUserIncludeDeleteAsync();

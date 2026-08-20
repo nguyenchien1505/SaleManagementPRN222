@@ -68,10 +68,26 @@
                 </form>
 
                 <!-- Add Button -->
-                <div>
-                    <a asp-action="Create" asp-controller="Product" method="post" class="btn btn-primary rounded-pill px-4 py-2 fw-bold">
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+
+                    <!-- Form Nhập Excel -->
+                    <form id="importExcelForm" asp-action="ImportExcel" method="post" enctype="multipart/form-data" class="m-0">
+                        <input type="file" id="fileInput" name="file" accept=".xlsx" class="d-none" onchange="handleExcelUpload(this)" />
+                        <label for="fileInput" class="btn btn-info text-white rounded-pill px-4 py-2 fw-bold m-0" style="cursor: pointer;">
+                            <i class="fas fa-upload me-2"></i>Nhập Excel
+                        </label>
+                    </form>
+
+                    <!-- Nút Xuất Excel -->
+                    <a asp-action="ExportExcel" class="btn btn-success rounded-pill px-4 py-2 fw-bold m-0">
+                        <i class="fas fa-file-excel me-2"></i>Xuất Excel
+                    </a>
+
+                    <!-- Nút Thêm sản phẩm -->
+                    <a asp-action="Create" asp-controller="Product" class="btn btn-primary rounded-pill px-4 py-2 fw-bold m-0">
                         <i class="fas fa-plus me-2"></i>Thêm sản phẩm
                     </a>
+
                 </div>
             </div>
 
@@ -227,29 +243,77 @@
 </div>
 
 
-<script>
-    setTimeout(function () {
-    var alert = document.querySelector('.alert');
-    if (alert) {
-    var bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
-    bsAlert.close();
-    }
-    }, 3000);
-   
-        function sort(column) {
-        const sortColumn = document.getElementById("SortColumn");
-        const sortStatus = document.getElementById("SortStatus");
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-        if (sortColumn.value === column) {
-            sortStatus.value = sortStatus.value == "0" ? "1" : "0";
-        } else {
-            sortColumn.value = column;
-            sortStatus.value = "0";
+    <script>
+        setTimeout(function () {
+            var alert = document.querySelector('.alert');
+            if (alert) {
+                var bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+                bsAlert.close();
+            }
+        }, 3000);
+
+        function sort(column) {
+            const sortColumn = document.getElementById("SortColumn");
+            const sortStatus = document.getElementById("SortStatus");
+
+            if (sortColumn.value === column) {
+                sortStatus.value = sortStatus.value == "0" ? "1" : "0";
+            } else {
+                sortColumn.value = column;
+                sortStatus.value = "0";
+            }
+
+            document.getElementById("filterForm").submit();
         }
 
-        document.getElementById("filterForm").submit();
-    }
-</script>
+        function handleExcelUpload(input) {
+            if (input.files && input.files.length > 0) {
+                var file = input.files[0];
+                var fileName = file.name;
+                var fileExtension = fileName.split('.').pop().toLowerCase();
+
+                if (fileExtension !== 'xlsx') {
+                    Swal.fire({
+                        title: 'Định dạng không hợp lệ!',
+                        text: 'Vui lòng chỉ chọn file Excel có đuôi .xlsx',
+                        icon: 'error',
+                        confirmButtonText: 'Đã hiểu'
+                    });
+                    input.value = '';
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Xác nhận tải lên?',
+                    html: `Bạn đang chuẩn bị nhập dữ liệu từ file:<br><b class="text-info">${fileName}</b>`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#0dcaf0',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Đồng ý, nhập ngay',
+                    cancelButtonText: 'Hủy bỏ'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Đang xử lý dữ liệu...',
+                            text: 'Vui lòng không đóng trình duyệt',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        document.getElementById('importExcelForm').submit();
+                    } else {
+                        input.value = '';
+                    }
+                });
+            }
+        }
+    </script>
+}
 
 
 

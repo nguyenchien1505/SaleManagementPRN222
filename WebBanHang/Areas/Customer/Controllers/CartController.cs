@@ -225,9 +225,8 @@ namespace WebBanHang.Areas.Customer.Controllers
         // ──────────────────────────────────────────────
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CheckoutAll(List<int> selectedProductIds, string? promoCode = null)
+        public async Task<IActionResult> CheckoutAll(List<int> selectedProductIds, string? promoCode = null, string paymentMethod = "COD")
         {
-       
             int? userId = HttpContext.Session.GetInt32("UserId");
             if (!userId.HasValue)
                 return RedirectToAction("Login", "Account", new { area = "" });
@@ -248,27 +247,35 @@ namespace WebBanHang.Areas.Customer.Controllers
 
             var itemsToCheckout = selectedItems.Select(c => (c.ProductId, c.Quantity)).ToList();
 
-            var result = await _orderService.CheckoutCartAsync(userId.Value, itemsToCheckout, promoCode);
+            // 🌟 Kiểm tra nếu là VNPay thì isPayment = true (không trừ kho ngay)
+            bool isVNPay = (paymentMethod == "VNPay");
+
+            var result = await _orderService.CheckoutCartAsync(userId.Value, itemsToCheckout, promoCode, isVNPay);
 
             if (result.Success)
             {
-                foreach (var id in selectedProductIds)
+                int newOrderId = result.OrderId;
+                await _orderService.UpdatePaymentInfoAsync(newOrderId, paymentMethod, "Pending");
+
+                if (isVNPay)
                 {
-                    await _cartService.RemoveFromCartAsync(userId.Value, id);
+                    // VNPay: Chuyển sang trang thanh toán, KHÔNG xóa giỏ hàng vội
+                    return RedirectToAction("CreatePayment", "Payment", new { orderId = newOrderId, area = "" });
                 }
-
-                TempData["Success"] = result.Message;
-
-                return RedirectToAction("MyOrders", "Order", new { area = "Customer" });
+                else
+                {
+                    // COD: Trừ kho đã thực hiện trong CheckoutCartAsync, giờ xóa giỏ hàng và hoàn tất
+                    foreach (var id in selectedProductIds)
+                    {
+                        await _cartService.RemoveFromCartAsync(userId.Value, id);
+                    }
+                    TempData["Success"] = result.Message;
+                    return RedirectToAction("MyOrders", "Order", new { area = "Customer" });
+                }
             }
             else
             {
-                // BẮT BỆNH: Nếu lỗi trả về có chứa Exception ngầm, lôi tin nhắn thật của SQL ra hiển thị
                 TempData["Error"] = result.Message;
-
-                // In thêm thông báo lỗi hệ thống nếu lỗi chung chung để bạn đọc được ngay trên giao diện giỏ hàng
-
-
                 return RedirectToAction(nameof(Index));
             }
         }

@@ -25,19 +25,21 @@ public partial class User
 
     public DateTime? DeletedDate { get; set; }
 
-    public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
-
-    public virtual Customer? Customer { get; set; }
-
-    public virtual ICollection<InventoryTransaction> InventoryTransactions { get; set; } = new List<InventoryTransaction>();
-
-    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
-
-    public virtual ICollection<Product> Products { get; set; } = new List<Product>();
-
-    //public virtual ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
-
     public string? ResetPasswordToken { get; set; }
 
     public DateTime? ResetPasswordTokenExpiry { get; set; }
+
+    public string? Phone { get; set; }
+
+    public string? Address { get; set; }
+
+    public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
+
+    public virtual ICollection<InventoryTransaction> InventoryTransactions { get; set; } = new List<InventoryTransaction>();
+
+    public virtual ICollection<Order> OrderCreatedByNavigations { get; set; } = new List<Order>();
+
+    public virtual ICollection<Order> OrderCustomers { get; set; } = new List<Order>();
+
+    public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 }

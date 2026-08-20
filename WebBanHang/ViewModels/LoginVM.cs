@@ -5,7 +5,7 @@ namespace WebBanHang.ViewModels
     public class LoginVM
     {
         [Required(ErrorMessage = "Vui long nhap ten dang nhap")]
-        public string Username { get; set; }
+        public string Email { get; set; }
 
         [Required(ErrorMessage = "Vui long nhap mat khau")]
         [DataType(DataType.Password)]

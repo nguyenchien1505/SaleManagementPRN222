@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.Contracts;
 
 namespace WebBanHang.ViewModels
@@ -24,6 +25,7 @@ namespace WebBanHang.ViewModels
         public string Description { get; set; }
         [Range(1, int.MaxValue, ErrorMessage = "Vui lòng chọn danh mục")]
         public int CategoryId { get; set; }
+        [ValidateNever]
         public string CategoryName { get; set; }
 
         public List<CategoryVM> Categories { get; set; } = new();

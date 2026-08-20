@@ -18,6 +18,7 @@ namespace WebBanHang.BLL.Services.Interfaces
         Task<bool> UpdateProductAsync(ProductDTO dto);
         Task<bool> RestoreProductAsync(int id);
         Task<bool> HardDeleteProductAsync(int id);
-
+        Task<byte[]> ExportProductsToExcelAsync();
+        Task<int> ImportProductsFromExcelAsync(Stream fileStream, int userId);
     }
 }

@@ -9,7 +9,7 @@ namespace WebBanHang.BLL.Services.Interfaces
 {
     public interface ICustomerService
     {
-        Task<IEnumerable<Customer>> GetAllCustomersAsync(string? searchString);
-        Task<Customer?> GetCustomerDetailsAsync(int id);
+        Task<IEnumerable<User>> GetAllCustomersAsync(string? searchString);
+        Task<User?> GetCustomerDetailsAsync(int id);
     }
 }

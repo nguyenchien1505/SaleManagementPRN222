@@ -63,7 +63,7 @@ namespace WebBanHang.DAL.Repositories.Implementations
                     OrderDate = o.OrderDate,
                     TotalAmount = o.TotalAmount ?? 0m,
                     Status = o.Status ?? "Unknow",
-                    CustomerName = o.Customer.User.FullName ?? "Unknown"
+                    CustomerName = o.Customer.FullName ?? "Unknown"
                 })
                 .ToListAsync();
         }
@@ -115,7 +115,7 @@ namespace WebBanHang.DAL.Repositories.Implementations
 
         public async Task<int> GetTotalCustomersAsync()
         {
-            return await _context.Customers.CountAsync();
+            return await _context.Users.Where(x => x.Role == "Customer").CountAsync();
         }
 
         public async Task<int> GetOrderCountByStatusAsync(string status)

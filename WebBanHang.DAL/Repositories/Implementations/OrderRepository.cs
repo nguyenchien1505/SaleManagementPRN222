@@ -51,7 +51,6 @@ namespace WebBanHang.DAL.Repositories.Implementations
         {
             var query = _context.Orders
                 .Include(o => o.Customer)
-                    .ThenInclude(c => c.User)
                 .Include(o => o.CreatedByNavigation)
                 .OrderByDescending(o => o.OrderDate)
                 .AsQueryable();
@@ -59,7 +58,7 @@ namespace WebBanHang.DAL.Repositories.Implementations
             if (!string.IsNullOrEmpty(searchString))
             {
                 query = query.Where(o => o.OrderCode.Contains(searchString) ||
-                                         o.Customer.User.FullName.Contains(searchString));
+                                         o.Customer.FullName.Contains(searchString));
             }
 
             if (!string.IsNullOrEmpty(statusFilter))

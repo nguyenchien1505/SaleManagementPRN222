@@ -39,7 +39,6 @@ namespace WebBanHang.Areas.Sale.Controllers
             // 4. Recent Orders
             var recentOrders = await _context.Orders
                 .Include(o => o.Customer)
-                    .ThenInclude(c => c.User)
                 .OrderByDescending(o => o.OrderDate)
                 .Take(5)
                 .ToListAsync();

@@ -58,7 +58,8 @@
                                 <th class="ps-4 py-3 border-0 text-muted fw-semibold">Mã Đơn</th>
                                 <th class="py-3 border-0 text-muted fw-semibold">Ngày đặt</th>
                                 <th class="py-3 border-0 text-muted fw-semibold">Tổng tiền</th>
-                                <th class="py-3 border-0 text-muted fw-semibold">Trạng thái</th>
+                                <th class="py-3 border-0 text-muted fw-semibold">Thanh toán</th>
+                                <th class="py-3 border-0 text-muted fw-semibold">Trạng thái đơn</th>
                                 <th class="pe-4 py-3 border-0 text-muted fw-semibold text-center">Chi tiết</th>
                             </tr>
                         </thead>
@@ -78,6 +79,26 @@
                                         <span class="fw-bold text-dark">
                                             @((order.TotalAmount ?? 0m).ToString("N0", new System.Globalization.CultureInfo("vi-VN"))) đ
                                         </span>
+                                    </td>
+                                    <!-- 🌟 HIỂN THỊ PHƯƠNG THỨC & TRẠNG THÁI THANH TOÁN -->
+                                    <td>
+                                        <div class="d-flex flex-column gap-1">
+                                            <span class="badge bg-light text-dark border rounded-pill px-2 py-1 w-fit">
+                                                <i class="bi bi-wallet2 me-1"></i> @(string.IsNullOrEmpty(order.PaymentMethod) ? "COD" : order.PaymentMethod)
+                                            </span>
+                                            @if (order.PaymentStatus == "Paid")
+                                            {
+                                                <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1 w-fit">Đã thanh toán</span>
+                                            }
+                                            else if (order.PaymentStatus == "Failed")
+                                            {
+                                                <span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1 w-fit">Thanh toán lỗi</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning-subtle text-warning rounded-pill px-2 py-1 w-fit">Chờ thanh toán</span>
+                                            }
+                                        </div>
                                     </td>
                                     <td>
                                         @switch (order.Status)
@@ -107,7 +128,7 @@
                                 </tr>
 
                                 <tr>
-                                    <td colspan="5" class="p-0 border-0">
+                                    <td colspan="6" class="p-0 border-0">
                                         <div class="collapse" id="collapseOrder-@order.OrderId">
                                             <div class="bg-light p-4 border-bottom row g-3">
 
@@ -148,9 +169,9 @@
                                                     </div>
                                                 </div>
 
-                                                <!-- Cột bên phải: Hiển thị thông tin nhận hàng, Voucher và chặn thao tác hủy đơn -->
+                                                <!-- Cột bên phải: Hiển thị thông tin vận chuyển, phương thức thanh toán chi tiết -->
                                                 <div class="col-lg-5">
-                                                    <h6 class="fw-bold mb-3"><i class="bi bi-truck me-2 text-primary"></i>Thông tin vận chuyển</h6>
+                                                    <h6 class="fw-bold mb-3"><i class="bi bi-truck me-2 text-primary"></i>Thông tin vận chuyển & Thanh toán</h6>
                                                     <div class="bg-white p-3 rounded-3 shadow-sm border small">
                                                         <div class="mb-2">
                                                             <span class="text-muted d-block">Số điện thoại nhận hàng:</span>
@@ -160,8 +181,12 @@
                                                             <span class="text-muted d-block">Địa chỉ nhận hàng thực tế:</span>
                                                             <strong class="text-dark">@(order.ShippingAddress ?? "Chưa cập nhật địa chỉ")</strong>
                                                         </div>
+                                                        <div class="mb-2">
+                                                            <span class="text-muted d-block">Hình thức thanh toán:</span>
+                                                            <strong class="text-primary"><i class="bi bi-credit-card me-1"></i> @(string.IsNullOrEmpty(order.PaymentMethod) ? "COD" : order.PaymentMethod)</strong>
+                                                        </div>
 
-                                                        <!-- 🌟 BỔ SUNG: Hiển thị thông tin Promotion/Voucher đã dùng -->
+                                                        <!-- Hiển thị thông tin Promotion/Voucher đã dùng -->
                                                         <div class="mb-3">
                                                             <span class="text-muted d-block">Mã giảm giá đã áp dụng:</span>
                                                             @if (order.DiscountAmount > 0)

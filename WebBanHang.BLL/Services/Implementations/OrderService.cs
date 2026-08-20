@@ -31,13 +31,13 @@ namespace WebBanHang.BLL.Services.Implementations
 
         public async Task<IEnumerable<Order>> GetMyOrdersAsync(int userId)
         {
-            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.UserId == userId);
+            var customer = await _context.Users.FirstOrDefaultAsync(c => c.UserId == userId);
             if (customer == null) return new List<Order>();
 
             return await _context.Orders
                 .Include(o => o.OrderDetails)
                 .ThenInclude(d => d.Product)
-                .Where(o => o.CustomerId == customer.CustomerId)
+                .Where(o => o.CustomerId == customer.UserId)
                 .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
         }
@@ -45,8 +45,7 @@ namespace WebBanHang.BLL.Services.Implementations
         public async Task<Order?> GetOrderDetailsAsync(int orderId)
         {
             return await _context.Orders
-                .Include(o => o.Customer)
-                    .ThenInclude(c => c.User)
+                    .Include(c => c.Customer)
                 .Include(o => o.CreatedByNavigation)
                 .Include(o => o.OrderDetails)
                     .ThenInclude(od => od.Product)
@@ -69,7 +68,7 @@ namespace WebBanHang.BLL.Services.Implementations
                     if (product.StockQuantity < quantity)
                         return (false, "Sản phẩm không đủ số lượng trong kho!", 0);
 
-                    var customer = await _context.Customers.FirstOrDefaultAsync(c => c.UserId == userId);
+                    var customer = await _context.Users.FirstOrDefaultAsync(c => c.UserId == userId);
                     if (customer == null)
                         return (false, "Bạn cần hoàn thiện hồ sơ khách hàng trước khi mua hàng!", 0);
 
@@ -86,12 +85,12 @@ namespace WebBanHang.BLL.Services.Implementations
                     var order = new Order
                     {
                         OrderCode = uniqueOrderCode,
-                        CustomerId = customer.CustomerId,
+                        CustomerId = customer.UserId,
                         OrderDate = DateTime.Now,
                         SubTotal = subTotal,
                         DiscountAmount = 0,
                         TotalAmount = subTotal,
-                        Status = "Draft", 
+                        Status = "Draft",
                         CreatedBy = safeCreatedBy,
 
                         ShippingAddress = customer.Address,
@@ -115,7 +114,7 @@ namespace WebBanHang.BLL.Services.Implementations
                         ProductId = productId,
                         Quantity = -quantity,
                         CreatedDate = DateTime.Now,
-                        Type = "Export", 
+                        Type = "Export",
                         Note = $"Direct Order Code: {order.OrderCode}",
                         CreatedBy = safeCreatedBy
                     });
@@ -136,7 +135,7 @@ namespace WebBanHang.BLL.Services.Implementations
         // ──────────────────────────────────────────────────────────────────────
         // LUỒNG 2: ĐẶT HÀNG TỪ GIỎ HÀNG (CheckoutCart)
         // ──────────────────────────────────────────────────────────────────────
-        public async Task<(bool Success, string Message, int OrderId)> CheckoutCartAsync(int userId, List<(int productId, int quantity)> items, string? promoCode = null)
+        public async Task<(bool Success, string Message, int OrderId)> CheckoutCartAsync(int userId, List<(int productId, int quantity)> items, string? promoCode = null, bool isPayment = false)
         {
             if (items == null || !items.Any())
                 return (false, "Giỏ hàng trống!", 0);
@@ -145,7 +144,7 @@ namespace WebBanHang.BLL.Services.Implementations
             {
                 try
                 {
-                    var customer = await _context.Customers.FirstOrDefaultAsync(c => c.UserId == userId);
+                    var customer = await _context.Users.FirstOrDefaultAsync(c => c.UserId == userId);
                     if (customer == null)
                         return (false, "Bạn cần hoàn thiện hồ sơ khách hàng trước khi mua hàng!", 0);
 
@@ -176,11 +175,10 @@ namespace WebBanHang.BLL.Services.Implementations
                         processedItems.Add((product, item.quantity));
                     }
 
-                    // 🌟 ĐÃ SỬA: Tính toán tiền giảm giá thực tế từ mã Promotion được gửi lên
+                    // Tính toán tiền giảm giá thực tế từ mã Promotion được gửi lên
                     decimal discountFromPromo = 0;
                     if (!string.IsNullOrWhiteSpace(promoCode))
                     {
-                        // Gọi qua PromotionService để kiểm tra tính hợp lệ và lấy số tiền giảm
                         var promoResult = await _promotionService.ValidatePromotionAsync(promoCode, totalOrderAmount);
                         if (promoResult.Success)
                         {
@@ -197,7 +195,7 @@ namespace WebBanHang.BLL.Services.Implementations
                     var order = new Order
                     {
                         OrderCode = uniqueOrderCode,
-                        CustomerId = customer.CustomerId,
+                        CustomerId = customer.UserId,
                         CreatedBy = safeCreatedBy,
                         OrderDate = DateTime.Now,
                         SubTotal = totalOrderAmount,      // Giá gốc trước giảm
@@ -214,7 +212,12 @@ namespace WebBanHang.BLL.Services.Implementations
 
                     foreach (var item in processedItems)
                     {
-                        item.product.StockQuantity -= item.quantity;
+                        // 🌟 NẾU LÀ COD (isPayment = false): Trừ kho ngay lập tức
+                        // 🌟 NẾU LÀ VNPAY (isPayment = true): BỎ QUA, không trừ kho ở bước này
+                        if (!isPayment)
+                        {
+                            item.product.StockQuantity -= item.quantity;
+                        }
 
                         var detail = new OrderDetail
                         {
@@ -226,15 +229,20 @@ namespace WebBanHang.BLL.Services.Implementations
                         };
                         _context.OrderDetails.Add(detail);
 
-                        _context.InventoryTransactions.Add(new InventoryTransaction
+                        // 🌟 NẾU LÀ COD: Ghi nhận giao dịch xuất kho ngay
+                        // 🌟 NẾU LÀ VNPAY: BỎ QUA, giao dịch kho sẽ được ghi nhận khi thanh toán thành công
+                        if (!isPayment)
                         {
-                            ProductId = item.product.ProductId,
-                            Quantity = -item.quantity,
-                            CreatedDate = DateTime.Now,
-                            Type = "Export",
-                            Note = $"Order Code: {order.OrderCode}",
-                            CreatedBy = safeCreatedBy
-                        });
+                            _context.InventoryTransactions.Add(new InventoryTransaction
+                            {
+                                ProductId = item.product.ProductId,
+                                Quantity = -item.quantity,
+                                CreatedDate = DateTime.Now,
+                                Type = "Export",
+                                Note = $"Order Code: {order.OrderCode}",
+                                CreatedBy = safeCreatedBy
+                            });
+                        }
                     }
 
                     await _context.SaveChangesAsync();
@@ -307,7 +315,7 @@ namespace WebBanHang.BLL.Services.Implementations
                             ProductId = product.ProductId,
                             Quantity = -quantities[i],
                             CreatedDate = DateTime.Now,
-                            Type = "Export", 
+                            Type = "Export",
                             CreatedBy = 1
                         });
                     }
@@ -348,11 +356,11 @@ namespace WebBanHang.BLL.Services.Implementations
                         _context.InventoryTransactions.Add(new InventoryTransaction
                         {
                             ProductId = detail.ProductId,
-                            Quantity = detail.Quantity, 
+                            Quantity = detail.Quantity,
                             CreatedDate = DateTime.Now,
-                            Type = "Import", 
+                            Type = "Import",
                             Note = $"Hoàn kho tự động - Hủy đơn hàng rác #{order.OrderCode}",
-                            CreatedBy = order.CreatedBy 
+                            CreatedBy = order.CreatedBy
                         });
                     }
                 }
@@ -364,34 +372,108 @@ namespace WebBanHang.BLL.Services.Implementations
             return true;
         }
 
-        public void ConfirmOrder(int orderId, int userId)
+
+        public async Task<Order?> GetOrderByIdAsync(int orderId)
         {
-            var order = _context.Orders
-                .Include(o => o.OrderDetails)
-                .FirstOrDefault(o => o.OrderId == orderId);
+            return await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId);
+        }
 
-            if (order == null)
-                throw new Exception("Đơn hàng không tồn tại");
-
-            foreach (var detail in order.OrderDetails)
+        public async Task UpdatePaymentInfoAsync(int orderId, string paymentMethod, string paymentStatus)
+        {
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId);
+            if (order != null)
             {
-                _inventoryService.XuatKho(
-                    detail.ProductId,
-                    detail.Quantity,
-                    userId,
-                    $"Tự động sinh khi Order Confirmed - Đơn hàng #{order.OrderCode}");
+                order.PaymentMethod = paymentMethod;
+                order.PaymentStatus = paymentStatus;
+                await _context.SaveChangesAsync();
             }
+        }
 
-            order.Status = "Confirmed";
-            _context.Orders.Update(order);
-            _context.SaveChanges();
+        public async Task UpdatePaymentStatusAsync(int orderId, string paymentStatus)
+        {
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId);
+            if (order != null)
+            {
+                order.PaymentStatus = paymentStatus;
 
-            // MỚI: 2 không đổi logic ở trên
-            var performer = _context.Users.FirstOrDefault(u => u.UserId == userId);
-            _auditLogService.LogAsync(
-                "Order", order.OrderId, "ConfirmOrder",
-                userId, performer?.FullName,
-                $"Xác nhận đơn #{order.OrderCode}").GetAwaiter().GetResult();
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<bool> ConfirmOrderAndDeductStockAsync(int orderId)
+        {
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    var order = await _context.Orders
+                        .Include(o => o.OrderDetails)
+                        .ThenInclude(od => od.Product)
+                        .FirstOrDefaultAsync(o => o.OrderId == orderId);
+
+                    if (order == null || order.Status == "Confirmed") return false;
+
+                    foreach (var detail in order.OrderDetails)
+                    {
+                        if (detail.Product.StockQuantity < detail.Quantity)
+                            throw new Exception($"Sản phẩm '{detail.Product.Name}' không đủ số lượng trong kho!");
+
+                        // Trừ kho thật
+                        detail.Product.StockQuantity -= detail.Quantity;
+
+                        // Ghi nhận lịch sử giao dịch kho
+                        _context.InventoryTransactions.Add(new InventoryTransaction
+                        {
+                            ProductId = detail.ProductId,
+                            Quantity = -detail.Quantity,
+                            Type = "Export",
+                            Note = $"Xuất kho thanh toán VNPay thành công. Đơn: {order.OrderCode}",
+                            CreatedDate = DateTime.Now,
+                            CreatedBy = order.CustomerId
+                        });
+                    }
+
+                    order.Status = "Confirmed";
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return true;
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    return false;
+                }
+            }
+        }
+
+        public async Task DeleteOrderIfFailedAsync(int orderId)
+        {
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    var order = await _context.Orders
+                        .Include(o => o.OrderDetails)
+                        .FirstOrDefaultAsync(o => o.OrderId == orderId);
+
+                    // Chỉ xóa nếu đơn hàng vẫn ở trạng thái Draft và chưa thanh toán Paid
+                    if (order != null && order.Status == "Draft" && order.PaymentStatus != "Paid")
+                    {
+                        if (order.OrderDetails != null && order.OrderDetails.Any())
+                        {
+                            _context.OrderDetails.RemoveRange(order.OrderDetails);
+                        }
+                        _context.Orders.Remove(order);
+
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+                    }
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                }
+            }
         }
     }
 }

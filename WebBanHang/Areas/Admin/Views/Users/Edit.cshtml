@@ -9,7 +9,7 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a asp-action="Index">Danh sách người dùng</a></li>
-                <li class="breadcrumb-item active" aria-current="page">@Model.Username</li>
+                <li class="breadcrumb-item active" aria-current="page">@Model.Email</li>
             </ol>
         </nav>
     </div>
@@ -27,8 +27,8 @@
 
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label asp-for="Username" class="form-label text-muted small fw-bold text-uppercase">Tên đăng nhập</label>
-                            <input asp-for="Username" class="form-control bg-light" readonly />
+                            <label asp-for="Email" class="form-label text-muted small fw-bold text-uppercase">Tên đăng nhập</label>
+                            <input asp-for="Email" class="form-control bg-light" readonly />
                         </div>
                         <div class="col-md-6">
                             <label asp-for="Role" class="form-label text-muted small fw-bold text-uppercase">Vai trò</label>
@@ -75,6 +75,24 @@
                             <label for="NewPassword" class="form-label">Mật khẩu mới</label>
                             <input type="password" name="NewPassword" class="form-control" placeholder=" ••••••••" />
                         </div>
+                    </div>
+                    <div class="mb-3" id="verificationPasswordContainer">
+                        <label asp-for="VerificationPassword" class="form-label">
+                            Mật khẩu xác thực của bạn
+                        </label>
+
+                        <input asp-for="VerificationPassword"
+                               type="password"
+                               class="form-control"
+                               autocomplete="current-password"
+                               placeholder="Nhập mật khẩu admin đang đăng nhập" />
+
+                        <span asp-validation-for="VerificationPassword"
+                              class="text-danger"></span>
+
+                        <small class="text-muted">
+                            Chỉ bắt buộc khi thay đổi quyền hoặc trạng thái liên quan đến Admin.
+                        </small>
                     </div>
 
                     <div class="d-flex justify-content-end gap-2 mt-5">
