@@ -62,7 +62,12 @@
                         <i class="bi bi-receipt"></i> Đơn hàng
                     </a>
                 </li>
-          
+                <li class="nav-item">
+                    <a class="nav-link @(currentController == "TicketApproval" ? "active" : "")" asp-area="Manager" asp-controller="TicketApproval" asp-action="Index">
+                        <i class="bi bi-headset"></i> Duyệt Yêu cầu CSKH
+                    </a>
+                </li>
+
             }
 
             @* --- MỤC CHỈ DÀNH RIÊNG CHO ADMIN --- *@
@@ -76,6 +81,11 @@
                 <li class="nav-item">
                     <a class="nav-link @(currentController == "AuditLog" ? "active" : "")" asp-area="Admin" asp-controller="AuditLog" asp-action="Index">
                         <i class="bi bi-clock-history"></i> Audit Log
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentController == "Tickets" ? "active" : "")" asp-area="Sale" asp-controller="Tickets" asp-action="Index">
+                        <i class="bi bi-headset"></i> Xử lý Yêu cầu CSKH
                     </a>
                 </li>
             }

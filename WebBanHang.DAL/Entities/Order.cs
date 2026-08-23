@@ -38,4 +38,6 @@ public partial class Order
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
     public virtual ICollection<OrderPromotion> OrderPromotions { get; set; } = new List<OrderPromotion>();
+
+    public virtual ICollection<SupportTicket> SupportTickets { get; set; } = new List<SupportTicket>();
 }

@@ -1,0 +1,57 @@
+﻿@model WebBanHang.BLL.DTOs.CreateTicketDTO
+
+@{
+    ViewData["Title"] = "Tạo yêu cầu CSKH";
+    int orderDetailId = ViewBag.OrderDetailId ?? 0;
+}
+
+<div class="container py-5" style="max-width: 720px;">
+    <h1 class="fw-bold mb-1"><i class="bi bi-headset me-2 text-primary"></i>Tạo yêu cầu CSKH</h1>
+    <p class="text-muted mb-4">Gửi yêu cầu bảo hành hoặc đổi/trả cho sản phẩm bạn đã mua</p>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger border-0 rounded-3 shadow-sm mb-4">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+        </div>
+    }
+
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4">
+            <form asp-area="Customer" asp-controller="Ticket" asp-action="Create" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="OrderDetailId" value="@orderDetailId" />
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Loại yêu cầu</label>
+                    <select name="TicketType" class="form-select" required>
+                        <option value="">-- Chọn loại yêu cầu --</option>
+                        <option value="WarrantyRequest">Bảo hành (sản phẩm bị lỗi)</option>
+                        <option value="ReturnRequest">Đổi / Trả hàng</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Mô tả chi tiết</label>
+                    <textarea name="Description" class="form-control" rows="4" required
+                              placeholder="Mô tả tình trạng lỗi hoặc lý do đổi/trả..."></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Ảnh minh chứng (nếu có)</label>
+                    <input type="file" name="images" class="form-control" multiple accept="image/*" />
+                    <small class="text-muted">Có thể chọn nhiều ảnh cùng lúc.</small>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">
+                        <i class="bi bi-send-fill me-1"></i> Gửi yêu cầu
+                    </button>
+                    <a asp-area="Customer" asp-controller="Order" asp-action="MyOrders" class="btn btn-outline-secondary rounded-pill px-4">
+                        Hủy
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

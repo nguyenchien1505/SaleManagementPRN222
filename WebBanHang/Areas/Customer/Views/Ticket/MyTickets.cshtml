@@ -1,0 +1,138 @@
+﻿@model IEnumerable<WebBanHang.BLL.DTOs.TicketListItemDTO>
+
+@{
+    ViewData["Title"] = "Yêu cầu CSKH của tôi";
+}
+
+<div class="container py-5">
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h1 class="fw-bold mb-1">
+                <i class="bi bi-headset me-2 text-primary"></i>Yêu cầu CSKH của tôi
+            </h1>
+            <p class="text-muted mb-0">Theo dõi các yêu cầu bảo hành / đổi trả bạn đã gửi</p>
+        </div>
+        <div class="col-auto">
+            <a asp-area="Customer" asp-controller="Order" asp-action="MyOrders" class="btn btn-outline-primary rounded-pill px-4">
+                <i class="bi bi-bag-check me-1"></i> Xem đơn hàng của tôi
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show border-0 rounded-3 shadow-sm mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show border-0 rounded-3 shadow-sm mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="text-center py-5 my-5 bg-white rounded-4 shadow-sm border-0">
+            <div class="mb-4">
+                <i class="bi bi-headset display-1 text-muted opacity-50"></i>
+            </div>
+            <h3 class="fw-bold text-secondary mb-2">Bạn chưa có yêu cầu CSKH nào</h3>
+            <p class="text-muted mb-4">Nếu sản phẩm gặp lỗi hoặc muốn đổi/trả, hãy tạo yêu cầu từ trang đơn hàng.</p>
+            <a asp-area="Customer" asp-controller="Order" asp-action="MyOrders" class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm">
+                <i class="bi bi-bag-check me-2"></i> Xem đơn hàng
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4 py-3 border-0 text-muted fw-semibold">Mã Ticket</th>
+                                <th class="py-3 border-0 text-muted fw-semibold">Sản phẩm</th>
+                                <th class="py-3 border-0 text-muted fw-semibold">Loại yêu cầu</th>
+                                <th class="py-3 border-0 text-muted fw-semibold">Ngày tạo</th>
+                                <th class="py-3 border-0 text-muted fw-semibold">Trạng thái</th>
+                                <th class="pe-4 py-3 border-0 text-muted fw-semibold text-center">Chi tiết</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var t in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="fw-bold text-primary">@t.TicketCode</div>
+                                        <small class="text-muted">Đơn @t.OrderCode</small>
+                                    </td>
+                                    <td>@t.ProductName</td>
+                                    <td>
+                                        @if (t.TicketType == "WarrantyRequest")
+                                        {
+                                            <span class="badge bg-info-subtle text-info rounded-pill px-3 py-2">Bảo hành</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">Đổi/Trả</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="fw-medium text-dark">@t.CreatedDate?.ToString("dd/MM/yyyy")</div>
+                                        <small class="text-muted">@t.CreatedDate?.ToString("HH:mm")</small>
+                                    </td>
+                                    <td>
+                                        @{
+                                            var st = t.Status;
+                                        }
+                                        @switch (st)
+                                        {
+                                            case "New":
+                                                <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">Mới tạo</span>
+                                                break;
+                                            case "InProgress":
+                                                <span class="badge bg-info-subtle text-info rounded-pill px-3 py-2">Đang xử lý</span>
+                                                break;
+                                            case "WaitingCustomer":
+                                                <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">Chờ bạn phản hồi</span>
+                                                break;
+                                            case "PendingApproval":
+                                                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">Chờ duyệt</span>
+                                                break;
+                                            case "Approved":
+                                                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">Đã duyệt</span>
+                                                break;
+                                            case "Resolved":
+                                                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">Đã xử lý xong</span>
+                                                break;
+                                            case "Rejected":
+                                                <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">Bị từ chối</span>
+                                                break;
+                                            case "Cancelled":
+                                                <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">Đã hủy</span>
+                                                break;
+                                            default:
+                                                <span class="badge bg-light text-dark border rounded-pill px-3 py-2">@st</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td class="pe-4 text-center">
+                                        <a asp-area="Customer" asp-controller="Ticket" asp-action="Details" asp-route-id="@t.TicketId"
+                                           class="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-sm">
+                                            Xem <i class="bi bi-chevron-right ms-1"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>

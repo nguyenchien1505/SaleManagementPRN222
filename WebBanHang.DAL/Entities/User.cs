@@ -42,4 +42,10 @@ public partial class User
     public virtual ICollection<Order> OrderCustomers { get; set; } = new List<Order>();
 
     public virtual ICollection<Product> Products { get; set; } = new List<Product>();
+
+    public virtual ICollection<SupportTicket> SupportTicketApprovedByUsers { get; set; } = new List<SupportTicket>();
+
+    public virtual ICollection<SupportTicket> SupportTicketAssignedSales { get; set; } = new List<SupportTicket>();
+
+    public virtual ICollection<SupportTicket> SupportTicketCustomers { get; set; } = new List<SupportTicket>();
 }

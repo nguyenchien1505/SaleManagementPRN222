@@ -143,6 +143,10 @@
                                                                     <th class="text-center py-2">Số lượng</th>
                                                                     <th class="text-end pe-3 py-2">Đơn giá</th>
                                                                     <th class="text-end pe-3 py-2">Tổng</th>
+                                                                    @if (order.Status == "Completed")
+                                                                    {
+                                                                        <th class="text-center py-2">CSKH</th>
+                                                                    }
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
@@ -161,6 +165,16 @@
                                                                             <td class="text-end pe-3 py-2 fw-semibold text-dark">
                                                                                 @detail.Total.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) đ
                                                                             </td>
+                                                                            @if (order.Status == "Completed")
+                                                                            {
+                                                                                <td class="text-center py-2">
+                                                                                    <a asp-area="Customer" asp-controller="Ticket" asp-action="Create"
+                                                                                       asp-route-orderDetailId="@detail.OrderDetailId"
+                                                                                       class="btn btn-sm btn-outline-warning rounded-pill px-2">
+                                                                                        <i class="bi bi-headset"></i> Bảo hành/Đổi trả
+                                                                                    </a>
+                                                                                </td>
+                                                                            }
                                                                         </tr>
                                                                     }
                                                                 }

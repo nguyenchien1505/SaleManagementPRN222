@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using WebBanHang.DAL.Entities;
@@ -38,10 +38,12 @@ public partial class WebBanHangContext : DbContext
 
     public virtual DbSet<Promotion> Promotions { get; set; }
 
+    public virtual DbSet<SupportTicket> SupportTickets { get; set; }
+
+    public virtual DbSet<TicketAttachment> TicketAttachments { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
 
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -260,9 +262,78 @@ public partial class WebBanHangContext : DbContext
             entity.Property(e => e.Value).HasColumnType("decimal(18, 2)");
         });
 
+        modelBuilder.Entity<SupportTicket>(entity =>
+        {
+            entity.HasKey(e => e.TicketId).HasName("PK__SupportT__712CC607F503CF51");
+
+            entity.HasIndex(e => e.CustomerId, "IX_SupportTickets_CustomerId");
+
+            entity.HasIndex(e => e.OrderId, "IX_SupportTickets_OrderId");
+
+            entity.HasIndex(e => e.Status, "IX_SupportTickets_Status");
+
+            entity.HasIndex(e => e.TicketCode, "UQ__SupportT__598CF7A31AF4A966").IsUnique();
+
+            entity.Property(e => e.ApprovedDate).HasColumnType("datetime");
+            entity.Property(e => e.ClosedDate).HasColumnType("datetime");
+            entity.Property(e => e.CreatedDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Description).HasMaxLength(1000);
+            entity.Property(e => e.RefundAmount).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.RejectReason).HasMaxLength(500);
+            entity.Property(e => e.ResolutionType).HasMaxLength(20);
+            entity.Property(e => e.Status)
+                .HasMaxLength(20)
+                .HasDefaultValue("New");
+            entity.Property(e => e.TicketCode).HasMaxLength(20);
+            entity.Property(e => e.TicketType).HasMaxLength(20);
+            entity.Property(e => e.UpdatedDate).HasColumnType("datetime");
+
+            entity.HasOne(d => d.ApprovedByUser).WithMany(p => p.SupportTicketApprovedByUsers)
+                .HasForeignKey(d => d.ApprovedByUserId)
+                .HasConstraintName("FK_SupportTickets_ApprovedBy");
+
+            entity.HasOne(d => d.AssignedSale).WithMany(p => p.SupportTicketAssignedSales)
+                .HasForeignKey(d => d.AssignedSaleId)
+                .HasConstraintName("FK_SupportTickets_AssignedSale");
+
+            entity.HasOne(d => d.Customer).WithMany(p => p.SupportTicketCustomers)
+                .HasForeignKey(d => d.CustomerId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_SupportTickets_Customer");
+
+            entity.HasOne(d => d.OrderDetail).WithMany(p => p.SupportTickets)
+                .HasForeignKey(d => d.OrderDetailId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_SupportTickets_OrderDetails");
+
+            entity.HasOne(d => d.Order).WithMany(p => p.SupportTickets)
+                .HasForeignKey(d => d.OrderId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_SupportTickets_Orders");
+        });
+
+        modelBuilder.Entity<TicketAttachment>(entity =>
+        {
+            entity.HasKey(e => e.AttachmentId).HasName("PK__TicketAt__442C64BE512D91CD");
+
+            entity.Property(e => e.FileType).HasMaxLength(20);
+            entity.Property(e => e.FileUrl).HasMaxLength(500);
+            entity.Property(e => e.UploadedDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Ticket).WithMany(p => p.TicketAttachments)
+                .HasForeignKey(d => d.TicketId)
+                .HasConstraintName("FK_TicketAttachments_SupportTickets");
+        });
+
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4C89771F98");
+
+            entity.HasIndex(e => e.Username, "UQ__Users__536C85E4FF1C900E").IsUnique();
 
             entity.HasIndex(e => e.Email, "UQ__Users__A9D10534CCD89E06").IsUnique();
 
@@ -279,6 +350,7 @@ public partial class WebBanHangContext : DbContext
             entity.Property(e => e.ResetPasswordToken).HasMaxLength(200);
             entity.Property(e => e.ResetPasswordTokenExpiry).HasColumnType("datetime");
             entity.Property(e => e.Role).HasMaxLength(20);
+            entity.Property(e => e.Username).HasMaxLength(50);
         });
 
         OnModelCreatingPartial(modelBuilder);

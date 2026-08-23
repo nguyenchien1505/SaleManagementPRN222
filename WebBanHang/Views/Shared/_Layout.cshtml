@@ -143,6 +143,14 @@
                                             </li>
                                         }
 
+                                        @* Sale (hoặc Manager thay mặt) xử lý hàng đợi yêu cầu CSKH *@
+                                        <li>
+                                            <a class="dropdown-item text-warning fw-bold" asp-area="Sale" asp-controller="Tickets" asp-action="Index">
+                                                <i class="bi bi-headset me-2"></i>
+                                                Xử lý Yêu cầu CSKH
+                                            </a>
+                                        </li>
+
                                         <li><hr class="dropdown-divider"></li>
                                     }
                                     @if (Context.Session.GetString("Role") == "Customer")
@@ -159,6 +167,8 @@
                                         <li><a class="dropdown-item" asp-area="Customer" asp-controller="Cart" asp-action="Index"><i class="bi bi-cart3 me-2"></i> Giỏ hàng của tôi</a></li>
 
                                         <li><a class="dropdown-item" asp-area="Customer" asp-controller="Order" asp-action="MyOrders"><i class="bi bi-bag-check me-2"></i> Đơn hàng của tôi </a></li>
+
+                                        <li><a class="dropdown-item" asp-area="Customer" asp-controller="Ticket" asp-action="MyTickets"><i class="bi bi-headset me-2"></i> Yêu cầu CSKH của tôi </a></li>
 
                                         <li><hr class="dropdown-divider"></li>
                                     }

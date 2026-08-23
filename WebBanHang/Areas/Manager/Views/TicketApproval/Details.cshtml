@@ -1,0 +1,91 @@
+﻿@model WebBanHang.DAL.Entities.SupportTicket
+
+@{
+    ViewData["Title"] = "Duyệt " + Model.TicketCode;
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid p-4" style="max-width: 900px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0">@Model.TicketCode <span class="badge-modern badge-info-modern">@Model.Status</span></h4>
+        <a asp-area="Manager" asp-controller="TicketApproval" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success border-0 rounded-3 shadow-sm mb-4">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger border-0 rounded-3 shadow-sm mb-4">@TempData["Error"]</div>
+    }
+
+    <div class="card-modern mb-4">
+        <div class="row g-3">
+            <div class="col-md-6"><small class="text-muted d-block">Khách hàng</small><strong>@Model.Customer.FullName</strong></div>
+            <div class="col-md-6"><small class="text-muted d-block">Đơn hàng</small><strong>@Model.Order.OrderCode</strong></div>
+            <div class="col-md-6"><small class="text-muted d-block">Sản phẩm</small><strong>@Model.OrderDetail.Product.Name (SL: @Model.OrderDetail.Quantity)</strong></div>
+            <div class="col-md-6"><small class="text-muted d-block">Loại yêu cầu</small><strong>@(Model.TicketType == "WarrantyRequest" ? "Bảo hành" : "Đổi/Trả")</strong></div>
+            <div class="col-md-6"><small class="text-muted d-block">Sale phụ trách</small><strong>@Model.AssignedSale?.FullName</strong></div>
+            <div class="col-md-6"><small class="text-muted d-block">Đề xuất xử lý</small><strong>@Model.ResolutionType</strong> @(Model.RefundAmount.HasValue ? $"({Model.RefundAmount.Value.ToString("N0")} đ)" : "")</div>
+            <div class="col-12"><small class="text-muted d-block">Mô tả từ khách</small><p class="mb-0">@Model.Description</p></div>
+        </div>
+
+        @if (Model.TicketAttachments != null && Model.TicketAttachments.Any())
+        {
+            <hr class="my-3" />
+            <div class="d-flex flex-wrap gap-3">
+                @foreach (var img in Model.TicketAttachments)
+                {
+                    <a href="@img.FileUrl" target="_blank"><img src="@img.FileUrl" style="width:100px;height:100px;object-fit:cover;" class="rounded-3 border" /></a>
+                }
+            </div>
+        }
+    </div>
+
+    @if (Model.Status == "PendingApproval")
+    {
+        <div class="d-flex gap-3">
+            <form asp-area="Manager" asp-controller="TicketApproval" asp-action="Approve" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="TicketId" value="@Model.TicketId" />
+                <button type="submit" class="btn btn-success rounded-pill px-4">
+                    <i class="bi bi-check-lg me-1"></i> Duyệt
+                </button>
+            </form>
+
+            <button type="button" class="btn btn-outline-danger rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                <i class="bi bi-x-lg me-1"></i> Từ chối
+            </button>
+        </div>
+
+        <div class="modal fade" id="rejectModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 rounded-4 shadow-lg">
+                    <form asp-area="Manager" asp-controller="TicketApproval" asp-action="Reject" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="TicketId" value="@Model.TicketId" />
+                        <div class="modal-header">
+                            <h5 class="modal-title">Từ chối yêu cầu</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <label class="form-label">Lý do từ chối</label>
+                            <textarea name="RejectReason" class="form-control" rows="3" required></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-danger rounded-pill px-4">Xác nhận từ chối</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-secondary border-0 rounded-3">Ticket này đã được xử lý (trạng thái: @Model.Status), không còn ở bước chờ duyệt.</div>
+    }
+</div>

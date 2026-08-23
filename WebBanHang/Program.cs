@@ -51,6 +51,8 @@ builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IAuditLogService, AuditLogService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<ITicketService, TicketService>();
+builder.Services.AddScoped<ICloudinaryImageService, CloudinaryImageService>();
 
 builder.Services.AddSession(options =>
 {

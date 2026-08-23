@@ -1,0 +1,114 @@
+﻿@model WebBanHang.DAL.Entities.SupportTicket
+
+@{
+    ViewData["Title"] = "Xử lý " + Model.TicketCode;
+    Layout = "_SaleLayout";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0">@Model.TicketCode <span class="badge bg-info-subtle text-info rounded-pill px-3 py-2">@Model.Status</span></h4>
+    <a asp-area="Sale" asp-controller="Tickets" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+        <i class="bi bi-arrow-left me-1"></i> Quay lại hàng đợi
+    </a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success border-0 rounded-3 shadow-sm mb-4">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger border-0 rounded-3 shadow-sm mb-4">@TempData["ErrorMessage"]</div>
+}
+
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-body p-4">
+        <div class="row g-3">
+            <div class="col-md-6"><small class="text-muted d-block">Khách hàng</small><strong>@Model.Customer.FullName</strong></div>
+            <div class="col-md-6"><small class="text-muted d-block">Đơn hàng</small><strong>@Model.Order.OrderCode</strong></div>
+            <div class="col-md-6"><small class="text-muted d-block">Sản phẩm</small><strong>@Model.OrderDetail.Product.Name (SL: @Model.OrderDetail.Quantity)</strong></div>
+            <div class="col-md-6"><small class="text-muted d-block">Loại yêu cầu</small><strong>@(Model.TicketType == "WarrantyRequest" ? "Bảo hành" : "Đổi/Trả")</strong></div>
+            <div class="col-12"><small class="text-muted d-block">Mô tả từ khách</small><p class="mb-0">@Model.Description</p></div>
+        </div>
+
+        @if (Model.TicketAttachments != null && Model.TicketAttachments.Any())
+        {
+            <hr class="my-3" />
+            <div class="d-flex flex-wrap gap-3">
+                @foreach (var img in Model.TicketAttachments)
+                {
+                    <a href="@img.FileUrl" target="_blank"><img src="@img.FileUrl" style="width:100px;height:100px;object-fit:cover;" class="rounded-3 border" /></a>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@if (Model.Status == "New")
+{
+    <form asp-area="Sale" asp-controller="Tickets" asp-action="Start" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.TicketId" />
+        <button type="submit" class="btn btn-primary rounded-pill px-4">
+            <i class="bi bi-play-fill me-1"></i> Tiếp nhận xử lý
+        </button>
+    </form>
+}
+
+@if (Model.Status == "InProgress")
+{
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4">
+            <h6 class="fw-bold mb-3">Đề xuất hướng xử lý (gửi Manager duyệt)</h6>
+            <form asp-area="Sale" asp-controller="Tickets" asp-action="SubmitForApproval" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="TicketId" value="@Model.TicketId" />
+                <div class="mb-3">
+                    <label class="form-label">Hướng xử lý</label>
+                    <select name="ResolutionType" class="form-select" required>
+                        <option value="">-- Chọn --</option>
+                        <option value="Exchange">Đổi hàng mới</option>
+                        <option value="Refund">Hoàn tiền</option>
+                        <option value="Repair">Sửa chữa</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Số tiền hoàn (nếu Refund)</label>
+                    <input type="number" step="1000" name="RefundAmount" class="form-control" />
+                </div>
+                <button type="submit" class="btn btn-primary rounded-pill px-4">
+                    <i class="bi bi-send-fill me-1"></i> Gửi đề xuất
+                </button>
+            </form>
+        </div>
+    </div>
+}
+
+@if (Model.Status == "PendingApproval")
+{
+    <div class="alert alert-info border-0 rounded-3">Đang chờ Manager duyệt đề xuất: <strong>@Model.ResolutionType</strong></div>
+}
+
+@if (Model.Status == "Approved")
+{
+    <div class="alert alert-primary border-0 rounded-3 mb-3">
+        Manager đã duyệt hướng xử lý: <strong>@Model.ResolutionType</strong>. Thực hiện xong ngoài thực tế thì bấm nút bên dưới.
+    </div>
+    <form asp-area="Sale" asp-controller="Tickets" asp-action="Complete" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.TicketId" />
+        <button type="submit" class="btn btn-success rounded-pill px-4">
+            <i class="bi bi-check2-circle me-1"></i> Hoàn tất xử lý (cập nhật kho)
+        </button>
+    </form>
+}
+
+@if (Model.Status == "Rejected")
+{
+    <div class="alert alert-danger border-0 rounded-3">Manager đã từ chối. Lý do: @Model.RejectReason</div>
+}
+
+@if (Model.Status == "Resolved" || Model.Status == "Closed")
+{
+    <div class="alert alert-success border-0 rounded-3">Ticket đã xử lý xong.</div>
+}
