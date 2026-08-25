@@ -56,7 +56,7 @@ namespace WebBanHang.Areas.Manager.Controllers
         [ValidateAntiForgeryToken]
         [Route("Manager/Inventory/Inbound")]
         [Route("Manager/Inventory/NhapKho")]
-        public IActionResult Inbound(int productId, int quantity, string note)
+        public IActionResult Inbound(int productId, int quantity, string? supplierName, string? note)
         {
             var userId = HttpContext.Session.GetInt32("UserId") ?? 0;
 
@@ -69,7 +69,7 @@ namespace WebBanHang.Areas.Manager.Controllers
 
             try
             {
-                _inventoryService.NhapKho(productId, quantity, userId, note);
+                _inventoryService.NhapKho(productId, quantity, userId, supplierName, note);
                 TempData["Success"] = "Nhập kho thành công, tồn kho đã được cập nhật.";
                 return RedirectToAction(nameof(Index));
             }

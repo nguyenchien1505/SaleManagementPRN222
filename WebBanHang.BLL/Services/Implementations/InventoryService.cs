@@ -21,7 +21,7 @@ namespace WebBanHang.BLL.Services.Implementations
             _productRepository = productRepository;
         }
 
-        public void NhapKho(int productId, int quantity, int userId, string? note = null)
+        public void NhapKho(int productId, int quantity, int userId, string? supplierName = null, string? note = null)
         {
             if (quantity <= 0)
                 throw new ArgumentException("Số lượng nhập phải lớn hơn 0");
@@ -31,6 +31,12 @@ namespace WebBanHang.BLL.Services.Implementations
                 throw new Exception("Sản phẩm không tồn tại");
 
             product.StockQuantity += quantity;
+
+            if (!string.IsNullOrWhiteSpace(supplierName))
+            {
+                product.SupplierName = supplierName.Trim();
+            }
+
             _repo.UpdateProductStock(product);
 
             _repo.AddTransaction(new InventoryTransaction
@@ -120,7 +126,13 @@ namespace WebBanHang.BLL.Services.Implementations
                 {
                     var productCode = worksheet.Cells[row, 1].Value?.ToString()?.Trim();
                     var qtyStr = worksheet.Cells[row, 2].Value?.ToString()?.Trim();
-                    var note = worksheet.Cells[row, 3].Value?.ToString()?.Trim() ?? "Nhập kho hàng loạt qua Excel";                    if (string.IsNullOrEmpty(productCode) && string.IsNullOrEmpty(qtyStr)) continue;
+                    var note = worksheet.Cells[row, 3].Value?.ToString()?.Trim() ?? "Nhập kho hàng loạt qua Excel";
+                    var supplierName = colCount >= 4
+                        ? worksheet.Cells[row, 4].Value?.ToString()?.Trim()
+                        : null;
+                    if (string.IsNullOrEmpty(supplierName)) supplierName = null;
+
+                    if (string.IsNullOrEmpty(productCode) && string.IsNullOrEmpty(qtyStr)) continue;
 
                     if (string.IsNullOrEmpty(productCode))
                     {
@@ -144,7 +156,7 @@ namespace WebBanHang.BLL.Services.Implementations
                         throw new Exception($"Dòng {row}: Mã sản phẩm '{productCode}' không tồn tại trong hệ thống! Vui lòng kiểm tra lại.");
                     }
 
-                    NhapKho(product.ProductId, quantity, userId, note);
+                    NhapKho(product.ProductId, quantity, userId, supplierName, note);
                     successCount++;
                 }
             }

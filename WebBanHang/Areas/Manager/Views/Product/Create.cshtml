@@ -110,6 +110,12 @@
                         </div>
 
                         <div class="form-group mb-3">
+                            <label asp-for="SupplierName" class="control-label fw-bold">Nhà cung cấp</label>
+                            <input asp-for="SupplierName" class="form-control" placeholder="Nhập tên nhà cung cấp" maxlength="255" />
+                            <span asp-validation-for="SupplierName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
                             <label asp-for="Status" class="control-label fw-bold">Trạng thái</label>
                             <select asp-for="Status" class="form-select">
                                 <option value="Active">Hoạt động</option>

@@ -32,7 +32,7 @@
                     {
                         foreach (var p in products)
                         {
-                            <option value="@p.ProductId">@p.Name (Tồn hiện tại: @p.StockQuantity)</option>
+                            <option value="@p.ProductId" data-supplier="@p.SupplierName">@p.Name (Tồn hiện tại: @p.StockQuantity)</option>
                         }
                     }
                 </select>
@@ -44,8 +44,14 @@
             </div>
 
             <div class="mb-4">
+                <label class="form-label fw-semibold text-secondary">Nhà cung cấp</label>
+                <input type="text" name="supplierName" id="supplierNameInput" class="form-control custom-input py-2" maxlength="255" placeholder="Tự động điền theo sản phẩm, có thể sửa để cập nhật..." style="border-radius: 8px;" />
+                <small class="text-muted">Tự động load nhà cung cấp hiện tại của sản phẩm. Chỉnh sửa nếu nhập từ nhà cung cấp mới.</small>
+            </div>
+
+            <div class="mb-4">
                 <label class="form-label fw-semibold text-secondary">Ghi chú vận hành</label>
-                <textarea name="note" class="form-control custom-input" rows="4" placeholder="Nhập lý do nhập kho hoặc thông tin nhà cung cấp..." style="border-radius: 8px;"></textarea>
+                <textarea name="note" class="form-control custom-input" rows="4" placeholder="Nhập lý do nhập kho..." style="border-radius: 8px;"></textarea>
             </div>
 
             <div class="d-flex gap-2 pt-2">
@@ -70,6 +76,20 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        // Tự động điền Nhà cung cấp hiện tại khi chọn sản phẩm
+        document.addEventListener("DOMContentLoaded", function () {
+            var productSelect = document.querySelector('select[name="productId"]');
+            var supplierInput = document.getElementById('supplierNameInput');
+
+            if (productSelect && supplierInput) {
+                productSelect.addEventListener('change', function () {
+                    var selectedOption = productSelect.options[productSelect.selectedIndex];
+                    var supplier = selectedOption ? selectedOption.getAttribute('data-supplier') : null;
+                    supplierInput.value = supplier || '';
+                });
+            }
+        });
+
         function handleInboundExcelUpload(input) {
             if (input.files && input.files.length > 0) {
                 var file = input.files[0];

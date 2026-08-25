@@ -24,6 +24,8 @@
                         <dd class="col-sm-9 text-primary fw-bold">@Model.SellingPrice.ToString("N0") đ</dd>
                         <dt class="col-sm-3">Tồn kho</dt>
                         <dd class="col-sm-9">@Model.StockQuantity</dd>
+                        <dt class="col-sm-3">Nhà cung cấp</dt>
+                        <dd class="col-sm-9">@(Model.SupplierName ?? "Chưa có")</dd>
                         <dt class="col-sm-3">Trạng thái</dt>
                         <dd class="col-sm-9">@Model.Status</dd>
                     </dl>

@@ -23,9 +23,10 @@
             <table class="table table-hover align-middle mb-0 text-center">
                 <thead class="table-dark" style="background-color: #212529;">
                     <tr>
-                        <th class="py-3" style="width: 20%;">Mã SP</th>
-                        <th class="py-3" style="width: 40%;">Tên sản phẩm</th>
-                        <th class="py-3" style="width: 20%;">Tồn kho hiện tại</th>
+                        <th class="py-3" style="width: 15%;">Mã SP</th>
+                        <th class="py-3" style="width: 30%;">Tên sản phẩm</th>
+                        <th class="py-3" style="width: 20%;">Nhà cung cấp</th>
+                        <th class="py-3" style="width: 15%;">Tồn kho hiện tại</th>
                         <th class="py-3" style="width: 20%;">Trạng thái</th>
                     </tr>
                 </thead>
@@ -33,7 +34,7 @@
                     @if (Model == null || !Model.Any())
                     {
                         <tr>
-                            <td colspan="4" class="py-5 text-muted">Không có sản phẩm nào</td>
+                            <td colspan="5" class="py-5 text-muted">Không có sản phẩm nào</td>
                         </tr>
                     }
                     else
@@ -44,6 +45,7 @@
                             <tr class="@(isLowStock ? "table-warning bg-warning-subtle" : "")">
                                 <td class="py-3 font-monospace fw-bold text-secondary">@p.Code</td>
                                 <td class="py-3 fw-semibold text-dark text-start ps-4">@p.Name</td>
+                                <td class="py-3 text-start ps-4">@(p.SupplierName ?? "-")</td>
                                 <td class="py-3 font-monospace fw-bold @(isLowStock ? "text-danger" : "text-dark")">@p.StockQuantity</td>
                                 <td class="py-3">
                                     @if (isLowStock)

@@ -30,6 +30,7 @@ namespace WebBanHang.BLL.Services.Implementations
                 Status = u.Status,
                 StockQuantity = u.StockQuantity,
                 Description = u.Description,
+                SupplierName = u.SupplierName,
                 Images = u.ProductImages.Select(x => new ProductImageDTO
                 {
                     ImageUrl = x.ImageUrl,
@@ -62,6 +63,7 @@ namespace WebBanHang.BLL.Services.Implementations
                 SellingPrice = product.SellingPrice,
                 ImportPrice = product.ImportPrice,
                 StockQuantity = product.StockQuantity,
+                SupplierName = product.SupplierName,
                 CategoryId = product.CategoryId,
                 CategoryName = product.Category.Name
             };
@@ -79,6 +81,7 @@ namespace WebBanHang.BLL.Services.Implementations
                 SellingPrice = product.SellingPrice,
                 ImportPrice = product.ImportPrice,
                 StockQuantity = product.StockQuantity,
+                SupplierName = product.SupplierName,
                 Status = product.Status,
                 Description = product.Description,
                 CreateBy = product.CreatedByNavigation.FullName,
@@ -118,6 +121,7 @@ namespace WebBanHang.BLL.Services.Implementations
                 ImportPrice = dto.ImportPrice,
                 StockQuantity = dto.StockQuantity,
                 Status = dto.Status,
+                SupplierName = dto.SupplierName,
                 Description = dto.Description,
                 CreatedDate = DateTime.Now,
                 CreatedBy = dto.CreatedBy,
@@ -140,6 +144,7 @@ namespace WebBanHang.BLL.Services.Implementations
             existedProduct.ImportPrice = dto.ImportPrice;
             existedProduct.StockQuantity = dto.StockQuantity;
             existedProduct.Status = dto.Status;
+            existedProduct.SupplierName = dto.SupplierName;
             existedProduct.CategoryId = dto.CategoryId;
 
             existedProduct.ProductImages ??= new List<ProductImage>();
@@ -191,6 +196,7 @@ namespace WebBanHang.BLL.Services.Implementations
                 Status = u.Status,
                 StockQuantity = u.StockQuantity,
                 Description = u.Description,
+                SupplierName = u.SupplierName,
                 Images = u.ProductImages.Select(x => new ProductImageDTO
                 {
                     ImageUrl = x.ImageUrl,
@@ -223,6 +229,7 @@ namespace WebBanHang.BLL.Services.Implementations
                 SellingPrice = product.SellingPrice,
                 ImportPrice = product.ImportPrice,
                 StockQuantity = product.StockQuantity,
+                SupplierName = product.SupplierName,
                 CategoryId = product.CategoryId,
                 CategoryName = product.Category.Name
             };
@@ -240,6 +247,7 @@ namespace WebBanHang.BLL.Services.Implementations
                 SellingPrice = product.SellingPrice,
                 ImportPrice = product.ImportPrice,
                 StockQuantity = product.StockQuantity,
+                SupplierName = product.SupplierName,
                 Status = product.Status,
                 Description = product.Description,
                 CreateBy = product.CreatedByNavigation.FullName,
@@ -309,10 +317,11 @@ namespace WebBanHang.BLL.Services.Implementations
                 worksheet.Cells[1, 6].Value = "Số Lượng Tồn";
                 worksheet.Cells[1, 7].Value = "Mô Tả";
                 worksheet.Cells[1, 8].Value = "Trạng Thái";
+                worksheet.Cells[1, 9].Value = "Nhà Cung Cấp";
 
-                worksheet.Cells["A1:H1"].Style.Font.Bold = true;
-                worksheet.Cells["A1:H1"].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                worksheet.Cells["A1:H1"].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+                worksheet.Cells["A1:I1"].Style.Font.Bold = true;
+                worksheet.Cells["A1:I1"].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                worksheet.Cells["A1:I1"].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
 
                 int row = 2;
                 foreach (var item in products)
@@ -327,6 +336,7 @@ namespace WebBanHang.BLL.Services.Implementations
                     worksheet.Cells[row, 6].Value = item.StockQuantity;
                     worksheet.Cells[row, 7].Value = item.Description;
                     worksheet.Cells[row, 8].Value = item.Status;
+                    worksheet.Cells[row, 9].Value = item.SupplierName;
                     row++;
                 }
 
@@ -392,6 +402,10 @@ namespace WebBanHang.BLL.Services.Implementations
 
                     var desc = worksheet.Cells[row, 7].Value?.ToString()?.Trim();
                     var status = worksheet.Cells[row, 8].Value?.ToString()?.Trim() ?? "Active";
+                    var supplierName = worksheet.Dimension?.Columns >= 9
+                        ? worksheet.Cells[row, 9].Value?.ToString()?.Trim()
+                        : null;
+                    if (string.IsNullOrEmpty(supplierName)) supplierName = null;
 
                     var dto = new ProductDTO
                     {
@@ -403,6 +417,7 @@ namespace WebBanHang.BLL.Services.Implementations
                         StockQuantity = stockQuantity,
                         Description = desc,
                         Status = status,
+                        SupplierName = supplierName,
                         CreatedBy = userId,
                         Images = new List<ProductImageDTO>()
                     };

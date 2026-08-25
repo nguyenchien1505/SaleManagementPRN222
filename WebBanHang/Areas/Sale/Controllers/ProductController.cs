@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebBanHang.BLL.DTOs;
 using WebBanHang.BLL.Services.Interfaces;
+using WebBanHang.Filters;
 using WebBanHang.ViewModels;
 
 namespace WebBanHang.Areas.Sale.Controllers
 {   
     [Area("Sale")]
+    [RoleAuthorize("Sales")]
     public class ProductController : Controller
     {
         
@@ -46,6 +48,7 @@ namespace WebBanHang.Areas.Sale.Controllers
                 SellingPrice = product.SellingPrice,
                 ImportPrice = product.ImportPrice,
                 StockQuantity = product.StockQuantity,
+                SupplierName = product.SupplierName,
                 Status = product.Status,
                 Description = product.Description,
                 ExistingImages = product.ExistingImages?.Select(x => new ProductImageDTO

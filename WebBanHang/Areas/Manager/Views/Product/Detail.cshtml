@@ -46,6 +46,9 @@
                         <dt class="col-sm-3">Category</dt>
                         <dd class="col-sm-9"><span class="badge bg-info text-dark">@Model.CategoryName</span></dd>
 
+                        <dt class="col-sm-3">Nhà cung cấp</dt>
+                        <dd class="col-sm-9">@(Model.SupplierName ?? "Chưa có")</dd>
+
                         <dt class="col-sm-3">Selling Price</dt>
                         <dd class="col-sm-9 text-success fw-bold">@((Model.SellingPrice).ToString("N0", new System.Globalization.CultureInfo("vi-VN"))) VNĐ</dd>
 

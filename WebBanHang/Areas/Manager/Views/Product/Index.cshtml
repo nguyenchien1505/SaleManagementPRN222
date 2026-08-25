@@ -104,6 +104,7 @@
                                 <button type="submit" onclick="sort('Name')" class="btn btn-outline-secondary rounded-pill"><i class="bi bi-sort-down"></i> Tên sản phẩm</button>
                             </th>
                             <th class="border-0">Danh mục</th>
+                            <th class="border-0">Nhà cung cấp</th>
                             <th class="border-0">
                                 <button type="submit" onclick="sort('Price')" class="btn btn-outline-secondary rounded-pill"><i class="bi bi-sort-down"></i> Giá bán</button>
                             </th>
@@ -118,7 +119,7 @@
                         @if (Model.Products == null || !Model.Products.Any())
                         {
                             <tr>
-                                <td colspan="8" class="text-center py-5 text-muted">Không tìm thấy sản phẩm nào.</td>
+                                <td colspan="9" class="text-center py-5 text-muted">Không tìm thấy sản phẩm nào.</td>
                             </tr>
                         }
                         @foreach (var item in Model.Products)
@@ -136,6 +137,7 @@
                                     <small class="text-muted text-truncate d-block" style="max-width: 200px;">@item.Description</small>
                                 </td>
                                 <td><span class="badge bg-light text-dark border">@item.CategoryName</span></td>
+                                <td>@(item.SupplierName ?? "-")</td>
                                 <td class="fw-bold text-primary">@((item.SellingPrice).ToString("N0", new System.Globalization.CultureInfo("vi-VN"))) VNĐ</td>
                                 <td>
                                     @if (item.StockQuantity < 10)

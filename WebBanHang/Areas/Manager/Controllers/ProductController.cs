@@ -180,6 +180,7 @@ namespace WebBanHang.Areas.Manager.Controllers
                 ImportPrice = vm.ImportPrice,
                 SellingPrice = vm.SellingPrice,
                 Status = vm.Status,
+                SupplierName = vm.SupplierName,
                 StockQuantity = vm.StockQuantity,
                 CreatedBy = userId ?? 0
             };
@@ -194,10 +195,10 @@ namespace WebBanHang.Areas.Manager.Controllers
             TempData["Success"] = "Tạo sản phẩm thành công!";
 
             // Ghi nhận Log tạo sản phẩm
-            //await _auditLogService.LogAsync(
-            //"Product", dto.ProductId, "CreateProduct",
-            //userId ?? 0, HttpContext.Session.GetString("FullName"),
-            //$"Tạo sản phẩm {dto.Code} - {dto.Name}");
+            await _auditLogService.LogAsync(
+            "Product", dto.ProductId, "CreateProduct",
+            userId ?? 0, HttpContext.Session.GetString("FullName"),
+            $"Tạo sản phẩm {dto.Code} - {dto.Name}");
 
             return RedirectToAction("Index");
         }
@@ -230,6 +231,7 @@ namespace WebBanHang.Areas.Manager.Controllers
                 SellingPrice = product.SellingPrice,
                 ImportPrice = product.ImportPrice,
                 StockQuantity = product.StockQuantity,
+                SupplierName = product.SupplierName,
                 Status = product.Status,
                 CreatedBy = product.CreatedBy,
                 CreatedDate = product.CreatedDate ?? DateTime.Now
@@ -311,6 +313,7 @@ namespace WebBanHang.Areas.Manager.Controllers
                 Description = vm.Description,
                 ImportPrice = vm.ImportPrice,
                 StockQuantity = vm.StockQuantity,
+                SupplierName = vm.SupplierName,
                 Images = imageDtos
             };
 
@@ -351,10 +354,10 @@ namespace WebBanHang.Areas.Manager.Controllers
             TempData["Success"] = "Cập nhật sản phẩm thành công!";
 
             // Bước 5b: Ghi nhận Log sửa sản phẩm
-            //await _auditLogService.LogAsync(
-            //"Product", vm.Id, "EditProduct",
-            //HttpContext.Session.GetInt32("UserId") ?? 0, HttpContext.Session.GetString("FullName"),
-            //$"Cập nhật sản phẩm {vm.Code}");
+            await _auditLogService.LogAsync(
+            "Product", vm.Id, "EditProduct",
+            HttpContext.Session.GetInt32("UserId") ?? 0, HttpContext.Session.GetString("FullName"),
+            $"Cập nhật sản phẩm {vm.Code}");
 
             return RedirectToAction("Index");
         }
@@ -374,6 +377,7 @@ namespace WebBanHang.Areas.Manager.Controllers
                 SellingPrice = product.SellingPrice,
                 ImportPrice = product.ImportPrice,
                 StockQuantity = product.StockQuantity,
+                SupplierName = product.SupplierName,
                 Status = product.Status,
                 Description = product.Description,
                 ExistingImages = product.ExistingImages.Select(x => new ProductImageDTO
