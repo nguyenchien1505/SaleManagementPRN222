@@ -1,0 +1,83 @@
+﻿@model IEnumerable<WebBanHang.BLL.DTOs.TicketListItemDTO>
+
+@{
+    ViewData["Title"] = "Hàng đợi Yêu cầu CSKH";
+    Layout = "_SaleLayout";
+    var currentStatus = ViewData["CurrentStatus"] as string;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0"><i class="bi bi-headset me-2 text-primary"></i>Hàng đợi Yêu cầu CSKH</h4>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success border-0 rounded-3 shadow-sm mb-4">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger border-0 rounded-3 shadow-sm mb-4">@TempData["ErrorMessage"]</div>
+}
+
+<form method="get" class="mb-3 d-flex gap-2" style="max-width:300px;">
+    <select name="statusFilter" class="form-select" onchange="this.form.submit()">
+        <option value="">Tất cả (chưa đóng)</option>
+        <option value="New" selected="@(currentStatus == "New")">Mới tạo</option>
+        <option value="InProgress" selected="@(currentStatus == "InProgress")">Đang xử lý</option>
+        <option value="PendingApproval" selected="@(currentStatus == "PendingApproval")">Chờ duyệt</option>
+        <option value="Approved" selected="@(currentStatus == "Approved")">Đã duyệt - chờ hoàn tất</option>
+        <option value="Rejected" selected="@(currentStatus == "Rejected")">Bị từ chối</option>
+        <option value="Resolved" selected="@(currentStatus == "Resolved")">Đã xử lý xong</option>
+    </select>
+</form>
+
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4 py-3">Mã Ticket</th>
+                        <th class="py-3">Khách hàng</th>
+                        <th class="py-3">Sản phẩm</th>
+                        <th class="py-3">Loại</th>
+                        <th class="py-3">Ngày tạo</th>
+                        <th class="py-3">Trạng thái</th>
+                        <th class="pe-4 py-3 text-center">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in Model)
+                    {
+                        <tr>
+                            <td class="ps-4 fw-bold text-primary">@t.TicketCode</td>
+                            <td>@t.CustomerName</td>
+                            <td>@t.ProductName</td>
+                            <td>@(t.TicketType == "WarrantyRequest" ? "Bảo hành" : "Đổi/Trả")</td>
+                            <td>@t.CreatedDate?.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td><span class="badge bg-info-subtle text-info rounded-pill px-3 py-2">@t.Status</span></td>
+                            <td class="pe-4 text-center">
+                                <a asp-area="Sale" asp-controller="Tickets" asp-action="Details" asp-route-id="@t.TicketId"
+                                   class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                    <i class="bi bi-eye"></i> Xem
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr><td colspan="7" class="text-center text-muted py-4">Không có ticket nào</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-info-subtle {
+        background-color: #cff4fc !important;
+        color: #087990 !important;
+        border: 1px solid #b6effc;
+    }
+</style>

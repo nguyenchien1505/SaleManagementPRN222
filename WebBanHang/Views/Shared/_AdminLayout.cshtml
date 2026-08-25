@@ -25,79 +25,73 @@
         </div>
 
         <ul class="sidebar-menu p-0">
+            @{
+                var userRole = Context.Session.GetString("Role");
+            }
 
-            <li class="nav-item">
-                <a class="nav-link @(currentController == "Dashboard" ? "active" : "")" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
-                    <i class="bi bi-speedometer2"></i>
-                    Tổng quan
-                </a>
-            </li>
+            @* --- MỤC DÀNH CHO CẢ ADMIN VÀ MANAGER (QUẢN LÝ BÁN HÀNG) --- *@
+            @if (userRole == "Manager")
+            {
+                <li class="nav-item">
+                    <a class="nav-link @(currentController == "Dashboard" ? "active" : "")" asp-area="Manager" asp-controller="Dashboard" asp-action="Index">
+                        <i class="bi bi-speedometer2"></i> Tổng quan
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentController == "Product" ? "active" : "")" asp-area="Manager" asp-controller="Product" asp-action="Index">
+                        <i class="bi bi-box-seam-fill"></i> Sản phẩm
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentController == "Category" ? "active" : "")" asp-area="Manager" asp-controller="Category" asp-action="Index">
+                        <i class="bi bi-grid-fill"></i> Danh mục
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentController == "Promotion" ? "active" : "")" asp-area="Manager" asp-controller="Promotion" asp-action="Index">
+                        <i class="bi bi-tags-fill"></i> Mã giảm giá
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentController == "Inventory" ? "active" : "")" asp-area="Manager" asp-controller="Inventory" asp-action="Index">
+                        <i class="bi bi-boxes"></i> Quản lý kho
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentController == "Orders" ? "active" : "")" asp-area="Manager" asp-controller="Orders" asp-action="Index">
+                        <i class="bi bi-receipt"></i> Đơn hàng
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentController == "TicketApproval" ? "active" : "")" asp-area="Manager" asp-controller="TicketApproval" asp-action="Index">
+                        <i class="bi bi-headset"></i> Duyệt Yêu cầu CSKH
+                    </a>
+                </li>
 
-            <li class="nav-item">
-                <a class="nav-link @(currentController == "Product" ? "active" : "")" asp-area="Admin" asp-controller="Product" asp-action="Index">
-                    <i class="bi bi-box-seam-fill"></i>
-                    Sản phẩm
-                </a>
-            </li>
+            }
 
-            <li class="nav-item">
-
-                <a class="nav-link @(currentController == "Category" ? "active" : "")" asp-area="Admin" asp-controller="Category" asp-action="Index">
-
-                    <i class="bi bi-grid-fill"></i>
-                    Danh mục
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link @(currentController == "Promotion" ? "active" : "")" asp-area="Admin" asp-controller="Promotion" asp-action="Index">
-                    <i class="bi bi-tags-fill"></i>
-                    Mã giảm giá
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link @(currentController == "Inventory" ? "active" : "")" asp-area="Admin" asp-controller="Inventory" asp-action="Index">
-                    <i class="bi bi-boxes"></i>
-                    Quản lý kho
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link @(currentController == "Users" ? "active" : "")" asp-area="Admin" asp-controller="Users" asp-action="Index">
-                    <i class="bi bi-person-badge"></i>
-                    Người dùng
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link @(currentController == "AuditLog" ? "active" : "")" asp-area="Admin" asp-controller="AuditLog" asp-action="Index">
-                    <i class="bi bi-clock-history"></i>
-                    Audit Log
-                </a>
-            </li>
-
-            @* <li class="nav-item">
-                <a class="nav-link @(currentController == "Report" ? "active" : "")" asp-area="Admin" asp-controller="Report" asp-action="Index">
-                    <i class="bi bi-bar-chart-line-fill"></i>
-                    Báo cáo
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link @(currentController == "Setting" ? "active" : "")" asp-area="Admin" asp-controller="Setting" asp-action="Index">
-                    <i class="bi bi-gear-fill"></i>
-                    Cài đặt
-                </a>
-            </li> *@
-
+            @* --- MỤC CHỈ DÀNH RIÊNG CHO ADMIN --- *@
+            @if (userRole == "Admin")
+            {
+                <li class="nav-item">
+                    <a class="nav-link @(currentController == "Users" ? "active" : "")" asp-area="Admin" asp-controller="Users" asp-action="Index">
+                        <i class="bi bi-person-badge"></i> Người dùng
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentController == "AuditLog" ? "active" : "")" asp-area="Admin" asp-controller="AuditLog" asp-action="Index">
+                        <i class="bi bi-clock-history"></i> Audit Log
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentController == "Tickets" ? "active" : "")" asp-area="Sale" asp-controller="Tickets" asp-action="Index">
+                        <i class="bi bi-headset"></i> Xử lý Yêu cầu CSKH
+                    </a>
+                </li>
+            }
         </ul>
 
-        <div class="sidebar-footer">
-            <a asp-area="Customer" asp-controller="Home" asp-action="Index" class="nav-link text-primary fw-semibold">
-                <i class="bi bi-shop me-2"></i>
-                Xem cửa hàng
-            </a>
-        </div>
+
 
     </nav>
 
@@ -115,7 +109,7 @@
                 <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <div class="text-end d-none d-sm-block me-3">
                         <small class="d-block text-secondary mb-0" style="font-size:0.75rem;">
-                            Xin chào, 
+                            Xin chào,
                         </small>
                         <span class="fw-bold text-dark">
                             @Context.Session.GetString("FullName")
@@ -140,7 +134,7 @@
                     </li>
                     <li><hr class="dropdown-divider"></li>
                     <li>
-                        <a class="dropdown-item text-danger fw-bold" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                        <a class="dropdown-item text-danger fw-bold" asp-area="@(Context.Session.GetString("Role") == "Manager" ? "Manager" : "Admin")" asp-controller="@(Context.Session.GetString("Role") == "Manager" ? "Dashboard" : "Users")" asp-action="Index">
                             <i class="bi bi-speedometer2 me-2"></i>
                             Trang Quản trị (Admin)
                         </a>

@@ -5,7 +5,7 @@ namespace WebBanHang.BLL.Services.Interfaces
 {
     public interface IInventoryService
     {
-        void NhapKho(int productId, int quantity, int userId, string? note = null);
+        void NhapKho(int productId, int quantity, int userId, string? supplierName = null, string? note = null);
 
         void XuatKho(int productId, int quantity, int userId, string? note = null);
 

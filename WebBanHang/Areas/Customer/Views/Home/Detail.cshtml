@@ -7,7 +7,7 @@
     int? sessionUserId = Context.Session.GetInt32("UserId");
     bool isUserLoggedIn = sessionUserId.HasValue;
     string? userRole = Context.Session.GetString("Role");
-    bool isAdmin = userRole == "Admin";
+    bool isAdmin = userRole == "Manager" || userRole == "Admin" || userRole == "Sales";
 
     string loginUrl = Url.Action("Login", "Account", new { area = "", returnUrl = Context.Request.Path + Context.Request.QueryString })!;
 
@@ -126,6 +126,9 @@
 <div class="container py-4 py-lg-5">
     @if (isAdmin)
     {
+
+        if(userRole == "Manager")
+        {
         <div class="alert alert-warning border-0 rounded-4 p-3 mb-4 d-flex flex-wrap align-items-center justify-content-between shadow-sm">
             <div class="d-flex align-items-center me-3 my-1">
                 <i class="bi bi-shield-lock-fill fs-3 text-warning me-3"></i>
@@ -135,17 +138,18 @@
                 </div>
             </div>
             <div class="d-flex flex-wrap gap-2 my-1">
-                <a asp-area="Admin" asp-controller="Product" asp-action="Edit" asp-route-id="@Model.ProductId" class="btn btn-warning fw-bold rounded-pill px-3 shadow-sm">
+                <a asp-area="Manager" asp-controller="Product" asp-action="Edit" asp-route-id="@Model.ProductId" class="btn btn-warning fw-bold rounded-pill px-3 shadow-sm">
                     <i class="bi bi-pencil-square me-1"></i> Sửa sản phẩm này
                 </a>
-                <a asp-area="Admin" asp-controller="Inventory" asp-action="Index" class="btn btn-outline-dark fw-bold rounded-pill px-3">
+                <a asp-area="Manager" asp-controller="Inventory" asp-action="Index" class="btn btn-outline-dark fw-bold rounded-pill px-3">
                     <i class="bi bi-boxes me-1"></i> Quản lý kho
                 </a>
-                <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="btn btn-dark fw-bold rounded-pill px-3">
+                <a asp-area="Manager" asp-controller="Dashboard" asp-action="Index" class="btn btn-dark fw-bold rounded-pill px-3">
                     <i class="bi bi-speedometer2 me-1"></i> Về Dashboard
                 </a>
             </div>
         </div>
+        }
     }
 
     <!-- Breadcrumb -->

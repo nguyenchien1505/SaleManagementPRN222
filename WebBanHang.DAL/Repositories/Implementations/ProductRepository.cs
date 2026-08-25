@@ -80,6 +80,7 @@ namespace WebBanHang.DAL.Repositories.Implementations
             existingProduct.ImportPrice = product.ImportPrice;
             existingProduct.Description = product.Description;
             existingProduct.SellingPrice = product.SellingPrice;
+            existingProduct.SupplierName = product.SupplierName;
             existingProduct.ProductImages = product.ProductImages;
             existingProduct.Status = product.Status;
             existingProduct.StockQuantity = product.StockQuantity;

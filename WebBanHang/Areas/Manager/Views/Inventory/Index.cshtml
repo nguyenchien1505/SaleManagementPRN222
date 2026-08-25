@@ -1,0 +1,73 @@
+﻿@using WebBanHang.DAL.Entities
+@model List<InventoryTransaction>
+@{
+    ViewData["Title"] = "Lịch sử kho";
+}
+
+<div class="container-fluid px-4 py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark m-0">Lịch Sử Biến Động Kho</h2>
+            <p class="text-muted small m-0">Theo dõi toàn bộ lịch sử nhập xuất và điều chỉnh hàng hóa</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Inbound" class="btn btn-success d-flex align-items-center gap-2 px-3" style="border-radius: 10px; font-weight: 500; background-color: #198754; border-color: #198754;">
+                <i class="bi bi-plus-circle"></i> Nhập kho
+            </a>
+            <a asp-action="Stock" class="btn btn-outline-secondary d-flex align-items-center gap-2 px-3" style="border-radius: 10px; font-weight: 500;">
+                <i class="bi bi-boxes"></i> Kiểm tra tồn kho
+            </a>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm" style="border-radius: 15px; overflow: hidden;">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 text-center">
+                <thead class="table-dark" style="background-color: #212529;">
+                    <tr>
+                        <th class="py-3" style="width: 18%;">Ngày</th>
+                        <th class="py-3" style="width: 12%;">Loại</th>
+                        <th class="py-3" style="width: 22%;">Sản phẩm</th>
+                        <th class="py-3" style="width: 15%;">Nhà cung cấp</th>
+                        <th class="py-3" style="width: 12%;">Số lượng</th>
+                        <th class="py-3" style="width: 21%;">Ghi chú</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model == null || !Model.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="py-5 text-muted">Chưa có giao dịch kho nào</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model)
+                        {
+                            bool isNhap = item.Type?.ToLower() == "nhap" || item.Type?.ToLower() == "import";
+                            <tr>
+                                <td class="py-3 text-muted">@item.CreatedDate?.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td class="py-3">
+                                    @if (isNhap)
+                                    {
+                                        <span class="badge bg-success-subtle text-success px-3 py-2 text-uppercase font-monospace" style="border-radius: 6px; font-weight: 600; background-color: #e8f5e9 !important;">IMPORT</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger-subtle text-danger px-3 py-2 text-uppercase font-monospace" style="border-radius: 6px; font-weight: 600; background-color: #ffebee !important;">EXPORT</span>
+                                    }
+                                </td>
+                                <td class="py-3 fw-semibold text-dark text-start ps-4">@item.Product?.Name</td>
+                                <td class="py-3 text-start ps-4">@(item.Product?.SupplierName ?? "-")</td>
+                                <td class="py-3 font-monospace fw-bold @(isNhap ? "text-success" : "text-danger")">
+                                    @(isNhap ? "+" : " ")@item.Quantity
+                                </td>
+                                <td class="py-3 text-muted text-start ps-4">@item.Note</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

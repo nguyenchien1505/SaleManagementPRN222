@@ -23,6 +23,7 @@ namespace WebBanHang.ViewModels
         public string Status { get; set; }
         [Required]
         public string Description { get; set; }
+        public string? SupplierName { get; set; }
         [Range(1, int.MaxValue, ErrorMessage = "Vui lòng chọn danh mục")]
         public int CategoryId { get; set; }
         [ValidateNever]

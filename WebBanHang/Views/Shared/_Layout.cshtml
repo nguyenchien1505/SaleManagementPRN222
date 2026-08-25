@@ -109,11 +109,12 @@
 
                                     <li><hr class="dropdown-divider"></li>
 
-                                    @* MENU ĐIỀU HƯỚNG DÀNH CHO ADMIN *@
-                                    @if (Context.Session.GetString("Role") == "Admin")
+
+                                    @* MENU ĐIỀU HƯỚNG DÀNH CHO Manager *@
+                                    @if (Context.Session.GetString("Role") == "Manager")
                                     {
                                         <li>
-                                            <a class="dropdown-item text-danger fw-bold" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                                            <a class="dropdown-item text-danger fw-bold" asp-area="Manager" asp-controller="Dashboard" asp-action="Index">
                                                 <i class="bi bi-speedometer2 me-2"></i>
                                                 Trang Quản trị (Admin)
                                             </a>
@@ -121,20 +122,20 @@
                                         <li><hr class="dropdown-divider"></li>
                                     }
 
-                                    @* MENU ĐIỀU HƯỚNG KHO DÀNH CHO ADMIN HOẶC SALES *@
-                                    @if (Context.Session.GetString("Role") == "Admin" || Context.Session.GetString("Role") == "Sales")
+                                    @* MENU ĐIỀU HƯỚNG KHO DÀNH CHO Manager HOẶC SALES *@
+                                    @if (Context.Session.GetString("Role") == "Manager" || Context.Session.GetString("Role") == "Sales")
                                     {
                                         <li>
-                                            <a class="dropdown-item text-primary fw-bold" asp-area="Admin" asp-controller="Inventory" asp-action="Stock">
+                                            <a class="dropdown-item text-primary fw-bold" asp-area="Manager" asp-controller="Inventory" asp-action="Stock">
                                                 <i class="bi bi-boxes me-2"></i>
                                                 Xem Tồn Kho (Stock)
                                             </a>
                                         </li>
 
-                                        @if (Context.Session.GetString("Role") == "Admin")
+                                        @if (Context.Session.GetString("Role") == "Manager")
                                         {
                                             <li>
-                                                <a class="dropdown-item text-success fw-bold" asp-area="Admin" asp-controller="Inventory" asp-action="Inbound">
+                                                <a class="dropdown-item text-success fw-bold" asp-area="Manager" asp-controller="Inventory" asp-action="Inbound">
                                                     <i class="bi bi-download me-2"></i>
                                                     Nhập Kho (Inbound)
                                                     Chin
@@ -142,24 +143,35 @@
                                             </li>
                                         }
 
+                                        @* Sale (hoặc Manager thay mặt) xử lý hàng đợi yêu cầu CSKH *@
+                                        <li>
+                                            <a class="dropdown-item text-warning fw-bold" asp-area="Sale" asp-controller="Tickets" asp-action="Index">
+                                                <i class="bi bi-headset me-2"></i>
+                                                Xử lý Yêu cầu CSKH
+                                            </a>
+                                        </li>
+
                                         <li><hr class="dropdown-divider"></li>
                                     }
+                                    @if (Context.Session.GetString("Role") == "Customer")
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" asp-area="Customer" asp-controller="Account" asp-action="Profile">
+                                                <i class="bi bi-person me-2"></i>
+                                                Hồ sơ
+                                            </a>
+                                        </li>
 
-                                    <li>
-                                        <a class="dropdown-item" asp-area="Customer" asp-controller="Account" asp-action="Profile">
-                                            <i class="bi bi-person me-2"></i>
-                                            Hồ sơ
-                                        </a>
-                                    </li>
 
 
+                                        <li><a class="dropdown-item" asp-area="Customer" asp-controller="Cart" asp-action="Index"><i class="bi bi-cart3 me-2"></i> Giỏ hàng của tôi</a></li>
 
-                                    <li><a class="dropdown-item" asp-area="Customer" asp-controller="Cart" asp-action="Index"><i class="bi bi-cart3 me-2"></i> Giỏ hàng của tôi</a></li>
+                                        <li><a class="dropdown-item" asp-area="Customer" asp-controller="Order" asp-action="MyOrders"><i class="bi bi-bag-check me-2"></i> Đơn hàng của tôi </a></li>
 
-                                    <li><a class="dropdown-item" asp-area="Customer" asp-controller="Order" asp-action="MyOrders"><i class="bi bi-bag-check me-2"></i> Đơn hàng của tôi </a></li>
+                                        <li><a class="dropdown-item" asp-area="Customer" asp-controller="Ticket" asp-action="MyTickets"><i class="bi bi-headset me-2"></i> Yêu cầu CSKH của tôi </a></li>
 
-                                    <li><hr class="dropdown-divider"></li>
-
+                                        <li><hr class="dropdown-divider"></li>
+                                    }
                                     <li>
                                         <form asp-controller="Account" asp-action="Logout" asp-area="" method="post" class="m-0 p-0">
                                             <button type="submit"

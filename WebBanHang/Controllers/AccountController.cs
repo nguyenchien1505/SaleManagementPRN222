@@ -13,9 +13,12 @@ namespace WebBanHang.Controllers
     public class AccountController : Controller
     {
         private readonly IUserService _service;
-        public AccountController(IUserService userService)
+        private readonly IConfiguration _configuration;
+
+        public AccountController(IUserService userService, IConfiguration configuration)
         {
             _service = userService;
+            _configuration = configuration;
         }
         //Login, Logout, Register
         [HttpGet]
@@ -53,7 +56,12 @@ namespace WebBanHang.Controllers
 
             if (user.Role == "Admin")
             {
-                return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+                return RedirectToAction("Index", "Users", new { area = "Admin" });
+            }
+
+            if (user.Role == "Manager")
+            {
+                return RedirectToAction("Index", "Dashboard", new { area = "Manager" });
             }
 
             if (user.Role == "Sales")
@@ -110,6 +118,15 @@ namespace WebBanHang.Controllers
         [HttpGet]
         public IActionResult GoogleLogin()
         {
+            var clientId = _configuration["Authentication:Google:ClientId"];
+            var clientSecret = _configuration["Authentication:Google:ClientSecret"];
+
+            if (string.IsNullOrWhiteSpace(clientId) || string.IsNullOrWhiteSpace(clientSecret))
+            {
+                TempData["Error"] = "Đăng nhập Google chưa được cấu hình.";
+                return RedirectToAction(nameof(Login), new { area = "" });
+            }
+
             var redirectUrl = Url.Action(nameof(GoogleResponse));
             var properties = new Microsoft.AspNetCore.Authentication.AuthenticationProperties
             {
@@ -155,7 +172,10 @@ namespace WebBanHang.Controllers
             HttpContext.Session.SetString("FullName", user.FullName);
 
             if (user.Role == "Admin")
-                return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+                return RedirectToAction("Index", "Users", new { area = "Admin" });
+
+            if (user.Role == "Manager")
+                return RedirectToAction("Index", "Dashboard", new { area = "Manager" });
 
             if (user.Role == "Sales")
                 return RedirectToAction("Index", "DashBoard", new { area = "Sale" });

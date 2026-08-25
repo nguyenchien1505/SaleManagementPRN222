@@ -21,6 +21,7 @@ namespace WebBanHang.BLL.DTOs
         public decimal SellingPrice { get; set; }
         public int StockQuantity { get; set; }
         public string? Status { get; set; }
+        public string? SupplierName { get; set; }
         public int CreatedBy { get; set; }
 
         public DateTime? CreatedDate { get; set; }

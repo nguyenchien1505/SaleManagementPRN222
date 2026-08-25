@@ -11,6 +11,7 @@ namespace WebBanHang.ViewModels
         public decimal SellingPrice { get; set; }
         public decimal ImportPrice { get; set; }
         public int StockQuantity { get; set; }
+        public string? SupplierName { get; set; }
         public string Status { get; set; }
         public string Description { get; set; }
         public string CreateBy { get; set; }

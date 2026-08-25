@@ -67,6 +67,7 @@
                             <th class="border-0 py-3" style="width: 80px;">Ảnh</th>
                             <th class="border-0 py-3">Tên sản phẩm</th>
                             <th class="border-0 py-3">Danh mục</th>
+                            <th class="border-0 py-3">Nhà cung cấp</th>
                             <th class="border-0 py-3">Giá bán</th>
                             <th class="border-0 py-3">Tồn kho</th>
                             <th class="border-0 py-3" style="width: 140px;">Trạng thái</th>
@@ -77,7 +78,7 @@
                         @if (Model.Products == null || !Model.Products.Any())
                         {
                             <tr>
-                                <td colspan="8" class="text-center py-5 text-muted italic">
+                                <td colspan="9" class="text-center py-5 text-muted italic">
                                     <i class="bi bi-inbox display-5 d-block mb-2 opacity-40 text-secondary"></i>
                                     Không tìm thấy dữ liệu sản phẩm phù hợp.
                                 </td>
@@ -107,6 +108,7 @@
                                             @item.CategoryName
                                         </span>
                                     </td>
+                                    <td>@(item.SupplierName ?? "-")</td>
                                     <td class="fw-bold text-dark">
                                         @((item.SellingPrice).ToString("N0", new System.Globalization.CultureInfo("vi-VN"))) đ
                                     </td>

@@ -27,6 +27,8 @@ public partial class Product
 
     public DateTime? CreatedDate { get; set; }
 
+    public string? SupplierName { get; set; }
+
     public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
 
     public virtual Category Category { get; set; } = null!;
